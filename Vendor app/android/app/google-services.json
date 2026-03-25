@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "100879464630",
+    "project_id": "portal-9524e",
+    "storage_bucket": "portal-9524e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:100879464630:android:2a56ef0c36129fd92cce17",
+        "android_client_info": {
+          "package_name": "com.vendor.portal_mart_store_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDuD7JPPP-9xGrI_J5aygfNvvSKjqUa6Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
