@@ -26,18 +26,20 @@ Future<void> main() async {
   Map<String, Map<String, String>> languages = await di.init();
 
   if(!GetPlatform.isWeb) {
-    if(GetPlatform.isAndroid) {
-      await Firebase.initializeApp(
-        options: const FirebaseOptions(
-          apiKey: "AIzaSyCc3OCd5I2xSlnftZ4bFAbuCzMhgQHLivA",
-          appId: "1:491987943015:android:9795ba69e89c684b8f1ec2",
-          messagingSenderId: "491987943015",
-          projectId: "stackmart-500c7",
-        ),
-      );
-    }else {
-      await Firebase.initializeApp();
-    }
+    try {
+      if(GetPlatform.isAndroid) {
+        await Firebase.initializeApp(
+          options: const FirebaseOptions(
+            apiKey: "AIzaSyCc3OCd5I2xSlnftZ4bFAbuCzMhgQHLivA",
+            appId: "1:491987943015:android:9795ba69e89c684b8f1ec2",
+            messagingSenderId: "491987943015",
+            projectId: "stackmart-500c7",
+          ),
+        );
+      }else {
+        await Firebase.initializeApp();
+      }
+    } catch(_) {}
   }
 
   NotificationBodyModel? body;
