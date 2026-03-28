@@ -36,11 +36,21 @@ class NotificationHelper {
       android: androidInitialize,
       iOS: iOSInitialize,
     );
-    flutterLocalNotificationsPlugin
+    final androidPlugin = flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
-        >()!
-        .requestNotificationsPermission();
+        >()!;
+    androidPlugin.requestNotificationsPermission();
+    await androidPlugin.createNotificationChannel(
+      const AndroidNotificationChannel(
+        '6ammart',
+        'პარტნიორი შეტყობინებები',
+        importance: Importance.max,
+        playSound: true,
+        sound: RawResourceAndroidNotificationSound('notification'),
+        enableVibration: true,
+      ),
+    );
     flutterLocalNotificationsPlugin.initialize(
       initializationsSettings,
       onDidReceiveNotificationResponse: (NotificationResponse load) async {
