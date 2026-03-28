@@ -43,7 +43,7 @@ class NotificationHelper {
     androidPlugin.requestNotificationsPermission();
     await androidPlugin.createNotificationChannel(
       const AndroidNotificationChannel(
-        '6ammart',
+        'portal_notifications',
         'პარტნიორი შეტყობინებები',
         importance: Importance.max,
         playSound: true,
@@ -460,7 +460,7 @@ class NotificationHelper {
   ) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-          '6ammart',
+          'portal_notifications',
           AppConstants.appName,
           playSound: true,
           importance: Importance.max,
@@ -493,7 +493,7 @@ class NotificationHelper {
     );
     AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-          '6ammart',
+          'portal_notifications',
           AppConstants.appName,
           importance: Importance.max,
           styleInformation: bigTextStyleInformation,
@@ -536,7 +536,7 @@ class NotificationHelper {
         );
     final AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-          '6ammart',
+          'portal_notifications',
           AppConstants.appName,
           largeIcon: FilePathAndroidBitmap(largeIconPath),
           priority: Priority.max,
@@ -673,7 +673,7 @@ Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) async {
 Future<void> _initService() async {
   FlutterForegroundTask.init(
     androidNotificationOptions: AndroidNotificationOptions(
-      channelId: '6ammart',
+      channelId: 'portal_notifications',
       channelName: 'Foreground Service Notification',
       channelDescription:
           'This notification appears when the foreground service is running.',
