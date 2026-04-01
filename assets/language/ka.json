@@ -1496,6 +1496,7 @@
   "notification_new_order_placed_title": "ახალი შეკვეთა",
   "notification_new_order_alert_confirm_to_proceed": "ახალი შეკვეთის შეტყობინება, გასაგრძელებლად დაადასტურეთ",
   "notification_order_prefix": "შეკვეთა",
+  "notification_is_processing": "შეკვეთა მუშავდება",
   "notification_picked_up": "აღებულია",
   "notification_delivered_successfully": "წარმატებით ჩაბარდა",
   "notification_open_app_check_order_details": "გახსენით აპი და გადაამოწმეთ შეკვეთის დეტალები."

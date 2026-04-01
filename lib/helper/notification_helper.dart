@@ -22,6 +22,7 @@ import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart_store/features/dashboard/widgets/new_request_dialog_widget.dart';
 
 class NotificationHelper {
@@ -379,6 +380,25 @@ class NotificationHelper {
     return _localizedNotificationText(body);
   }
 
+  static Future<bool> shouldUseGeorgianNotificationText() async {
+    if (Get.locale?.languageCode == 'ka') {
+      return true;
+    }
+
+    try {
+      final SharedPreferences preferences =
+          await SharedPreferences.getInstance();
+      final List<String?> languageCodes = [
+        preferences.getString(AppConstants.languageCode),
+        preferences.getString(AppConstants.cacheLanguageCode),
+      ];
+
+      return languageCodes.any((code) => code?.toLowerCase() == 'ka');
+    } catch (_) {
+      return false;
+    }
+  }
+
   static String _localizedNotificationText(
     String? text, {
     bool isTitle = false,
@@ -396,6 +416,10 @@ class NotificationHelper {
       'New order placed': _translatedLabel(
         'notification_new_order_placed_title',
         'ახალი შეკვეთა',
+      ),
+      'Order is processing': _translatedLabel(
+        'notification_is_processing',
+        'შეკვეთა მუშავდება',
       ),
     };
 
@@ -701,10 +725,11 @@ Future<ServiceRequestResult> _startService(String? orderId) async {
   if (await FlutterForegroundTask.isRunningService) {
     return FlutterForegroundTask.restartService();
   } else {
-    final String title = Get.locale?.languageCode == 'ka'
+    final bool isKa = await NotificationHelper.shouldUseGeorgianNotificationText();
+    final String title = isKa
         ? '${NotificationHelper.localizedTitle('New order placed')}${orderId != null && orderId.isNotEmpty ? ' (#$orderId)' : ''}'
         : 'You got a new order ($orderId)';
-    final String body = Get.locale?.languageCode == 'ka'
+    final String body = isKa
         ? NotificationHelper._translatedLabel(
             'notification_open_app_check_order_details',
             'გახსენით აპი და გადაამოწმეთ შეკვეთის დეტალები.',
@@ -784,12 +809,13 @@ class MyTaskHandler extends TaskHandler {
   }
 
   @override
-  void onNotificationDismissed() {
+  void onNotificationDismissed() async {
+    final bool isKa = await NotificationHelper.shouldUseGeorgianNotificationText();
     FlutterForegroundTask.updateService(
-      notificationTitle: Get.locale?.languageCode == 'ka'
+      notificationTitle: isKa
           ? NotificationHelper.localizedTitle('New order placed')
           : 'You got a new order!',
-      notificationText: Get.locale?.languageCode == 'ka'
+      notificationText: isKa
           ? NotificationHelper._translatedLabel(
               'notification_open_app_check_order_details',
               'გახსენით აპი და გადაამოწმეთ შეკვეთის დეტალები.',
