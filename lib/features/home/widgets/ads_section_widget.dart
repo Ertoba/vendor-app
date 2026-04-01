@@ -23,7 +23,13 @@ class AdsSectionWidget extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
                 color: Theme.of(context).cardColor,
-                boxShadow: const [BoxShadow(color: Colors.black12, spreadRadius: 0, blurRadius: 5)],
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    spreadRadius: 0,
+                    blurRadius: 5,
+                  ),
+                ],
               ),
               child: Container(
                 decoration: BoxDecoration(
@@ -31,60 +37,80 @@ class AdsSectionWidget extends StatelessWidget {
                   color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                 ),
                 padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-                child: Row(children: [
-
-                  Column(
+                child: Row(
+                  children: [
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                    Text('want_to_get_highlighted'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
-                    const SizedBox(height: Dimensions.paddingSizeSmall),
+                        Text(
+                          'want_to_get_highlighted'.tr,
+                          style: robotoBold.copyWith(
+                            fontSize: Dimensions.fontSizeLarge,
+                          ),
+                        ),
+                        const SizedBox(height: Dimensions.paddingSizeSmall),
 
-                    Text(
-                      'in_the_customer_app_and_websites'.tr,
-                      textAlign: TextAlign.center,
-                      style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.7)),
+                        Text(
+                          'in_the_customer_app_and_websites'.tr,
+                          textAlign: TextAlign.center,
+                          style: robotoRegular.copyWith(
+                            fontSize: Dimensions.fontSizeDefault,
+                            color: Theme.of(context).textTheme.bodyLarge!.color!
+                                .withValues(alpha: 0.7),
+                          ),
+                        ),
+                        const SizedBox(height: Dimensions.paddingSizeSmall),
+                      ],
                     ),
-                    const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                  ]),
-
-                ]),
+                  ],
+                ),
               ),
             ),
 
             const Positioned(
-              top: 3, right: 3,
-              child: CustomAssetImageWidget(Images.adsRoundShape, height: 100, width: 100, color: Colors.white),
+              top: 3,
+              right: 3,
+              child: CustomAssetImageWidget(
+                Images.adsRoundShape,
+                height: 100,
+                width: 100,
+                color: Colors.white,
+              ),
             ),
 
             const Positioned(
-              bottom: 3, left: 3,
-              child: CustomAssetImageWidget(Images.adsCurveShape, height: 100, width: 100, color: Colors.white),
+              bottom: 3,
+              left: 3,
+              child: CustomAssetImageWidget(
+                Images.adsCurveShape,
+                height: 100,
+                width: 100,
+                color: Colors.white,
+              ),
             ),
-
           ],
         ),
 
         Positioned(
-          bottom: 15, left: 15,
-          width: 120,
+          bottom: 15,
+          left: 15,
+          width: 150,
           child: CustomButtonWidget(
             buttonText: 'create_ads'.tr,
             fontWeight: FontWeight.w500,
-            fontSize: Dimensions.fontSizeDefault,
-            onPressed: (){
+            fontSize: Dimensions.fontSizeSmall,
+            onPressed: () {
               Get.toNamed(RouteHelper.getCreateAdvertisementRoute());
             },
           ),
         ),
 
         const Positioned(
-          top: 30, right: 15,
-          child:  CustomAssetImageWidget(Images.adsImage, height: 85, width: 98),
+          top: 30,
+          right: 15,
+          child: CustomAssetImageWidget(Images.adsImage, height: 85, width: 98),
         ),
-
       ],
     );
   }
 }
-
