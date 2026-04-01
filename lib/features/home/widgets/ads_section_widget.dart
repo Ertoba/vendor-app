@@ -45,7 +45,7 @@ class AdsSectionWidget extends StatelessWidget {
                         Text(
                           'want_to_get_highlighted'.tr,
                           style: robotoBold.copyWith(
-                            fontSize: Dimensions.fontSizeLarge,
+                            fontSize: Dimensions.fontSizeLarge * 0.9,
                           ),
                         ),
                         const SizedBox(height: Dimensions.paddingSizeSmall),
@@ -54,7 +54,7 @@ class AdsSectionWidget extends StatelessWidget {
                           'in_the_customer_app_and_websites'.tr,
                           textAlign: TextAlign.center,
                           style: robotoRegular.copyWith(
-                            fontSize: Dimensions.fontSizeDefault,
+                            fontSize: Dimensions.fontSizeDefault * 0.9,
                             color: Theme.of(context).textTheme.bodyLarge!.color!
                                 .withValues(alpha: 0.7),
                           ),
