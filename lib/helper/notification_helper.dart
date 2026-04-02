@@ -342,14 +342,18 @@ class NotificationHelper {
     String? title;
     String? body;
     String? image;
-    NotificationBodyModel notificationBody = convertNotification(
-      message.data,
-    );
+    NotificationBodyModel notificationBody = convertNotification(message.data);
 
-    title = localizedTitle(message.data['title']);
-    body = localizedBody(message.data['body']);
-    image =
-        (message.data['image'] != null && message.data['image'].isNotEmpty)
+    final bool useGeorgianText = await shouldUseGeorgianNotificationText();
+    title = await localizedTitleAsync(
+      message.data['title'],
+      forceGeorgian: useGeorgianText,
+    );
+    body = await localizedBodyAsync(
+      message.data['body'],
+      forceGeorgian: useGeorgianText,
+    );
+    image = (message.data['image'] != null && message.data['image'].isNotEmpty)
         ? message.data['image'].startsWith('http')
               ? message.data['image']
               : '${AppConstants.baseUrl}/storage/app/public/notification/${message.data['image']}'
@@ -372,12 +376,30 @@ class NotificationHelper {
     }
   }
 
-  static String localizedTitle(String? title) {
-    return _localizedNotificationText(title, isTitle: true);
+  static String localizedTitle(String? title, {bool forceGeorgian = false}) {
+    return _localizedNotificationText(
+      title,
+      isTitle: true,
+      useGeorgian: forceGeorgian,
+    );
   }
 
-  static String localizedBody(String? body) {
-    return _localizedNotificationText(body);
+  static String localizedBody(String? body, {bool forceGeorgian = false}) {
+    return _localizedNotificationText(body, useGeorgian: forceGeorgian);
+  }
+
+  static Future<String> localizedTitleAsync(
+    String? title, {
+    bool forceGeorgian = false,
+  }) async {
+    return localizedTitle(title, forceGeorgian: forceGeorgian);
+  }
+
+  static Future<String> localizedBodyAsync(
+    String? body, {
+    bool forceGeorgian = false,
+  }) async {
+    return localizedBody(body, forceGeorgian: forceGeorgian);
   }
 
   static Future<bool> shouldUseGeorgianNotificationText() async {
@@ -402,9 +424,10 @@ class NotificationHelper {
   static String _localizedNotificationText(
     String? text, {
     bool isTitle = false,
+    bool useGeorgian = false,
   }) {
     final String rawText = text?.trim() ?? '';
-    if (rawText.isEmpty || Get.locale?.languageCode != 'ka') {
+    if (rawText.isEmpty || !(useGeorgian || Get.locale?.languageCode == 'ka')) {
       return rawText;
     }
 
@@ -725,9 +748,10 @@ Future<ServiceRequestResult> _startService(String? orderId) async {
   if (await FlutterForegroundTask.isRunningService) {
     return FlutterForegroundTask.restartService();
   } else {
-    final bool isKa = await NotificationHelper.shouldUseGeorgianNotificationText();
+    final bool isKa =
+        await NotificationHelper.shouldUseGeorgianNotificationText();
     final String title = isKa
-        ? '${NotificationHelper.localizedTitle('New order placed')}${orderId != null && orderId.isNotEmpty ? ' (#$orderId)' : ''}'
+        ? '${NotificationHelper.localizedTitle('New order placed', forceGeorgian: isKa)}${orderId != null && orderId.isNotEmpty ? ' (#$orderId)' : ''}'
         : 'You got a new order ($orderId)';
     final String body = isKa
         ? NotificationHelper._translatedLabel(
@@ -810,10 +834,14 @@ class MyTaskHandler extends TaskHandler {
 
   @override
   void onNotificationDismissed() async {
-    final bool isKa = await NotificationHelper.shouldUseGeorgianNotificationText();
+    final bool isKa =
+        await NotificationHelper.shouldUseGeorgianNotificationText();
     FlutterForegroundTask.updateService(
       notificationTitle: isKa
-          ? NotificationHelper.localizedTitle('New order placed')
+          ? NotificationHelper.localizedTitle(
+              'New order placed',
+              forceGeorgian: isKa,
+            )
           : 'You got a new order!',
       notificationText: isKa
           ? NotificationHelper._translatedLabel(
