@@ -1512,5 +1512,9 @@
   "selected_email_is_invalid": "შეყვანილი ელფოსტა არასწორია.",
   "selected_phone_is_invalid": "შეყვანილი ტელეფონის ნომერი არასწორია.",
   "request_failed": "მოთხოვნა ვერ შესრულდა.",
-  "connection_to_api_server_failed": "სერვერთან დაკავშირება ვერ მოხერხდა. შეამოწმეთ ინტერნეტი."
+  "connection_to_api_server_failed": "სერვერთან დაკავშირება ვერ მოხერხდა. შეამოწმეთ ინტერნეტი.",
+  "notification_loyalty_point_transaction": "ქულების ტრანზაქცია",
+  "notification_loyalty_points_earned_prefix": "თქვენ დაგერიცხათ",
+  "notification_loyalty_points_converted_prefix": "თქვენ გადაცვალეთ",
+  "notification_loyalty_points_unit": "ქულა"
 }
