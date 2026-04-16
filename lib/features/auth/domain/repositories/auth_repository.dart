@@ -49,12 +49,7 @@ class AuthRepository implements AuthRepositoryInterface {
   Future<String?> _saveDeviceToken() async {
     String? deviceToken = '';
     if(!GetPlatform.isWeb) {
-      try {
-        deviceToken = await FirebaseMessaging.instance.getToken()
-            .timeout(const Duration(seconds: 10));
-      } catch (_) {
-        deviceToken = null;
-      }
+      deviceToken = (await FirebaseMessaging.instance.getToken())!;
     }
     if (kDebugMode) {
       print('-----Device Token----- $deviceToken');

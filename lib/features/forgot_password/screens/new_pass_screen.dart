@@ -67,7 +67,7 @@ class _NewPassScreenState extends State<NewPassScreen> {
                   const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
                   CustomTextFieldWidget(
-                    hintText: 'new_password'.tr,
+                    hintText: 'minimum_8_characters'.tr,
                     labelText: 'new_password'.tr,
                     controller: _newPasswordController,
                     focusNode: _newPasswordFocus,
@@ -95,7 +95,7 @@ class _NewPassScreenState extends State<NewPassScreen> {
                   const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
                   CustomTextFieldWidget(
-                    hintText: 'confirm_password'.tr,
+                    hintText: 'minimum_8_characters'.tr,
                     labelText: 'confirm_password'.tr,
                     controller: _confirmPasswordController,
                     focusNode: _confirmPasswordFocus,

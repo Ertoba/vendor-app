@@ -55,7 +55,6 @@ class _AnnouncementStatusBottomSheetState extends State<AnnouncementStatusBottom
           const SizedBox(height: 50),
 
           Row(children: [
-
             Expanded(
               child: CustomButtonWidget(
                 onPressed: () async {

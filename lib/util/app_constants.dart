@@ -3,7 +3,7 @@ import 'package:sixam_mart_store/util/images.dart';
 
 class AppConstants {
   static const String appName = 'პორტალი';
-  static const double appVersion = 3.6; ///Flutter SDK: 3.38.5
+  static const double appVersion = 3.8; ///Flutter SDK: 3.41.6
 
   static const String fontFamily = 'Roboto';
   static const double limitOfPickedVideoSizeInMB = 50;

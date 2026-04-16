@@ -17,6 +17,8 @@ import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_store/common/widgets/paginated_list_widget.dart';
 import 'package:sixam_mart_store/features/chat/widgets/message_bubble_widget.dart';
 
+import '../domain/models/message_model.dart';
+
 class ChatScreen extends StatefulWidget {
   final NotificationBodyModel? notificationBody;
   final User? user;
@@ -65,37 +67,37 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Scaffold(
           appBar: AppBar(
             leading: IconButton(onPressed: () {
-                if(widget.fromNotification){
-                  Get.offAllNamed(RouteHelper.getInitialRoute());
-                }else{
-                  Get.back();
-                }
-              },
-              icon: const Icon(Icons.arrow_back_ios_rounded)),
-              title: Text(
-                chatController.messageModel != null ? '${chatController.messageModel!.conversation!.receiver!.fName}'
-                ' ${chatController.messageModel!.conversation!.receiver!.lName}' : 'receiver_name'.tr,
-              ),
-              backgroundColor: Theme.of(context).primaryColor,
-              actions: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    width: 40, height: 40, alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border.all(width: 2,color: Theme.of(context).cardColor),
-                      color: Theme.of(context).cardColor,
-                    ),
-                    child: ClipOval(child: chatController.messageModel != null ? CustomImageWidget(
-                      image: chatController.messageModel!.conversation!.receiver!.imageFullUrl ?? '',
-                      //imageType: baseUrl,
-                      //storage: chatController.messageModel!.conversation!.receiver!.storage,
-                      fit: BoxFit.cover, height: 40, width: 40,
-                    ) : const SizedBox()),
+              if(widget.fromNotification){
+                Get.offAllNamed(RouteHelper.getInitialRoute());
+              }else{
+                Get.back();
+              }
+            },
+            icon: const Icon(Icons.arrow_back_ios_rounded)),
+            title: Row(
+              children: [
+                ClipOval(child: chatController.messageModel?.conversation!.receiver!.imageFullUrl != null ? CustomImageWidget(
+                  image: chatController.messageModel!.conversation!.receiver!.imageFullUrl ?? '',
+                  fit: BoxFit.cover, height: 40, width: 40,
+                ) : const SizedBox()),
+                SizedBox(width: 6),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(
+                    chatController.messageModel != null ? '${chatController.messageModel?.conversation!.receiver!.fName}'
+                    ' ${chatController.messageModel!.conversation!.receiver!.lName}' : 'receiver_name'.tr,
+                      style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge)
                   ),
-                )
-              ]),
+                  chatController.messageModel?.conversation!.receiver!.phone != null ?  Text(
+                    ' ${chatController.messageModel!.conversation!.receiver!.phone}',
+                    style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
+                  ) : SizedBox.shrink(),
+                ]),
+              ],
+            ),
+            backgroundColor: Theme.of(context).cardColor,
+            scrolledUnderElevation: 0,
+            elevation: 0,
+          ),
 
           body: _isLoggedIn ? SafeArea(
             child: Center(
@@ -120,8 +122,17 @@ class _ChatScreenState extends State<ChatScreen> {
                             reverse: true,
                             itemCount: chatController.messageModel!.messages!.length,
                             itemBuilder: (context, index) {
+                              Message? previousMessage = index < chatController.messageModel!.messages!.length - 1
+                                  ? chatController.messageModel!.messages![index + 1]
+                                  : null;
+                              Message? nextMessage = index > 0
+                                  ? chatController.messageModel!.messages![index - 1]
+                                  : null;
+                                  
                               return MessageBubbleWidget(
                                 message: chatController.messageModel!.messages![index],
+                                previousMessage: previousMessage,
+                                nextMessage: nextMessage,
                                 user: chatController.messageModel!.conversation!.receiver,
                                 sender: chatController.messageModel!.conversation!.sender,
                                 userType: widget.notificationBody!.customerId != null || (widget.notificationBody!.conversationId != null && widget.notificationBody!.type == 'customer')
@@ -139,51 +150,51 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: Column(children: [
 
                       GetBuilder<ChatController>(builder: (chatController) {
-                          return chatController.chatImage!.isNotEmpty ? SizedBox(height: 100,
-                            child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                shrinkWrap: true,
-                                itemCount: chatController.chatImage!.length,
-                                itemBuilder: (BuildContext context, index){
-                                  return  chatController.chatImage!.isNotEmpty ? Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Stack(children: [
+                        return chatController.chatImage!.isNotEmpty ? SizedBox(height: 100,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            itemCount: chatController.chatImage!.length,
+                            itemBuilder: (BuildContext context, index){
+                              return  chatController.chatImage!.isNotEmpty ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Stack(children: [
 
-                                      Container(width: 100, height: 100,
-                                        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(20))),
-                                        child: ClipRRect(
-                                          borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingSizeDefault)),
-                                          child: ResponsiveHelper.isWeb() ? Image.network(
-                                            chatController.chatImage![index].path, width: 100, height: 100, fit: BoxFit.cover,
-                                          ) : Image.file(
-                                            File(chatController.chatImage![index].path), width: 100, height: 100, fit: BoxFit.cover,
-                                          ),
+                                  Container(width: 100, height: 100,
+                                    decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(20))),
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingSizeDefault)),
+                                      child: ResponsiveHelper.isWeb() ? Image.network(
+                                        chatController.chatImage![index].path, width: 100, height: 100, fit: BoxFit.cover,
+                                      ) : Image.file(
+                                        File(chatController.chatImage![index].path), width: 100, height: 100, fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+
+                                  Positioned(top:0, right:0,
+                                    child: InkWell(
+                                      onTap : () => chatController.removeImage(index),
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.all(Radius.circular(Dimensions.paddingSizeDefault))
+                                        ),
+                                        child: const Padding(
+                                          padding: EdgeInsets.all(4.0),
+                                          child: Icon(Icons.clear, color: Colors.red, size: 15),
                                         ),
                                       ),
-
-                                      Positioned(top:0, right:0,
-                                        child: InkWell(
-                                          onTap : () => chatController.removeImage(index),
-                                          child: Container(
-                                            decoration: const BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.all(Radius.circular(Dimensions.paddingSizeDefault))
-                                            ),
-                                            child: const Padding(
-                                              padding: EdgeInsets.all(4.0),
-                                              child: Icon(Icons.clear, color: Colors.red, size: 15),
-                                            ),
-                                          ),
-                                        ),
-                                      )],
                                     ),
-                                  ) : const SizedBox();
-                                }),
-                          ) : const SizedBox();
+                                  )],
+                                ),
+                              ) : const SizedBox();
+                            }
+                          ),
+                        ) : const SizedBox();
                       }),
 
                       Row(children: [
-
                         InkWell(
                           onTap: () async {
                             Get.find<ChatController>().pickImage(false);
@@ -210,7 +221,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             maxLines: null,
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'type_here'.tr,
+                              hintText: 'type_a_message'.tr,
                               hintStyle: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeLarge),
                             ),
                             onSubmitted: (String newText) {

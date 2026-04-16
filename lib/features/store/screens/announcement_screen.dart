@@ -45,7 +45,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                 activeTrackColor: Theme.of(context).primaryColor,
                 value: storeController.announcementStatus,
                 onChanged: (value) {
-                  showCustomBottomSheet(child: const AnnouncementStatusBottomSheet());
+                  showCustomBottomSheet(child: AnnouncementStatusBottomSheet());
                 },
               ),
             ),

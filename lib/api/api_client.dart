@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
@@ -158,7 +159,7 @@ class ApiClient extends GetxService {
     }else if(response0.statusCode != 200 && response0.body == null) {
       response0 = const Response(statusCode: 0, statusText: noInternetMessage);
     }
-    debugPrint('====> API Response: [${response0.statusCode}] $uri\n${response0.body}');
+    log('====> API Response: [${response0.statusCode}] $uri\n${response0.body}');
     if(handleError) {
       if(response0.statusCode == 200) {
         return response0;

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart_store/common/models/vat_tax_model.dart';
@@ -108,6 +109,20 @@ class StoreRepository implements StoreRepositoryInterface {
       '_method': 'put',
       'translations': jsonEncode(translation),
       'contact_number': store.phone ?? '',
+      'meta_index' : store.metaData?.metaIndex.toString() ?? '',
+      'meta_title' : store.metaTitle ?? '',
+      'meta_description' : store.metaDescription ?? '',
+      'meta_image' : store.metaImageFullUrl ?? '',
+      'meta_no_follow' : store.metaData?.metaNoFollow ?? '',
+      'meta_no_image_index' : store.metaData?.metaNoImageIndex ?? '',
+      'meta_no_archive' : store.metaData?.metaNoArchive ?? '',
+      'meta_no_snippet' : store.metaData?.metaNoSnippet ?? '',
+      'meta_max_snippet' : store.metaData?.metaMaxSnippet.toString() ?? '',
+      'meta_max_snippet_value' : store.metaData?.metaMaxSnippetValue.toString() ?? '',
+      'meta_max_video_preview' : store.metaData?.metaMaxVideoPreview.toString() ?? '',
+      'meta_max_video_preview_value' : store.metaData?.metaMaxVideoPreviewValue.toString() ?? '',
+      'meta_max_image_preview' : store.metaData?.metaMaxImagePreview.toString() ?? '',
+      'meta_max_image_preview_value' : store.metaData?.metaMaxImagePreviewValue ?? '',
     });
     Response response = await apiClient.postMultipartData(AppConstants.vendorBasicInfoUpdateUri, fields, [MultipartBody('logo', logo), MultipartBody('cover_photo', cover), MultipartBody('meta_image', metaImage)]);
     return (response.statusCode == 200);
@@ -122,6 +137,7 @@ class StoreRepository implements StoreRepositoryInterface {
       'take_away': store.takeAway! ? '1' : '0', 'gst_status': store.gstStatus! ? '1' : '0', 'gst': store.gstCode!,
       'minimum_delivery_charge': store.minimumShippingCharge.toString(), 'per_km_delivery_charge': store.perKmShippingCharge.toString(),
       'veg': store.veg.toString(), 'non_veg': store.nonVeg.toString(),
+      'halal_tag_status': store.isHalalActive! ? '1' : '0',
       'order_place_to_schedule_interval': store.orderPlaceToScheduleInterval.toString(), 'minimum_delivery_time': min,
       'maximum_delivery_time': max, 'delivery_time_type': type, 'prescription_order': store.prescriptionStatus! ? '1' : '0',
       'cutlery': store.cutlery! ? '1' : '0', 'free_delivery': store.freeDelivery! ? '1' : '0',
@@ -131,28 +147,32 @@ class StoreRepository implements StoreRepositoryInterface {
     if(store.maximumShippingCharge != null){
       fields.addAll({'maximum_delivery_charge':  store.maximumShippingCharge.toString()});
     }
+    
+    print('SENDING TO API - Halal: ${store.isHalalActive}, Veg: ${store.veg}, Non-Veg: ${store.nonVeg}');
+    print('API Fields: $fields');
+    
     Response response = await apiClient.postData(AppConstants.vendorUpdateUri, fields);
+    
+    print('API RESPONSE - Status: ${response.statusCode}, Body: ${response.body}');
+    
     return (response.statusCode == 200);
   }
 
   @override
-  Future<Response> addItem(Item item, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName) async {
+  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName) async {
     Map<String, String> fields = {};
     fields.addAll(<String, String>{
       'price': item.price.toString(), 'discount': item.discount.toString(), 'veg': item.veg.toString(),
       'discount_type': item.discountType!, 'category_id': item.categoryIds![0].id!,
       'translations': jsonEncode(item.translations), 'tags': tags, 'maximum_cart_quantity': item.maxOrderQuantity.toString(),
     });
-
     if(Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'grocery' || Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'food') {
       fields.addAll(<String, String> {'nutritions': nutrition, 'allergies': allergicIngredients});
     }
-
     if(Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'pharmacy') {
       fields.addAll(<String, String> {'generic_name': genericName});
       fields.addAll((<String, String> {'condition_id': item.conditionId!.toString()}));
     }
-
     if(Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!) {
       fields.addAll((<String, String> {'current_stock': item.stock.toString()}));
     }
@@ -161,8 +181,28 @@ class StoreRepository implements StoreRepositoryInterface {
       fields.addAll((<String, String> {'basic': item.isBasicMedicine!.toString()}));
     }
     if(Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'ecommerce') {
-      fields.addAll((<String, String> {'brand_id': item.brandId.toString()}));
+      fields.addAll((<String, String> {
+        'brand_id': item.brandId.toString(),
+        'meta_title' : item.metaTitle ?? '',
+        'meta_description' : item.metaDescription ?? '',
+        'meta_index' : item.metaData?.metaIndex.toString() ?? '',
+        'meta_no_follow' : item.metaData?.metaNoFollow ?? '',
+        'meta_no_image_index' : item.metaData?.metaNoImageIndex ?? '',
+        'meta_no_archive' : item.metaData?.metaNoArchive ?? '',
+        'meta_no_snippet' : item.metaData?.metaNoSnippet ?? '',
+        'meta_max_snippet' : item.metaData?.metaMaxSnippet.toString() ?? '',
+        'meta_max_snippet_value' : item.metaData?.metaMaxSnippetValue.toString() ?? '',
+        'meta_max_video_preview' : item.metaData?.metaMaxVideoPreview.toString() ?? '',
+        'meta_max_video_preview_value' : item.metaData?.metaMaxVideoPreviewValue.toString() ?? '',
+        'meta_max_image_preview' : item.metaData?.metaMaxImagePreview.toString() ?? '',
+        'meta_max_image_preview_value' : item.metaData?.metaMaxImagePreviewValue ?? '',
+      }));
+      // if (item.metaImageFullUrl != null && item.metaImageFullUrl!.isNotEmpty){
+      //   fields.addAll((<String, String> {'meta_image': item.metaImageFullUrl!}));
+      // }
+      log('fields of add item product meta data: ${fields.toString()}');
     }
+
     if(Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'grocery' || Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'food') {
       fields.addAll((<String, String> {'is_halal': item.isHalal.toString()}));
     }
@@ -196,6 +236,9 @@ class StoreRepository implements StoreRepositoryInterface {
 
     List<MultipartBody> images0 = [];
     images0.add(MultipartBody('image', image));
+    if(metaImage != null) {
+      images0.add(MultipartBody('meta_image', metaImage));
+    }
     for(int index=0; index<images.length; index++) {
       images0.add(MultipartBody('item_images[]', images[index]));
     }
@@ -205,7 +248,12 @@ class StoreRepository implements StoreRepositoryInterface {
       fields.addAll({'temp_product' : '1'});
     }
 
-    Response response = await apiClient.postMultipartData(isAdd ? AppConstants.addItemUri : AppConstants.updateItemUri, fields,images0, handleError: false);
+    Response response = await apiClient.postMultipartData(
+        isAdd ? AppConstants.addItemUri : AppConstants.updateItemUri,
+        fields,
+        images0,
+        handleError: false
+    );
     return response;
   }
 

@@ -121,27 +121,28 @@ class _InVoicePrintScreenState extends State<InVoicePrintScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(children: [
-                Text('paired_bluetooth'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge)),
-                const SizedBox(width: Dimensions.paddingSizeSmall),
-
-                SizedBox(height: 20, width: 20,
+              Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: [
+                Text('paired_bluetooth'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault)),
+                const SizedBox(width: Dimensions.paddingSizeExtraSmall / 3),
+                SizedBox(
+                  width: 20, height: 20,
                   child: _isLoading ?  CircularProgressIndicator(
                     color: Theme.of(context).primaryColor,
                   ) : InkWell(
                     onTap: () => getBluetooth(),
-                    child: Icon(Icons.refresh, color: Theme.of(context).primaryColor),
+                    child: Icon(Icons.refresh, color: Theme.of(context).primaryColor, size: 20),
                   ),
                 ),
               ]),
-
-              SizedBox(width: 100, child: DropdownButton<int>(
+              Spacer(),
+              SizedBox(width: 60, child: DropdownButton<int>(
                 hint: Text('select'.tr),
                 value: _selectedSize,
                 items: _paperSizeList.map((int? value) {
                   return DropdownMenuItem<int>(
-                      value: value,
-                      child: Text('$value''mm'));
+                    value: value,
+                    child: Text('$value''mm', style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall))
+                  );
                 }).toList(),
                 onChanged: (int? value) {
                   setState(() {
@@ -179,10 +180,10 @@ class _InVoicePrintScreenState extends State<InVoicePrintScreen> {
                                 setConnect(availableBluetoothDevices?[index].macAdress ?? '');
                               }
                             },
-                            title: Text(availableBluetoothDevices?[index].name ?? ''),
+                            title: Text(availableBluetoothDevices?[index].name ?? '', style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall)),
                             subtitle: Text(
                               isConnected ? 'connected'.tr : "click_to_connect".tr,
-                              style: robotoRegular.copyWith(color: isConnected ? null : Theme.of(context).primaryColor),
+                              style: robotoRegular.copyWith(color: isConnected ? null : Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall),
                             ),
                           ),
 

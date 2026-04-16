@@ -37,6 +37,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_store/features/store/widgets/food_variation_view_widget.dart';
 
+import '../../../common/widgets/custom_card.dart';
+import '../../profile/domain/models/profile_model.dart' hide Module;
+import '../widgets/meta_seo_item_widget.dart';
+
 class AddItemScreen extends StatefulWidget {
   final Item? item;
   const AddItemScreen({super.key, required this.item});
@@ -54,17 +58,24 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
   final TextEditingController _stockController = TextEditingController();
   final TextEditingController _tagController = TextEditingController();
   final TextEditingController _maxOrderQuantityController = TextEditingController();
-  final FocusNode _priceNode = FocusNode();
-  final FocusNode _discountNode = FocusNode();
   TextEditingController _c = TextEditingController();
   TextEditingController _nutritionSuggestionController = TextEditingController();
   TextEditingController _allergicIngredientsSuggestionController = TextEditingController();
   final TextEditingController _genericNameSuggestionController = TextEditingController();
+  final TextEditingController _metaTitleController = TextEditingController();
+  final TextEditingController _metaDescriptionController = TextEditingController();
+  final TextEditingController _maxSnippetController = TextEditingController();
+  final TextEditingController _maxVideoPreviewController = TextEditingController();
+  final FocusNode _priceNode = FocusNode();
+  final FocusNode _discountNode = FocusNode();
+  final FocusNode _metaTitleNode = FocusNode();
+  final FocusNode _metaDescriptionNode = FocusNode();
 
   final List<FocusNode> _nameFocusList = [];
   final List<FocusNode> _descriptionFocusList = [];
 
   late bool _update;
+  late bool _discountTypeSelected;
   late Item _item;
 
   final Module? _module = Get.find<SplashController>().configModel!.moduleConfig!.module;
@@ -85,6 +96,7 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
     CategoryController categoryController = Get.find<CategoryController>();
 
     _update = widget.item != null;
+    _discountTypeSelected = _update;
 
     storeController.initItemData(item: widget.item, isFood: isFood, isGrocery: isGrocery, isPharmacy: isPharmacy);
     categoryController.initCategoryData(widget.item);
@@ -113,9 +125,22 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
       }
     }
 
-    if(isEcommerce) {
+    if(isEcommerce && _update) {
       storeController.getBrandList(widget.item);
+      // storeController.pickedMetaImage?.path;
+      storeController.initializeMetaData(widget.item?.metaData);
+
+      if(widget.item != null ) {
+        _metaTitleController.text = widget.item!.metaTitle ?? '';
+        _metaDescriptionController.text = widget.item!.metaDescription ?? '';
+      }
+
+      if (widget.item?.metaData != null) {
+        _maxSnippetController.text = widget.item!.metaData!.metaMaxSnippetValue?.toString() ?? '';
+        _maxVideoPreviewController.text = widget.item!.metaData!.metaMaxVideoPreviewValue?.toString() ?? '';
+      }
     }
+
     if(isPharmacy) {
       storeController.getSuitableTagList(widget.item);
     }
@@ -180,6 +205,15 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
         _discountController.text = price.toString();
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _metaTitleController.dispose();
+    _metaDescriptionController.dispose();
+    _maxVideoPreviewController.dispose();
+    _maxSnippetController.dispose();
+    super.dispose();
   }
 
   @override
@@ -469,7 +503,7 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                         ),
                         const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
-                        categoryController.selectedSubCategoryID != null ? CustomDropdownButton(
+                        categoryController.selectedSubCategoryID != null && categoryController.subCategoryList != null && categoryController.subCategoryList!.isNotEmpty ? CustomDropdownButton(
                           hintText: categoryController.subCategoryList != null && categoryController.subCategoryList!.isNotEmpty ? 'sub_category'.tr : 'no_sub_category_found'.tr,
                           dropdownMenuItems: categoryController.subCategoryList?.map((item) => DropdownMenuItem<String>(
                             value: item.id.toString(),
@@ -479,8 +513,8 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                             categoryController.setSelectedSubCategory(value!);
                           },
                           selectedValue: categoryController.selectedSubCategoryID,
-                        ) : SizedBox(),
-                        SizedBox(height: categoryController.selectedSubCategoryID != null ? Dimensions.paddingSizeExtraLarge : 0),
+                        ) : SizedBox.shrink(),
+                        SizedBox(height: categoryController.selectedSubCategoryID != null && categoryController.subCategoryList != null && categoryController.subCategoryList!.isNotEmpty ? Dimensions.paddingSizeExtraLarge : 0),
 
                         isPharmacy ? Container(
                           decoration: BoxDecoration(
@@ -954,7 +988,6 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
 
                             Expanded(
                               child: Row(children: [
-
                                 RadioGroup(
                                   groupValue: storeController.isVeg ? 'veg' : 'non_veg',
                                   onChanged: (String? value) => storeController.setVeg(value == 'veg', true),
@@ -976,39 +1009,28 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
 
                             Expanded(
                               child: Row(children: [
-
                                 RadioGroup(
                                   groupValue: storeController.isVeg ? 'veg' : 'non_veg',
                                   onChanged: (String? value) => storeController.setVeg(value == 'veg', true),
-                                  child: Radio(
-                                    value: 'non_veg',
-                                    fillColor: WidgetStateProperty.all<Color>(
-                                      storeController.isVeg ? Theme.of(context).disabledColor : Theme.of(context).primaryColor,
-                                    ),
+                                  child: Radio(value: 'non_veg',
+                                    fillColor: WidgetStateProperty.all<Color>(storeController.isVeg ? Theme.of(context).disabledColor : Theme.of(context).primaryColor),
                                   ),
                                 ),
-
                                 Text(
                                   'non_veg'.tr, style: robotoMedium.copyWith(
                                     fontSize: Dimensions.fontSizeSmall, color: storeController.isVeg ? Theme.of(context).disabledColor : Theme.of(context).textTheme.bodyLarge?.color),
                                 ),
-
                               ]),
                             ),
-
                           ]),
                         )  : const SizedBox(),
                         SizedBox(height: Get.find<SplashController>().configModel!.systemTaxType == 'product_wise' && (_module.vegNonVeg! && Get.find<SplashController>().configModel!.toggleVegNonVeg!) ? Dimensions.paddingSizeExtraLarge : 0),
 
                         (isFood || isGrocery) && storeHalalActive ? LabelWidget(
                           labelText: 'halal_tag'.tr,
-                          padding: const EdgeInsets.only(
-                            left: Dimensions.paddingSizeDefault, top: Dimensions.paddingSizeExtraSmall, bottom: Dimensions.paddingSizeExtraSmall,
-                          ),
+                          padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault, top: Dimensions.paddingSizeExtraSmall, bottom: Dimensions.paddingSizeExtraSmall,),
                           child: Row(children: [
-
                             Expanded(child: Text('status'.tr, style: robotoMedium)),
-
                             Transform.scale(
                               scale: 0.7,
                               child: CupertinoSwitch(
@@ -1068,7 +1090,12 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                               storeController.setSelectedVatTax(selectedVatTax.name, selectedVatTax.id, selectedVatTax.taxRate);
                             }
                           },
-                          selectedValue: storeController.selectedVatTaxName,
+                          selectedValue: null,
+                          selectedItemBuilder: (context) {
+                            return storeController.vatTaxList?.map((e) {
+                              return Text('select_vat_tax'.tr, style: robotoRegular.copyWith(color: Colors.grey));
+                            }).toList() ?? [];
+                          },
                         ),
                         SizedBox(height: storeController.selectedVatTaxNameList.isNotEmpty ? Dimensions.paddingSizeSmall : 0),
 
@@ -1166,14 +1193,12 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                               child: CustomDropdown(
                                 onChange: (int? value, int index) {
                                   storeController.setDiscountTypeIndex(value!, true);
+                                  _discountTypeSelected = true;
                                   _validateDiscount();
                                 },
                                 dropdownButtonStyle: DropdownButtonStyle(
                                   height: 45,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: Dimensions.paddingSizeExtraSmall,
-                                    horizontal: Dimensions.paddingSizeExtraSmall,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
                                   primaryColor: Theme.of(context).textTheme.bodyLarge!.color,
                                 ),
                                 iconColor: Theme.of(context).disabledColor,
@@ -1184,10 +1209,10 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                                 ),
                                 items: discountTypeList,
                                 child: Padding(
-                                  padding: const EdgeInsets.only(left: 8),
+                                  padding: const EdgeInsets.only(left: 2),
                                   child: Text(
                                     widget.item != null ? storeController.discountTypeList[storeController.discountTypeIndex]!.tr : 'discount_type'.tr,
-                                    style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeLarge),
+                                    style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeSmall),
                                   ),
                                 ),
                               ),
@@ -1523,17 +1548,9 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                                 borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                               ),
                               child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-
                                 Icon(CupertinoIcons.photo_camera_solid, color: Theme.of(context).disabledColor.withValues(alpha: 0.5), size: 30),
                                 const SizedBox(height: Dimensions.paddingSizeDefault),
-
-                                RichText(
-                                  textAlign: TextAlign.center,
-                                  text: TextSpan(children: [
-                                    TextSpan(text: 'click_to_upload'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
-                                  ]),
-                                ),
-
+                                Text('click_to_upload'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
                               ]),
                             ),
                           ),
@@ -1566,6 +1583,7 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                     ),
                     const SizedBox(height: Dimensions.paddingSizeDefault),
 
+                    // Item Image Section
                     Row(children: [
                       Text('item_images'.tr, style: robotoBold),
                       const SizedBox(width: Dimensions.paddingSizeSmall),
@@ -1622,14 +1640,8 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
 
                                     Icon(CupertinoIcons.photo_camera_solid, color: Theme.of(context).disabledColor.withValues(alpha: 0.5), size: 30),
                                     const SizedBox(height: Dimensions.paddingSizeDefault),
-
-                                    RichText(
-                                      textAlign: TextAlign.center,
-                                      text: TextSpan(children: [
-                                        TextSpan(text: 'click_to_upload'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
-                                      ]),
-                                    ),
-
+                                      Text( 'click_to_upload'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
+                                      Text('image_format'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor), textAlign: TextAlign.center),
                                   ]),
                                 ),
                               ),
@@ -1678,10 +1690,336 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                         },
                       ),
                     ),
+                    const SizedBox(height: Dimensions.paddingSizeSmall),
+                    // Meta Section
+                    isEcommerce ?
+                    Column( crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        const SizedBox(height: Dimensions.paddingSizeDefault),
+                        Text('meta_data'.tr, style: robotoBold),
+                        const SizedBox(height: Dimensions.paddingSizeSmall),
+                        Text('meta_data_des'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
+                        const SizedBox(height: Dimensions.paddingSizeSmall),
+                        CustomCard(width: context.width, padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            CustomTextFieldWidget(
+                              hintText: 'title'.tr,
+                              labelText: 'title'.tr,
+                              controller: _metaTitleController,
+                              capitalization: TextCapitalization.words,
+                              focusNode: _metaTitleNode,
+                              nextFocus: _metaDescriptionNode,
+                              showTitle: false,
+                              required: true,
+                            ),
+                            const SizedBox(height: Dimensions.paddingSizeExtraLarge),
+
+                            CustomTextFieldWidget(
+                              hintText: 'meta_description'.tr,
+                              labelText: 'description'.tr,
+                              controller: _metaDescriptionController,
+                              focusNode: _metaDescriptionNode,
+                              capitalization: TextCapitalization.sentences,
+                              maxLines: 5,
+                              inputAction: TextInputAction.done,
+                              nextFocus:  null,
+                              showTitle: false,
+                              required: true,
+                            ),
+                            const SizedBox(height: Dimensions.paddingSizeDefault),
+                            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text('meta_image'.tr, style: robotoMedium.copyWith(fontWeight: FontWeight.w600)),
+                              Text('image_format_and_ratio_for_business_logo'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor)),
+                              const SizedBox(height: Dimensions.paddingSizeSmall),
+                              Stack(clipBehavior: Clip.none, children: [
+
+                                Padding(
+                                  padding: const EdgeInsets.all(2),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                    child: storeController.pickedMetaImage != null ?
+                                      GetPlatform.isWeb ?
+                                        Image.network(storeController.pickedMetaImage!.path, width: double.infinity, height: 150, fit: BoxFit.cover)
+                                        : Image.file(File(storeController.pickedMetaImage!.path), width: double.infinity, height: 150, fit: BoxFit.cover)
+                                      : _item.metaImageFullUrl != null ?
+                                        CustomImageWidget(image: _item.metaImageFullUrl ?? '', height: 150, width: double.infinity, fit: BoxFit.cover)
+                                        : SizedBox(height: 150, width: double.infinity, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                            Icon(CupertinoIcons.photo_camera_solid, color: Theme.of(context).disabledColor.withValues(alpha: 0.5), size: 30),
+                                            const SizedBox(height: Dimensions.paddingSizeDefault),
+                                            Text('click_to_upload'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
+                                        ])
+                                    ),
+                                  ),
+                                ),
+
+                                Positioned(bottom: 0, right: 0, top: 0, left: 0,
+                                  child: InkWell(
+                                    onTap: () => storeController.pickMetaImage(),
+                                    child: DottedBorder(
+                                      options: RoundedRectDottedBorderOptions(
+                                        radius: const Radius.circular(Dimensions.radiusDefault),
+                                        dashPattern: const [8, 4],
+                                        strokeWidth: 1,
+                                        color: Theme.of(context).hintColor,
+                                      ),
+                                      child: const SizedBox(width: 120, height: 120),
+                                    ),
+                                  ),
+                                ),
+
+                                Positioned(
+                                  top: -10, right: -10,
+                                  child: InkWell(
+                                    onTap: () => storeController.pickMetaImage(),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        boxShadow: const [BoxShadow(color: Colors.black12, spreadRadius: 0, blurRadius: 5)],
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.blue, width: 0.5),
+                                      ),
+                                      child: const Icon(Icons.edit, color: Colors.blue, size: 16),
+                                    ),
+                                  ),
+                                ),
+                              ]),
+                            ]),
+                            const SizedBox(height: Dimensions.paddingSizeDefault),
+
+                            Container(
+                              width: double.infinity, padding: EdgeInsets.all(Dimensions.paddingSizeSmall),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).disabledColor.withValues(alpha: 0.07),
+                                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                                decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(Dimensions.radiusDefault)),
+                                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                  const SizedBox(height: Dimensions.paddingSizeDefault),
+                                  InkWell(
+                                    onTap: () {
+                                      storeController.setMetaIndex('index');
+                                      storeController.setNoFollow('0');
+                                      storeController.setNoImageIndex('0');
+                                      storeController.setNoArchive('0');
+                                      storeController.setNoSnippet('0');
+                                    },
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(width: Dimensions.paddingSizeExtraSmall  + 2),
+                                        SizedBox(
+                                          height: 20, width: 20,
+                                          child: RadioGroup<String>(
+                                            groupValue: storeController.metaIndex,
+                                            onChanged: (value) {
+                                              storeController.setMetaIndex(value!);
+                                              storeController.setNoFollow('0');
+                                              storeController.setNoImageIndex('0');
+                                              storeController.setNoArchive('0');
+                                              storeController.setNoSnippet('0');
+                                            },
+                                            child: Radio<String>(value: 'index'),
+                                          ),
+                                        ),
+                                        const SizedBox(width: Dimensions.paddingSizeSmall),
+
+                                        Text('index'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault,  color: Theme.of(context).textTheme.bodyLarge?.color)),
+                                        const SizedBox(width: Dimensions.paddingSizeSmall),
+
+                                        CustomToolTip(
+                                          message: 'allow_search_engines_to_index_this_page'.tr,
+                                          size: 16,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(height: Dimensions.paddingSizeSmall),
+
+                                  MetaSeoItem(
+                                    title: 'no_follow'.tr,
+                                    value: storeController.noFollow == 'nofollow' ? true : false,
+                                    callback: (bool? value){
+                                      storeController.setNoFollow(value! ? 'nofollow' : '0');
+                                    },
+                                    message: 'instruct_search_engines_not_to_follow_links_from_this_page'.tr,
+                                  ),
+
+                                  MetaSeoItem(
+                                    title: 'no_image_index'.tr,
+                                    value: storeController.noImageIndex == 'noimageindex' ? true : false,
+                                    callback: (bool? value){
+                                      storeController.setNoImageIndex(value! ? 'noimageindex' : '0');
+                                    },
+                                    message: 'prevent_images_from_being_indexed'.tr,
+                                  ),
+                                  const SizedBox(height: Dimensions.paddingSizeSmall),
+
+                                  InkWell(
+                                    onTap: () {
+                                      storeController.setMetaIndex('noindex');
+                                      storeController.setNoFollow('nofollow');
+                                      storeController.setNoImageIndex('noimageindex');
+                                      storeController.setNoArchive('noarchive');
+                                      storeController.setNoSnippet('nosnippet');
+                                    },
+                                    child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.start, children: [
+                                      const SizedBox(width: Dimensions.paddingSizeExtraSmall  + 2),
+                                      SizedBox(
+                                        height: 20, width: 20,
+                                        child: RadioGroup<String>(
+                                          groupValue: storeController.metaIndex,
+                                          onChanged: (value) {
+                                            storeController.setMetaIndex(value!);
+                                            storeController.setNoFollow('nofollow');
+                                            storeController.setNoImageIndex('noimageindex');
+                                            storeController.setNoArchive('noarchive');
+                                            storeController.setNoSnippet('nosnippet');
+                                          },
+                                          child: Radio<String>(value: 'noindex'),
+                                        ),
+                                      ),
+                                      const SizedBox(width: Dimensions.paddingSizeSmall),
+
+                                      Text('no_index'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault,  color: Theme.of(context).textTheme.bodyLarge?.color)),
+                                      const SizedBox(width: Dimensions.paddingSizeSmall),
+
+                                      CustomToolTip(
+                                        message: 'disallow_search_engines_from_indexing_this_page'.tr,
+                                        size: 16,
+                                      ),
+                                    ]),
+                                  ),
+                                  SizedBox(height: Dimensions.paddingSizeSmall),
+
+                                  MetaSeoItem(
+                                    title: 'no_archive'.tr,
+                                    value: storeController.noArchive == 'noarchive' ? true : false,
+                                    callback: (bool? value){
+                                      storeController.setNoArchive(value! ? 'noarchive' : '0');
+                                    },
+                                    message: 'prevent_search_engines_from_caching_this_page'.tr,
+                                  ),
+
+                                  MetaSeoItem(
+                                    title: 'no_snippet'.tr,
+                                    value: storeController.noSnippet == 'nosnippet' ? true : false,
+                                    callback: (bool? value){
+                                      storeController.setNoSnippet(value! ? 'nosnippet' : '0');
+                                    },
+                                    message: 'prevent_search_engines_from_showing_snippet'.tr,
+                                  ),
+
+                                ]),
+                              ),
+                            ),
+                            const SizedBox(height: Dimensions.paddingSizeLarge),
+
+                            Container(
+                              width: double.infinity, padding: EdgeInsets.all(Dimensions.paddingSizeSmall),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).disabledColor.withValues(alpha: 0.07),
+                                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                                decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(Dimensions.radiusDefault)),
+                                child: Row(children: [
+                                  Expanded(flex: 3,
+                                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                      MetaSeoItem(
+                                        title: 'max_snippet'.tr,
+                                        value: storeController.maxSnippet == '1' ? true : false,
+                                        callback: (bool? value){
+                                          storeController.setMaxSnippet(value! ? '1' : '0');
+                                        },
+                                      ),
+                                      SizedBox(height: Dimensions.paddingSizeSmall),
+                                      MetaSeoItem(
+                                        title: 'max_video_preview'.tr,
+                                        value: storeController.maxVideoPreview == '1' ? true : false,
+                                        callback: (bool? value){
+                                          storeController.setMaxVideoPreview(value! ? '1' : '0');
+                                        },
+                                      ),
+                                      SizedBox(height: Dimensions.paddingSizeSmall),
+                                      MetaSeoItem(
+                                        title: 'max_image_preview'.tr,
+                                        value: storeController.maxImagePreview == '1' ? true : false,
+                                        callback: (bool? value){
+                                          storeController.setMaxImagePreview(value! ? '1' : '0');
+                                        },
+                                      ),
+                                    ]),
+                                  ),
+                                  const SizedBox(width: Dimensions.paddingSizeDefault),
+
+                                  Expanded(
+                                    flex: 2,
+                                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                      SizedBox(
+                                        height: 48,
+                                        child: CustomTextFieldWidget(
+                                          hintText: 'ex_1'.tr,
+                                          showLabelText: false,
+                                          inputType: TextInputType.number,
+                                          controller: _maxSnippetController,
+                                        ),
+                                      ),
+                                      SizedBox(height: Dimensions.paddingSizeSmall),
+
+                                      SizedBox(
+                                        height: 48,
+                                        child: CustomTextFieldWidget(
+                                          hintText: 'ex_1'.tr,
+                                          showLabelText: false,
+                                          inputType: TextInputType.number,
+                                          controller: _maxVideoPreviewController,
+                                        ),
+                                      ),
+                                      SizedBox(height: Dimensions.paddingSizeSmall),
+
+                                      Container(
+                                        height: 48,
+                                        padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(color: Theme.of(context).disabledColor),
+                                          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                        ),
+                                        child: DropdownButton<String>(
+                                          value: storeController.imagePreviewSelectedType,
+                                          items: storeController.imagePreviewType.map((String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(value.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge?.color)),
+                                            );
+                                          }).toList(),
+                                          onChanged: (value) {
+                                            storeController.setImagePreviewType(value!);
+                                          },
+                                          isExpanded: true,
+                                          underline: const SizedBox(),
+                                        ),
+                                      ),
+
+                                    ]),
+                                  ),
+
+                                ]),
+                              ),
+                            ),
+                          ]),
+                        ),
+                      ],
+                    ) : SizedBox.shrink(),
+                    const SizedBox(height: Dimensions.paddingSizeDefault),
 
                   ]),
                 )),
 
+                // Button
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall, horizontal: Dimensions.paddingSizeLarge),
                   decoration: BoxDecoration(
@@ -1706,6 +2044,10 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                       bool variationMinLessThenZero = false;
                       bool variationMaxSmallThenMin = false;
                       bool variationMaxBigThenOptions = false;
+                      String metaTitle = _metaTitleController.text.trim();
+                      String metaDescription = _metaDescriptionController.text.trim();
+
+
                       for(AttributeModel attr in storeController.attributeList!) {
                         if(attr.active && attr.variants.isEmpty) {
                           haveBlankVariant = true;
@@ -1775,8 +2117,12 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                         showCustomSnackBar('enter_data_for_english'.tr);
                       }else if(categoryController.selectedCategoryID == null) {
                         showCustomSnackBar('select_a_category'.tr);
+                      }else if(Get.find<SplashController>().configModel!.systemTaxType == 'product_wise' && storeController.selectedVatTaxIdList.isEmpty) {
+                        showCustomSnackBar('select_vat_tax'.tr);
                       }else if(price.isEmpty) {
                         showCustomSnackBar('enter_item_price'.tr);
+                      }else if(!_discountTypeSelected) {
+                        showCustomSnackBar('enter_discount_type'.tr);
                       }else if(discount.isEmpty) {
                         showCustomSnackBar('enter_item_discount'.tr);
                       }else if(haveBlankVariant) {
@@ -1801,6 +2147,10 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                         showCustomSnackBar('enter_stock_for_every_variant'.tr);
                       }else if(_module.stock! && storeController.variantTypeList!.isEmpty && _stockController.text.trim().isEmpty) {
                         showCustomSnackBar('enter_stock'.tr);
+                      }else if(isEcommerce && metaTitle.isEmpty){
+                        showCustomSnackBar('enter_meta_title'.tr);
+                      }else if(isEcommerce && metaDescription.isEmpty){
+                        showCustomSnackBar('enter_meta_description'.tr);
                       }else if(_module.unit! && (storeController.unitIndex == null)) {
                         showCustomSnackBar('add_an_unit'.tr);
                       }else if(maxOrderQuantity < 0) {
@@ -1809,15 +2159,29 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                         showCustomSnackBar('pick_start_time'.tr);
                       }else if(_module.itemAvailableTime! && storeController.availableTimeEnds == null) {
                         showCustomSnackBar('pick_end_time'.tr);
-                      }else if(!_update && (Get.find<SplashController>().getStoreModuleConfig().newVariation! ? false : storeController.rawLogo == null)) {
+                      }else if(!_update && storeController.rawLogo == null && _item.imageFullUrl == null) {
                         showCustomSnackBar('upload_item_thumbnail_image'.tr);
                       }else if(!_update && (Get.find<SplashController>().getStoreModuleConfig().newVariation! ? false : storeController.rawImages.isEmpty)) {
                         showCustomSnackBar('upload_item_image'.tr);
                       }else if(checkDiscountWithVariationPrice){
                         showCustomSnackBar('discount_cant_be_more_then_minimum_variation_price'.tr);
-                      }else if(Get.find<SplashController>().configModel!.systemTaxType == 'product_wise' && storeController.selectedVatTaxIdList.isEmpty) {
-                        showCustomSnackBar('select_vat_tax'.tr);
                       }else {
+                        MetaSeoData metaSeoData = MetaSeoData(
+                          metaIndex: storeController.metaIndex,
+                          metaNoFollow: storeController.noFollow,
+                          metaNoImageIndex: storeController.noImageIndex,
+                          metaNoArchive: storeController.noArchive,
+                          metaNoSnippet: storeController.noSnippet,
+                          metaMaxSnippet: storeController.maxSnippet,
+                          metaMaxVideoPreview: storeController.maxVideoPreview,
+                          metaMaxImagePreview: storeController.maxImagePreview,
+                          metaMaxSnippetValue: _maxSnippetController.text.trim(),
+                          metaMaxVideoPreviewValue: _maxVideoPreviewController.text.trim(),
+                          metaMaxImagePreviewValue: storeController.imagePreviewSelectedType,
+                        );
+                        _item.metaData = metaSeoData;
+                        _item.metaTitle = metaTitle;
+                        _item.metaDescription = metaDescription;
                         _item.veg = storeController.isVeg ? 1 : 0;
                         _item.isPrescriptionRequired = storeController.isPrescriptionRequired ? 1 : 0;
                         _item.isHalal = storeController.isHalal ? 1 : 0;

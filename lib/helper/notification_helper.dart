@@ -22,231 +22,117 @@ import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart_store/features/dashboard/widgets/new_request_dialog_widget.dart';
 
 class NotificationHelper {
-  static Future<void> initialize(
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
-  ) async {
-    var androidInitialize = const AndroidInitializationSettings(
-      'notification_icon',
-    );
-    var iOSInitialize = const DarwinInitializationSettings(
-      requestSoundPermission: true,
-      requestBadgePermission: true,
-      requestAlertPermission: true,
-    );
-    var initializationsSettings = InitializationSettings(
-      android: androidInitialize,
-      iOS: iOSInitialize,
-    );
-    final androidPlugin = flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()!;
-    androidPlugin.requestNotificationsPermission();
-    await androidPlugin.createNotificationChannel(
-      const AndroidNotificationChannel(
-        'portal_notifications',
-        'პარტნიორი შეტყობინებები',
-        importance: Importance.max,
-        playSound: true,
-        sound: RawResourceAndroidNotificationSound('notification'),
-        enableVibration: true,
-      ),
-    );
-    flutterLocalNotificationsPlugin.initialize(
-      initializationsSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse load) async {
-        try {
-          if (load.payload!.isNotEmpty) {
-            NotificationBodyModel payload = NotificationBodyModel.fromJson(
-              jsonDecode(load.payload!),
-            );
 
-            final Map<NotificationType, Function> notificationActions = {
-              NotificationType.order: () {
-                if (Get.find<AuthController>().getModuleType() == 'rental') {
-                  Get.to(
-                    () => TripDetailsScreen(
-                      tripId: payload.orderId!,
-                      fromNotification: true,
-                    ),
-                  );
-                } else {
-                  Get.toNamed(
-                    RouteHelper.getOrderDetailsRoute(
-                      payload.orderId,
-                      fromNotification: true,
-                    ),
-                  );
-                }
-              },
-              NotificationType.advertisement: () => Get.toNamed(
-                RouteHelper.getAdvertisementDetailsScreen(
-                  advertisementId: payload.advertisementId,
-                  fromNotification: true,
-                ),
-              ),
-              NotificationType.block: () =>
-                  Get.offAllNamed(RouteHelper.getSignInRoute()),
-              NotificationType.unblock: () =>
-                  Get.offAllNamed(RouteHelper.getSignInRoute()),
-              NotificationType.withdraw: () =>
-                  Get.to(const DashboardScreen(pageIndex: 3)),
-              NotificationType.campaign: () => Get.toNamed(
-                RouteHelper.getCampaignDetailsRoute(
-                  id: payload.campaignId,
-                  fromNotification: true,
-                ),
-              ),
-              NotificationType.message: () {
-                if (Get.find<AuthController>().getModuleType() == 'rental') {
-                  Get.to(
-                    () => TaxiChatScreen(
-                      notificationBody: payload,
-                      conversationId: payload.conversationId,
-                      fromNotification: true,
-                    ),
-                  );
-                } else {
-                  Get.toNamed(
-                    RouteHelper.getChatRoute(
-                      notificationBody: payload,
-                      conversationId: payload.conversationId,
-                      fromNotification: true,
-                    ),
-                  );
-                }
-              },
-              NotificationType.subscription: () => Get.toNamed(
-                RouteHelper.getMySubscriptionRoute(fromNotification: true),
-              ),
-              NotificationType.product_approve: () =>
-                  Get.offAll(const DashboardScreen(pageIndex: 2)),
-              NotificationType.product_rejected: () => Get.toNamed(
-                RouteHelper.getPendingItemRoute(fromNotification: true),
-              ),
-              NotificationType.general: () => Get.toNamed(
-                RouteHelper.getNotificationRoute(fromNotification: true),
-              ),
-            };
+  static Future<void> initialize(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
+    var androidInitialize = const AndroidInitializationSettings('notification_icon');
+    var iOSInitialize = const DarwinInitializationSettings();
+    var initializationsSettings = InitializationSettings(android: androidInitialize, iOS: iOSInitialize);
+    flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation < AndroidFlutterLocalNotificationsPlugin>()!.requestNotificationsPermission();
+    flutterLocalNotificationsPlugin.initialize(initializationsSettings, onDidReceiveNotificationResponse: (NotificationResponse load) async{
+      try{
+        if(load.payload!.isNotEmpty){
+          NotificationBodyModel payload = NotificationBodyModel.fromJson(jsonDecode(load.payload!));
 
-            notificationActions[payload.notificationType]?.call();
-          }
-        } catch (_) {}
-        return;
-      },
-    );
+          final Map<NotificationType, Function> notificationActions = {
+            NotificationType.order: () {
+              if(Get.find<AuthController>().getModuleType() == 'rental'){
+                Get.to(()=> TripDetailsScreen(tripId: payload.orderId!, fromNotification: true));
+              }else{
+                Get.toNamed(RouteHelper.getOrderDetailsRoute(payload.orderId, fromNotification: true));
+              }
+            },
+            NotificationType.advertisement: () => Get.toNamed(RouteHelper.getAdvertisementDetailsScreen(advertisementId: payload.advertisementId, fromNotification: true)),
+            NotificationType.block: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
+            NotificationType.unblock: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
+            NotificationType.withdraw: () => Get.to(const DashboardScreen(pageIndex: 3)),
+            NotificationType.campaign: () => Get.toNamed(RouteHelper.getCampaignDetailsRoute(id: payload.campaignId, fromNotification: true)),
+            NotificationType.message: () {
+              if(Get.find<AuthController>().getModuleType() == 'rental'){
+                Get.to(()=> TaxiChatScreen(notificationBody: payload, conversationId: payload.conversationId, fromNotification: true));
+              }else{
+                Get.toNamed(RouteHelper.getChatRoute(notificationBody: payload, conversationId: payload.conversationId, fromNotification: true));
+              }
+            },
+            NotificationType.subscription: () => Get.toNamed(RouteHelper.getMySubscriptionRoute(fromNotification: true)),
+            NotificationType.product_approve: () => Get.offAll(const DashboardScreen(pageIndex: 2)),
+            NotificationType.product_rejected: () => Get.toNamed(RouteHelper.getPendingItemRoute(fromNotification: true)),
+            NotificationType.general: () => Get.toNamed(RouteHelper.getNotificationRoute(fromNotification: true)),
+          };
+
+          notificationActions[payload.notificationType]?.call();
+        }
+      }catch(_){}
+      return;
+    });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint("onMessage message type:${message.data['type']}");
       debugPrint("onMessage message :${message.data}");
 
-      if (message.data['type'] == 'message' &&
-          (Get.currentRoute.startsWith(RouteHelper.chatScreen) ||
-              Get.currentRoute.startsWith('/TaxiChatScreen'))) {
-        if (Get.find<AuthController>().getModuleType() == 'rental') {
-          if (Get.find<AuthController>().isLoggedIn()) {
+      if(message.data['type'] == 'message' && (Get.currentRoute.startsWith(RouteHelper.chatScreen) || Get.currentRoute.startsWith('/TaxiChatScreen'))) {
+        if(Get.find<AuthController>().getModuleType() == 'rental'){
+          if(Get.find<AuthController>().isLoggedIn()) {
             Get.find<TaxiChatController>().getConversationList(1);
-            if (Get.find<TaxiChatController>().messageModel!.conversation!.id
-                    .toString() ==
-                message.data['conversation_id'].toString()) {
+            if(Get.find<TaxiChatController>().messageModel!.conversation!.id.toString() == message.data['conversation_id'].toString()) {
               Get.find<TaxiChatController>().getMessages(
-                1,
-                NotificationBodyModel(
-                  notificationType: NotificationType.message,
-                  customerId: message.data['sender_type'] == AppConstants.user
-                      ? 0
-                      : null,
-                  deliveryManId:
-                      message.data['sender_type'] == AppConstants.deliveryMan
-                      ? 0
-                      : null,
-                ),
-                null,
-                int.parse(message.data['conversation_id'].toString()),
+                1, NotificationBodyModel(
+                notificationType: NotificationType.message,
+                customerId: message.data['sender_type'] == AppConstants.user ? 0 : null,
+                deliveryManId: message.data['sender_type'] == AppConstants.deliveryMan ? 0 : null,
+              ),
+                null, int.parse(message.data['conversation_id'].toString()),
               );
-            } else {
-              NotificationHelper.showNotification(
-                message,
-                flutterLocalNotificationsPlugin,
-              );
+            }else {
+              NotificationHelper.showNotification(message, flutterLocalNotificationsPlugin);
             }
           }
-        } else {
-          if (Get.find<AuthController>().isLoggedIn()) {
+        }else{
+          if(Get.find<AuthController>().isLoggedIn()) {
             Get.find<ChatController>().getConversationList(1);
-            if (Get.find<ChatController>().messageModel!.conversation!.id
-                    .toString() ==
-                message.data['conversation_id'].toString()) {
+            if(Get.find<ChatController>().messageModel!.conversation!.id.toString() == message.data['conversation_id'].toString()) {
               Get.find<ChatController>().getMessages(
-                1,
-                NotificationBodyModel(
-                  notificationType: NotificationType.message,
-                  customerId: message.data['sender_type'] == AppConstants.user
-                      ? 0
-                      : null,
-                  deliveryManId:
-                      message.data['sender_type'] == AppConstants.deliveryMan
-                      ? 0
-                      : null,
-                ),
-                null,
-                int.parse(message.data['conversation_id'].toString()),
+                1, NotificationBodyModel(
+                notificationType: NotificationType.message,
+                customerId: message.data['sender_type'] == AppConstants.user ? 0 : null,
+                deliveryManId: message.data['sender_type'] == AppConstants.deliveryMan ? 0 : null,
+              ),
+                null, int.parse(message.data['conversation_id'].toString()),
               );
-            } else {
-              NotificationHelper.showNotification(
-                message,
-                flutterLocalNotificationsPlugin,
-              );
+            }else {
+              NotificationHelper.showNotification(message, flutterLocalNotificationsPlugin);
             }
           }
         }
-      } else if (message.data['type'] == 'message' &&
-          (Get.currentRoute.startsWith(RouteHelper.conversationListScreen) ||
-              Get.currentRoute.startsWith('/TaxiConversationScreen'))) {
-        if (Get.find<AuthController>().getModuleType() == 'rental') {
-          if (Get.find<AuthController>().isLoggedIn()) {
+      }else if(message.data['type'] == 'message' && (Get.currentRoute.startsWith(RouteHelper.conversationListScreen) || Get.currentRoute.startsWith('/TaxiConversationScreen'))) {
+        if(Get.find<AuthController>().getModuleType() == 'rental'){
+          if(Get.find<AuthController>().isLoggedIn()) {
             Get.find<TaxiChatController>().getConversationList(1);
           }
-          NotificationHelper.showNotification(
-            message,
-            flutterLocalNotificationsPlugin,
-          );
-        } else {
-          if (Get.find<AuthController>().isLoggedIn()) {
+          NotificationHelper.showNotification(message, flutterLocalNotificationsPlugin);
+        }else{
+          if(Get.find<AuthController>().isLoggedIn()) {
             Get.find<ChatController>().getConversationList(1);
           }
-          NotificationHelper.showNotification(
-            message,
-            flutterLocalNotificationsPlugin,
-          );
+          NotificationHelper.showNotification(message, flutterLocalNotificationsPlugin);
         }
-      } else {
-        NotificationHelper.showNotification(
-          message,
-          flutterLocalNotificationsPlugin,
-        );
+      }else {
+        NotificationHelper.showNotification(message, flutterLocalNotificationsPlugin);
 
-        if (message.data['type'] == 'new_order' ||
-            message.data['title'] == 'New order placed') {
-          if (Get.find<AuthController>().getModuleType() == 'rental') {
+        if (message.data['type'] == 'new_order' || message.data['title'] == 'New order placed') {
+          if(Get.find<AuthController>().getModuleType() == 'rental'){
             TripController tripController = Get.find<TripController>();
             tripController.getTripList(status: 'pending', offset: '1');
             tripController.getTripList(status: 'confirmed', offset: '1');
             tripController.getTripList(status: 'ongoing', offset: '1');
-          } else {
+          }else{
             Get.find<OrderController>().getPaginatedOrders(1, true);
             Get.find<OrderController>().getCurrentOrders();
           }
-          Get.dialog(
-            NewRequestDialogWidget(
-              orderId: int.parse(message.data['order_id']),
-            ),
-          );
-        } else if (message.data['type'] == 'advertisement') {
+          Get.dialog(NewRequestDialogWidget(orderId: int.parse(message.data['order_id'])));
+        }else if(message.data['type'] == 'advertisement') {
           Get.find<AdvertisementController>().getAdvertisementList('1', 'all');
         }
         Get.find<NotificationController>().getNotificationList();
@@ -257,382 +143,106 @@ class NotificationHelper {
       debugPrint("onOpenApp message type:${message.data['type']}");
       debugPrint("onOpenApp message :${message.data}");
 
-      try {
-        NotificationBodyModel notificationBody = convertNotification(
-          message.data,
-        );
+      try{
+        NotificationBodyModel notificationBody = convertNotification(message.data);
 
         final Map<NotificationType, Function> notificationActions = {
           NotificationType.order: () {
-            if (Get.find<AuthController>().getModuleType() == 'rental') {
-              Get.to(
-                () => TripDetailsScreen(
-                  tripId: int.parse(message.data['order_id']),
-                  fromNotification: true,
-                ),
-              );
-            } else {
-              Get.toNamed(
-                RouteHelper.getOrderDetailsRoute(
-                  int.parse(message.data['order_id']),
-                  fromNotification: true,
-                ),
-              );
+            if(Get.find<AuthController>().getModuleType() == 'rental'){
+              Get.to(()=> TripDetailsScreen(tripId: int.parse(message.data['order_id']), fromNotification: true));
+            }else{
+              Get.toNamed(RouteHelper.getOrderDetailsRoute(int.parse(message.data['order_id']), fromNotification: true));
             }
           },
-          NotificationType.advertisement: () => Get.toNamed(
-            RouteHelper.getAdvertisementDetailsScreen(
-              advertisementId: notificationBody.advertisementId,
-              fromNotification: true,
-            ),
-          ),
-          NotificationType.block: () =>
-              Get.offAllNamed(RouteHelper.getSignInRoute()),
-          NotificationType.unblock: () =>
-              Get.offAllNamed(RouteHelper.getSignInRoute()),
-          NotificationType.withdraw: () =>
-              Get.to(const DashboardScreen(pageIndex: 3)),
-          NotificationType.campaign: () => Get.toNamed(
-            RouteHelper.getCampaignDetailsRoute(
-              id: notificationBody.campaignId,
-              fromNotification: true,
-            ),
-          ),
+          NotificationType.advertisement: () => Get.toNamed(RouteHelper.getAdvertisementDetailsScreen(advertisementId:  notificationBody.advertisementId, fromNotification: true)),
+          NotificationType.block: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
+          NotificationType.unblock: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
+          NotificationType.withdraw: () => Get.to(const DashboardScreen(pageIndex: 3)),
+          NotificationType.campaign: () => Get.toNamed(RouteHelper.getCampaignDetailsRoute(id: notificationBody.campaignId, fromNotification: true)),
           NotificationType.message: () {
-            if (Get.find<AuthController>().getModuleType() == 'rental') {
-              Get.to(
-                () => TaxiChatScreen(
-                  notificationBody: notificationBody,
-                  conversationId: notificationBody.conversationId,
-                  fromNotification: true,
-                ),
-              );
-            } else {
-              Get.toNamed(
-                RouteHelper.getChatRoute(
-                  notificationBody: notificationBody,
-                  conversationId: notificationBody.conversationId,
-                  fromNotification: true,
-                ),
-              );
+            if(Get.find<AuthController>().getModuleType() == 'rental'){
+              Get.to(()=> TaxiChatScreen(notificationBody: notificationBody, conversationId: notificationBody.conversationId, fromNotification: true));
+            }else{
+              Get.toNamed(RouteHelper.getChatRoute(notificationBody: notificationBody, conversationId: notificationBody.conversationId, fromNotification: true));
             }
           },
-          NotificationType.subscription: () => Get.toNamed(
-            RouteHelper.getMySubscriptionRoute(fromNotification: true),
-          ),
-          NotificationType.product_approve: () =>
-              Get.offAll(const DashboardScreen(pageIndex: 2)),
-          NotificationType.product_rejected: () => Get.toNamed(
-            RouteHelper.getPendingItemRoute(fromNotification: true),
-          ),
-          NotificationType.general: () => Get.toNamed(
-            RouteHelper.getNotificationRoute(fromNotification: true),
-          ),
+          NotificationType.subscription: () => Get.toNamed(RouteHelper.getMySubscriptionRoute(fromNotification: true)),
+          NotificationType.product_approve: () => Get.offAll(const DashboardScreen(pageIndex: 2)),
+          NotificationType.product_rejected: () => Get.toNamed(RouteHelper.getPendingItemRoute(fromNotification: true)),
+          NotificationType.general: () => Get.toNamed(RouteHelper.getNotificationRoute(fromNotification: true)),
         };
 
         notificationActions[notificationBody.notificationType]?.call();
-      } catch (_) {}
+      }catch (_){}
     });
   }
 
-  static Future<void> showNotification(
-    RemoteMessage message,
-    FlutterLocalNotificationsPlugin fln,
-  ) async {
-    String? title;
-    String? body;
-    String? image;
-    NotificationBodyModel notificationBody = convertNotification(message.data);
+  static Future<void> showNotification(RemoteMessage message, FlutterLocalNotificationsPlugin fln) async {
+    if(!GetPlatform.isIOS) {
+      String? title;
+      String? body;
+      String? image;
+      NotificationBodyModel notificationBody = convertNotification(message.data);
 
-    final bool useGeorgianText = await shouldUseGeorgianNotificationText();
-    title = await localizedTitleAsync(
-      message.data['title'],
-      forceGeorgian: useGeorgianText,
-    );
-    body = await localizedBodyAsync(
-      message.data['body'],
-      forceGeorgian: useGeorgianText,
-    );
-    image = (message.data['image'] != null && message.data['image'].isNotEmpty)
-        ? message.data['image'].startsWith('http')
-              ? message.data['image']
-              : '${AppConstants.baseUrl}/storage/app/public/notification/${message.data['image']}'
-        : null;
+      title = message.data['title'];
+      body = message.data['body'];
+      image = (message.data['image'] != null && message.data['image'].isNotEmpty) ? message.data['image'].startsWith('http') ? message.data['image']
+        : '${AppConstants.baseUrl}/storage/app/public/notification/${message.data['image']}' : null;
 
-    if (image != null && image.isNotEmpty) {
-      try {
-        await showBigPictureNotificationHiddenLargeIcon(
-          title,
-          body,
-          notificationBody,
-          image,
-          fln,
-        );
-      } catch (e) {
-        await showBigTextNotification(title, body, notificationBody, fln);
-      }
-    } else {
-      await showBigTextNotification(title, body, notificationBody, fln);
-    }
-  }
-
-  static String localizedTitle(String? title, {bool forceGeorgian = false}) {
-    return _localizedNotificationText(
-      title,
-      isTitle: true,
-      useGeorgian: forceGeorgian,
-    );
-  }
-
-  static String localizedBody(String? body, {bool forceGeorgian = false}) {
-    return _localizedNotificationText(body, useGeorgian: forceGeorgian);
-  }
-
-  static Future<String> localizedTitleAsync(
-    String? title, {
-    bool forceGeorgian = false,
-  }) async {
-    return localizedTitle(title, forceGeorgian: forceGeorgian);
-  }
-
-  static Future<String> localizedBodyAsync(
-    String? body, {
-    bool forceGeorgian = false,
-  }) async {
-    return localizedBody(body, forceGeorgian: forceGeorgian);
-  }
-
-  static Future<bool> shouldUseGeorgianNotificationText() async {
-    if (Get.locale?.languageCode == 'ka') {
-      return true;
-    }
-
-    try {
-      final SharedPreferences preferences =
-          await SharedPreferences.getInstance();
-      final List<String?> languageCodes = [
-        preferences.getString(AppConstants.languageCode),
-        preferences.getString(AppConstants.cacheLanguageCode),
-      ];
-
-      return languageCodes.any((code) => code?.toLowerCase() == 'ka');
-    } catch (_) {
-      return false;
-    }
-  }
-
-  static String _localizedNotificationText(
-    String? text, {
-    bool isTitle = false,
-    bool useGeorgian = false,
-  }) {
-    final String rawText = text?.trim() ?? '';
-    if (rawText.isEmpty || !(useGeorgian || Get.locale?.languageCode == 'ka')) {
-      return rawText;
-    }
-    final String normalizedText = rawText
-        .replaceFirst(RegExp(r'^messages\.'), '')
-        .trim();
-
-    final Map<String, String> exactMatches = {
-      'Order Notification': _translatedLabel(
-        'notification_order_title',
-        'შეკვეთის შეტყობინება',
-      ),
-      'New order placed': _translatedLabel(
-        'notification_new_order_placed_title',
-        'ახალი შეკვეთა',
-      ),
-      'Order is processing': _translatedLabel(
-        'notification_is_processing',
-        'შეკვეთა მუშავდება',
-      ),
-      'Loyalty Point Transaction': _translatedLabel(
-        'notification_loyalty_point_transaction',
-        'ქულების ტრანზაქცია',
-      ),
-    };
-
-    if (exactMatches.containsKey(normalizedText)) {
-      return exactMatches[normalizedText]!;
-    }
-
-    final List<_NotificationTextPattern> patterns = [
-      _NotificationTextPattern(
-        RegExp(r'^New order alert, confirm to proceed$', caseSensitive: false),
-        (_) => _translatedLabel(
-          'notification_new_order_alert_confirm_to_proceed',
-          'ახალი შეკვეთის შეტყობინება, გასაგრძელებლად დაადასტურეთ',
-        ),
-      ),
-      _NotificationTextPattern(
-        RegExp(r'^(\d+)\s+Order is picked up$', caseSensitive: false),
-        (match) =>
-            '${_translatedLabel('notification_order_prefix', 'შეკვეთა')} #${match.group(1)} ${_translatedLabel('notification_picked_up', 'აღებულია')}',
-      ),
-      _NotificationTextPattern(
-        RegExp(r'^Order\s+#?(\d+)\s+is picked up$', caseSensitive: false),
-        (match) =>
-            '${_translatedLabel('notification_order_prefix', 'შეკვეთა')} #${match.group(1)} ${_translatedLabel('notification_picked_up', 'აღებულია')}',
-      ),
-      _NotificationTextPattern(
-        RegExp(
-          r'^Order\s+#?(\d+)\s+delivered successfully$',
-          caseSensitive: false,
-        ),
-        (match) =>
-            '${_translatedLabel('notification_order_prefix', 'შეკვეთა')} #${match.group(1)} ${_translatedLabel('notification_delivered_successfully', 'წარმატებით ჩაბარდა')}',
-      ),
-      _NotificationTextPattern(
-        RegExp(
-          r'^Order\s+#?(\d+)\s+is delivered successfully$',
-          caseSensitive: false,
-        ),
-        (match) =>
-            '${_translatedLabel('notification_order_prefix', 'შეკვეთა')} #${match.group(1)} ${_translatedLabel('notification_delivered_successfully', 'წარმატებით ჩაბარდა')}',
-      ),
-      _NotificationTextPattern(
-        RegExp(
-          r'^You have earned\s+([\d.,]+)\s+Loyalty points?$',
-          caseSensitive: false,
-        ),
-        (match) =>
-            '${_translatedLabel('notification_loyalty_points_earned_prefix', 'თქვენ დაგერიცხათ')} ${match.group(1)} ${_translatedLabel('notification_loyalty_points_unit', 'ქულა')}',
-      ),
-      _NotificationTextPattern(
-        RegExp(
-          r'^You have converted\s+([\d.,]+)\s+Loyalty points?$',
-          caseSensitive: false,
-        ),
-        (match) =>
-            '${_translatedLabel('notification_loyalty_points_converted_prefix', 'თქვენ გადაცვალეთ')} ${match.group(1)} ${_translatedLabel('notification_loyalty_points_unit', 'ქულა')}',
-      ),
-    ];
-
-    for (final pattern in patterns) {
-      final RegExpMatch? match = pattern.regex.firstMatch(normalizedText);
-      if (match != null) {
-        return pattern.builder(match);
+      if(image != null && image.isNotEmpty) {
+        try{
+          await showBigPictureNotificationHiddenLargeIcon(title, body, notificationBody, image, fln);
+        }catch(e) {
+          await showBigTextNotification(title, body!, notificationBody, fln);
+        }
+      }else {
+        await showBigTextNotification(title, body!, notificationBody, fln);
       }
     }
-
-    return normalizedText;
   }
 
-  static String _translatedLabel(String key, String fallback) {
-    final String translated = key.tr;
-    return translated == key ? fallback : translated;
-  }
-
-  static Future<void> showTextNotification(
-    String title,
-    String body,
-    NotificationBodyModel notificationBody,
-    FlutterLocalNotificationsPlugin fln,
-  ) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-          'portal_notifications',
-          AppConstants.appName,
-          playSound: true,
-          importance: Importance.max,
-          priority: Priority.max,
-          sound: RawResourceAndroidNotificationSound('notification'),
-        );
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
+  static Future<void> showTextNotification(String title, String body, NotificationBodyModel notificationBody, FlutterLocalNotificationsPlugin fln) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '6ammart', AppConstants.appName, playSound: true,
+      importance: Importance.max, priority: Priority.max, sound: RawResourceAndroidNotificationSound('notification'),
     );
-    await fln.show(
-      0,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: jsonEncode(notificationBody.toJson()),
-    );
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await fln.show(0, title, body, platformChannelSpecifics, payload: jsonEncode(notificationBody.toJson()));
   }
 
-  static Future<void> showBigTextNotification(
-    String? title,
-    String body,
-    NotificationBodyModel notificationBody,
-    FlutterLocalNotificationsPlugin fln,
-  ) async {
+  static Future<void> showBigTextNotification(String? title, String body, NotificationBodyModel notificationBody, FlutterLocalNotificationsPlugin fln) async {
     BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
-      body,
-      htmlFormatBigText: true,
-      contentTitle: title,
-      htmlFormatContentTitle: true,
+      body, htmlFormatBigText: true,
+      contentTitle: title, htmlFormatContentTitle: true,
     );
-    AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-          'portal_notifications',
-          AppConstants.appName,
-          importance: Importance.max,
-          styleInformation: bigTextStyleInformation,
-          priority: Priority.max,
-          playSound: true,
-          sound: const RawResourceAndroidNotificationSound('notification'),
-        );
-    NotificationDetails platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
+    AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '6ammart', AppConstants.appName, importance: Importance.max,
+      styleInformation: bigTextStyleInformation, priority: Priority.max, playSound: true,
+      sound: const RawResourceAndroidNotificationSound('notification'),
     );
-    await fln.show(
-      0,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: jsonEncode(notificationBody.toJson()),
-    );
+    NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await fln.show(0, title, body, platformChannelSpecifics, payload: jsonEncode(notificationBody.toJson()));
   }
 
-  static Future<void> showBigPictureNotificationHiddenLargeIcon(
-    String? title,
-    String? body,
-    NotificationBodyModel notificationBody,
-    String image,
-    FlutterLocalNotificationsPlugin fln,
-  ) async {
+  static Future<void> showBigPictureNotificationHiddenLargeIcon(String? title, String? body, NotificationBodyModel notificationBody, String image, FlutterLocalNotificationsPlugin fln) async {
     final String largeIconPath = await _downloadAndSaveFile(image, 'largeIcon');
-    final String bigPicturePath = await _downloadAndSaveFile(
-      image,
-      'bigPicture',
+    final String bigPicturePath = await _downloadAndSaveFile(image, 'bigPicture');
+    final BigPictureStyleInformation bigPictureStyleInformation = BigPictureStyleInformation(
+      FilePathAndroidBitmap(bigPicturePath), hideExpandedLargeIcon: true,
+      contentTitle: title, htmlFormatContentTitle: true,
+      summaryText: body, htmlFormatSummaryText: true,
     );
-    final BigPictureStyleInformation bigPictureStyleInformation =
-        BigPictureStyleInformation(
-          FilePathAndroidBitmap(bigPicturePath),
-          hideExpandedLargeIcon: true,
-          contentTitle: title,
-          htmlFormatContentTitle: true,
-          summaryText: body,
-          htmlFormatSummaryText: true,
-        );
-    final AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-          'portal_notifications',
-          AppConstants.appName,
-          largeIcon: FilePathAndroidBitmap(largeIconPath),
-          priority: Priority.max,
-          playSound: true,
-          styleInformation: bigPictureStyleInformation,
-          importance: Importance.max,
-          sound: const RawResourceAndroidNotificationSound('notification'),
-        );
-    final NotificationDetails platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
+    final AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '6ammart', AppConstants.appName,
+      largeIcon: FilePathAndroidBitmap(largeIconPath), priority: Priority.max, playSound: true,
+      styleInformation: bigPictureStyleInformation, importance: Importance.max,
+      sound: const RawResourceAndroidNotificationSound('notification'),
     );
-    await fln.show(
-      0,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: jsonEncode(notificationBody.toJson()),
-    );
+    final NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await fln.show(0, title, body, platformChannelSpecifics, payload: jsonEncode(notificationBody.toJson()));
   }
 
-  static Future<String> _downloadAndSaveFile(
-    String url,
-    String fileName,
-  ) async {
+  static Future<String> _downloadAndSaveFile(String url, String fileName) async {
     final Directory directory = await getApplicationDocumentsDirectory();
     final String filePath = '${directory.path}/$fileName';
     final http.Response response = await http.get(Uri.parse(url));
@@ -646,37 +256,21 @@ class NotificationHelper {
 
     switch (type) {
       case 'advertisement':
-        return NotificationBodyModel(
-          notificationType: NotificationType.advertisement,
-          advertisementId: int.tryParse(data['advertisement_id']),
-        );
+        return NotificationBodyModel(notificationType: NotificationType.advertisement, advertisementId: int.tryParse(data['advertisement_id']));
       case 'block':
         return NotificationBodyModel(notificationType: NotificationType.block);
       case 'unblock':
-        return NotificationBodyModel(
-          notificationType: NotificationType.unblock,
-        );
+        return NotificationBodyModel(notificationType: NotificationType.unblock);
       case 'withdraw':
-        return NotificationBodyModel(
-          notificationType: NotificationType.withdraw,
-        );
+        return NotificationBodyModel(notificationType: NotificationType.withdraw);
       case 'product_approve':
-        return NotificationBodyModel(
-          notificationType: NotificationType.product_approve,
-        );
+        return NotificationBodyModel(notificationType: NotificationType.product_approve);
       case 'product_rejected':
-        return NotificationBodyModel(
-          notificationType: NotificationType.product_rejected,
-        );
+      return NotificationBodyModel(notificationType: NotificationType.product_rejected);
       case 'campaign':
-        return NotificationBodyModel(
-          notificationType: NotificationType.campaign,
-          campaignId: int.tryParse(data['data_id']),
-        );
+        return NotificationBodyModel(notificationType: NotificationType.campaign, campaignId: int.tryParse(data['data_id']));
       case 'subscription':
-        return NotificationBodyModel(
-          notificationType: NotificationType.subscription,
-        );
+      return NotificationBodyModel(notificationType: NotificationType.subscription);
       case 'new_order':
       case 'New order placed':
       case 'order_status':
@@ -684,15 +278,11 @@ class NotificationHelper {
       case 'message':
         return _handleMessageNotification(data);
       default:
-        return NotificationBodyModel(
-          notificationType: NotificationType.general,
-        );
+        return NotificationBodyModel(notificationType: NotificationType.general);
     }
   }
 
-  static NotificationBodyModel _handleOrderNotification(
-    Map<String, dynamic> data,
-  ) {
+  static NotificationBodyModel _handleOrderNotification(Map<String, dynamic> data) {
     final orderId = data['order_id'];
     return NotificationBodyModel(
       orderId: int.tryParse(orderId) ?? 0,
@@ -700,27 +290,21 @@ class NotificationHelper {
     );
   }
 
-  static NotificationBodyModel _handleMessageNotification(
-    Map<String, dynamic> data,
-  ) {
+  static NotificationBodyModel _handleMessageNotification(Map<String, dynamic> data) {
     final orderId = data['order_id'];
     final conversationId = data['conversation_id'];
     final senderType = data['sender_type'];
 
     return NotificationBodyModel(
-      orderId: orderId != null && orderId.isNotEmpty
-          ? int.tryParse(orderId)
-          : null,
-      conversationId: conversationId != null && conversationId.isNotEmpty
-          ? int.tryParse(conversationId)
-          : null,
+      orderId: orderId != null && orderId.isNotEmpty ? int.tryParse(orderId) : null,
+      conversationId: conversationId != null && conversationId.isNotEmpty ? int.tryParse(conversationId) : null,
       notificationType: NotificationType.message,
-      type: senderType == AppConstants.deliveryMan
-          ? AppConstants.deliveryMan
-          : AppConstants.customer,
+      type: senderType == AppConstants.deliveryMan ? AppConstants.deliveryMan : AppConstants.customer,
     );
   }
+
 }
+
 
 final AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -730,10 +314,10 @@ Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) async {
   WidgetsFlutterBinding.ensureInitialized();
   customPrint("onBackground: ${message.data}");
 
-  NotificationBodyModel notificationBody =
-      NotificationHelper.convertNotification(message.data);
+  NotificationBodyModel notificationBody = NotificationHelper.convertNotification(message.data);
 
-  if (notificationBody.notificationType == NotificationType.order) {
+  if(notificationBody.notificationType == NotificationType.order) {
+
     FlutterForegroundTask.initCommunicationPort();
     await _initService();
     await _startService(notificationBody.orderId.toString());
@@ -745,10 +329,9 @@ Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) async {
 Future<void> _initService() async {
   FlutterForegroundTask.init(
     androidNotificationOptions: AndroidNotificationOptions(
-      channelId: 'portal_notifications',
+      channelId: '6ammart',
       channelName: 'Foreground Service Notification',
-      channelDescription:
-          'This notification appears when the foreground service is running.',
+      channelDescription: 'This notification appears when the foreground service is running.',
       onlyAlertOnce: false,
     ),
     iosNotificationOptions: const IOSNotificationOptions(
@@ -771,21 +354,10 @@ Future<ServiceRequestResult> _startService(String? orderId) async {
   if (await FlutterForegroundTask.isRunningService) {
     return FlutterForegroundTask.restartService();
   } else {
-    final bool isKa =
-        await NotificationHelper.shouldUseGeorgianNotificationText();
-    final String title = isKa
-        ? '${NotificationHelper.localizedTitle('New order placed', forceGeorgian: isKa)}${orderId != null && orderId.isNotEmpty ? ' (#$orderId)' : ''}'
-        : 'You got a new order ($orderId)';
-    final String body = isKa
-        ? NotificationHelper._translatedLabel(
-            'notification_open_app_check_order_details',
-            'გახსენით აპი და გადაამოწმეთ შეკვეთის დეტალები.',
-          )
-        : 'Open app and check order details.';
     return FlutterForegroundTask.startService(
       serviceId: 256,
-      notificationTitle: title,
-      notificationText: body,
+      notificationTitle: 'You got a new order ($orderId)',
+      notificationText: 'Open app and check order details.',
       callback: startCallback,
     );
   }
@@ -856,29 +428,10 @@ class MyTaskHandler extends TaskHandler {
   }
 
   @override
-  void onNotificationDismissed() async {
-    final bool isKa =
-        await NotificationHelper.shouldUseGeorgianNotificationText();
+  void onNotificationDismissed() {
     FlutterForegroundTask.updateService(
-      notificationTitle: isKa
-          ? NotificationHelper.localizedTitle(
-              'New order placed',
-              forceGeorgian: isKa,
-            )
-          : 'You got a new order!',
-      notificationText: isKa
-          ? NotificationHelper._translatedLabel(
-              'notification_open_app_check_order_details',
-              'გახსენით აპი და გადაამოწმეთ შეკვეთის დეტალები.',
-            )
-          : 'Open app and check order details.',
+      notificationTitle: 'You got a new order!',
+      notificationText: 'Open app and check order details.',
     );
   }
-}
-
-class _NotificationTextPattern {
-  final RegExp regex;
-  final String Function(RegExpMatch match) builder;
-
-  const _NotificationTextPattern(this.regex, this.builder);
 }

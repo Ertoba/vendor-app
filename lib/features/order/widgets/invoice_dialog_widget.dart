@@ -11,6 +11,7 @@ import 'package:sixam_mart_store/features/order/domain/models/order_details_mode
 import 'package:sixam_mart_store/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart_store/features/profile/domain/models/profile_model.dart';
 import 'package:sixam_mart_store/helper/date_converter_helper.dart';
+import 'package:sixam_mart_store/helper/price_converter_helper.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/styles.dart';
 
@@ -25,6 +26,7 @@ class InvoiceDialogWidget extends StatelessWidget {
   const InvoiceDialogWidget({super.key, required this.order, required this.orderDetails, /*required this.onPrint,*/ required this.isPrescriptionOrder, required this.paper80MM, required this.dmTips, required this.screenshotController});
 
   String _priceDecimal(double price) {
+    return PriceConverterHelper.convertPrice(price);
     return price.toStringAsFixed(Get.find<SplashController>().configModel!.digitAfterDecimalPoint!);
   }
 
@@ -86,12 +88,21 @@ class InvoiceDialogWidget extends StatelessWidget {
                   Text('${'order_id'.tr}:', style: robotoRegular.copyWith(fontSize: fontSize)),
                   const SizedBox(width: 2),
                   Expanded(child: Text(order!.id.toString(), style: robotoMedium.copyWith(fontSize: fontSize))),
-                  Text(DateConverterHelper.dateTimeStringToMonthAndTime(order!.createdAt!), style: robotoRegular.copyWith(fontSize: fontSize - 2), textAlign: TextAlign.end,),
+                  Text(DateConverterHelper.dateTimeStringToMonthAndTime(order!.createdAt!), style: robotoRegular.copyWith(fontSize: fontSize - 2), textAlign: TextAlign.end),
                 ]),
-                order!.scheduled == 1 ? Text(
-                  '${'scheduled_order_time'.tr} ${DateConverterHelper.dateTimeStringToDateTime(order!.scheduleAt!)}',
-                  style: robotoRegular.copyWith(fontSize: fontSize),
-                ) : const SizedBox(),
+
+                order!.scheduled == 1 ? const SizedBox(height: 4) :SizedBox.shrink(),
+                order!.scheduled == 1 ? Row(children: [
+                  Text('scheduled_order_time'.tr, style: robotoRegular.copyWith(fontSize: fontSize)),
+                  Spacer(),
+                  Flexible(
+                    child: Text(
+                      DateConverterHelper.dateTimeStringToDateTime(order!.scheduleAt!),
+                      style: robotoRegular.copyWith(fontSize: fontSize - 2), textAlign: TextAlign.end,
+                    ),
+                  ),
+                ]) : const SizedBox(),
+                order!.scheduled == 1 ? const SizedBox(height: 4) :SizedBox.shrink(),
                 const SizedBox(height: 5),
 
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [

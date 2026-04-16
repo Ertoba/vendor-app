@@ -18,6 +18,8 @@ import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
 import 'package:sixam_mart_store/util/styles.dart';
 
+import '../../../common/widgets/confirmation_dialog_widget.dart';
+
 class AdvertisementListScreen extends StatefulWidget {
   const AdvertisementListScreen({super.key});
   @override
@@ -106,10 +108,11 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
               isTabShow ? const SizedBox(height: Dimensions.paddingSizeSmall) : const SizedBox(),
 
               Expanded(
-                child: advertisementController.advertisementList != null ? advertisementController.advertisementList!.isNotEmpty
-                    ? advertisementListWidget(advertisementController, advertisementController.advertisementList)
-                    : EmptyAdsView(counts: count)
-                    : const Center(child: CircularProgressIndicator()),
+                child: advertisementController.advertisementList != null ?
+                  advertisementController.advertisementList!.isNotEmpty ?
+                    advertisementListWidget(advertisementController, advertisementController.advertisementList) :
+                  EmptyAdsView(counts: count) :
+                const Center(child: CircularProgressIndicator()),
               ),
             ]),
           ),
@@ -137,9 +140,13 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
 
           Expanded(
             child: ListView.builder(
-              itemCount: advertisementList!.length,
+              itemCount: advertisementList!.length + 1,
                 controller: scrollController,
                 itemBuilder: (context, index) {
+                  if (index == advertisementList.length) {
+                    return const SizedBox(height: Dimensions.paddingSizeExtraOverLarge * 1.5);
+                  }
+
                 String status = advertisementList[index].status == 'approved' && advertisementList[index].active == 1 ? 'running'
                     : advertisementList[index].status == 'approved' && advertisementList[index].active == 0 ? 'expired'
                     : advertisementList[index].status!;
@@ -212,15 +219,34 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
                               return adsController.getPopupMenuList(advertisementList[index].status!, advertisementList[index].active??0).map((PopupMenuModel option) {
                                 return PopupMenuItem<PopupMenuModel>(
                                   onTap: () async {
-
                                     if(option.title == "edit_ads"){
-                                      Get.dialog(const CustomLoaderWidget());
-                                      adsController.getAdvertisementDetails(id: advertisementList[index].id!).then((AdsDetailsModel? adsDetailsModel) {
-                                        Get.back();
-                                        if(adsDetailsModel != null) {
-                                          Get.to(()=> CreateAdvertisementScreen(adsDetailsModel: adsDetailsModel));
-                                        }
-                                      });
+                                      if (status == 'running'){
+                                        Get.dialog(ConfirmationDialogWidget(
+                                          icon: Images.cautionDialogIcon,
+                                          title: 'do_you_want_to_edit'.tr,
+                                          description: 'your_ad_is_running'.tr,
+                                          onNoPressed: () => Get.back(),
+                                          onNoButtonText: 'not_now'.tr,
+                                          onYesButtonText: 'yes_edit'.tr,
+                                          onYesPressed: () async {
+                                            Get.back();
+                                            Get.dialog(const CustomLoaderWidget());
+                                            adsController.getAdvertisementDetails(id: advertisementList[index].id!).then((AdsDetailsModel? adsDetailsModel) {
+                                              Get.back();
+                                              if (adsDetailsModel != null) {
+                                                Get.to(() => CreateAdvertisementScreen(adsDetailsModel: adsDetailsModel));
+                                              }
+                                            });
+                                          },
+                                        ));
+                                      } else {Get.dialog(const CustomLoaderWidget());
+                                        adsController.getAdvertisementDetails(id: advertisementList[index].id!).then((AdsDetailsModel? adsDetailsModel) {
+                                          Get.back();
+                                          if(adsDetailsModel != null) {
+                                            Get.to(()=> CreateAdvertisementScreen(adsDetailsModel: adsDetailsModel));
+                                          }
+                                        });
+                                      }
                                     }
 
                                     else if(option.title == "edit_and_resubmit_ads"){
@@ -305,14 +331,12 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
                                   },
                                   value: option,
                                   height: 40,
-                                  child: Row(
-                                    children: [
-                                      const SizedBox(width: Dimensions.paddingSizeExtraSmall,),
-                                      Icon(option.icon, size: Dimensions.fontSizeLarge,),
-                                      const SizedBox(width: Dimensions.paddingSizeSmall,),
-                                      Text(option.title.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
-                                    ],
-                                  ),
+                                  child: Row(children: [
+                                    const SizedBox(width: Dimensions.paddingSizeExtraSmall,),
+                                    Icon(option.icon, size: Dimensions.fontSizeLarge,),
+                                    const SizedBox(width: Dimensions.paddingSizeSmall,),
+                                    Text(option.title.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
+                                  ]),
                                 );
                               }).toList();
                             },
@@ -373,6 +397,7 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
               );
             }),
           ),
+
 
           adsController.isLoading ? Center(child: Padding(
             padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),

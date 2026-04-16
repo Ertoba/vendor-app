@@ -31,9 +31,116 @@ class DailyTimeWidget extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
       child: Row(children: [
 
-        Expanded(flex: 3, child: Text(dayString.tr, style: robotoMedium)),
+        Expanded(flex: 3, child: Text(dayString.tr, style: robotoMedium.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7)))),
 
-        Expanded(flex: 7, child: SizedBox(height: 60, child: ListView.builder(
+        Expanded(flex: 7, child: SizedBox(height: 60, child: scheduleList.isEmpty
+          ? Row(children: [
+              Padding(
+                padding: const EdgeInsets.only(right: Dimensions.paddingSizeLarge),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  height: 60,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.2), width: 1),
+                    color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall),
+                  alignment: Alignment.center,
+                  child: Text('off_day'.tr),
+                ),
+              ),
+              InkWell(
+                onTap: () => Get.dialog(Dialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.radiusLarge)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+
+                      Text('${'schedule_for'.tr} ${dayString.tr}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor)),
+                      const SizedBox(height: Dimensions.paddingSizeLarge),
+
+                      Row(children: [
+                        Expanded(child: CustomTimePickerWidget(
+                          title: 'open_time'.tr, time: openingTime,
+                          onTimeChanged: (time) => openingTime = time,
+                        )),
+                        const SizedBox(width: Dimensions.paddingSizeSmall),
+
+                        Expanded(child: CustomTimePickerWidget(
+                          title: 'close_time'.tr, time: closingTime,
+                          onTimeChanged: (time) => closingTime = time,
+                        )),
+
+                      ]),
+                      const SizedBox(height: Dimensions.paddingSizeLarge),
+
+                      GetBuilder<StoreController>(builder: (storeController) {
+                        return storeController.scheduleLoading ? const Center(child: CircularProgressIndicator()) : Row(children: [
+
+                          Expanded(child: TextButton(
+                            onPressed: () => Get.back(),
+                            style: TextButton.styleFrom(
+                              backgroundColor: Theme.of(context).disabledColor.withValues(alpha: 0.3), minimumSize: const Size(1170, 40), padding: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.radiusSmall)),
+                            ),
+                            child: Text(
+                              'cancel'.tr, textAlign: TextAlign.center,
+                              style: robotoBold.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color),
+                            ),
+                          )),
+                          const SizedBox(width: Dimensions.paddingSizeLarge),
+
+                          Expanded(child: CustomButtonWidget(
+                            buttonText: 'add'.tr,
+                            onPressed: () {
+                              bool overlapped = false;
+                              if(openingTime != null && closingTime != null) {
+                                for(int index=0; index<scheduleList.length; index++) {
+                                  if(_isUnderTime(scheduleList[index].openingTime!, openingTime!, closingTime)
+                                      || _isUnderTime(scheduleList[index].closingTime!, openingTime!, closingTime)
+                                      || _isUnderTime(openingTime!, scheduleList[index].openingTime!, scheduleList[index].closingTime)
+                                      || _isUnderTime(closingTime!, scheduleList[index].openingTime!, scheduleList[index].closingTime)) {
+                                    overlapped = true;
+                                    break;
+                                  }
+                                }
+                              }
+                              if(openingTime == null) {
+                                showCustomSnackBar('pick_start_time'.tr);
+                              }else if(closingTime == null) {
+                                showCustomSnackBar('pick_end_time'.tr);
+                              }else if(DateConverterHelper.convertTimeToDateTime(openingTime!).isAfter(DateConverterHelper.convertTimeToDateTime(openingTime!))) {
+                                showCustomSnackBar('closing_time_must_be_after_the_opening_time'.tr);
+                              }else if(overlapped) {
+                                showCustomSnackBar('this_schedule_is_overlapped'.tr);
+                              }else {
+                                storeController.addSchedule(Schedules(
+                                  day: weekDay, openingTime: openingTime, closingTime: closingTime,
+                                ));
+                              }
+                            },
+                            height: 40,
+                          )),
+
+                        ]);
+                      }),
+
+                    ]),
+                  ),
+                ), barrierDismissible: false),
+                child: Container(
+                  height: 30, width: 30,
+                  margin: const EdgeInsets.symmetric(vertical: 15),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                  ),
+                  child: const Icon(Icons.add, color: Colors.white),
+                ),
+              ),
+            ])
+          : ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: scheduleList.length+1,
           itemBuilder: (context, index) {
@@ -46,14 +153,10 @@ class DailyTimeWidget extends StatelessWidget {
                     padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
 
-                      Text(
-                        '${'schedule_for'.tr} ${dayString.tr}',
-                        style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
-                      ),
+                      Text('${'schedule_for'.tr} ${dayString.tr}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor)),
                       const SizedBox(height: Dimensions.paddingSizeLarge),
 
                       Row(children: [
-
                         Expanded(child: CustomTimePickerWidget(
                           title: 'open_time'.tr, time: openingTime,
                           onTimeChanged: (time) => openingTime = time,
@@ -142,8 +245,8 @@ class DailyTimeWidget extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(vertical: 10),
                   height: 60,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Theme.of(context).textTheme.bodyLarge!.color!, width: 1),
-                    color: Theme.of(context).cardColor,
+                    border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.2), width: 1),
+                    color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall),
@@ -162,10 +265,21 @@ class DailyTimeWidget extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: InkWell(
-                      onTap: () => Get.dialog(ConfirmationDialogWidget(
-                        icon: Images.warning, description: 'are_you_sure_to_delete_this_schedule'.tr,
-                        onYesPressed: () => Get.find<StoreController>().deleteSchedule(scheduleList[index].id),
-                      ), barrierDismissible: false),
+                      onTap: () {
+                        Get.dialog(
+                          Builder(
+                            builder: (dialogContext) => ConfirmationDialogWidget(
+                              icon: Images.warning,
+                              description: 'are_you_sure_to_delete_this_schedule'.tr,
+                              onYesPressed: () {
+                                Navigator.of(dialogContext).pop();
+                                Get.find<StoreController>().deleteSchedule(scheduleList[index].id);
+                              },
+                            ),
+                          ),
+                          barrierDismissible: false,
+                        );
+                      },
                       child: const Icon(Icons.cancel_outlined, color: Colors.red),
                     ),
                   ),

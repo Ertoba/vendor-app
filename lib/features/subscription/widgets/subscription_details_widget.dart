@@ -31,9 +31,7 @@ class _SubscriptionDetailsWidgetState extends State<SubscriptionDetailsWidget> {
   Widget build(BuildContext context) {
 
     bool businessIsCommission = widget.subscriptionController.profileModel!.stores![0].storeBusinessModel == 'commission';
-
     int remainingDays = widget.subscriptionController.profileModel!.subscription != null ? DateConverterHelper.differenceInDaysIgnoringTime(DateTime.parse(widget.subscriptionController.profileModel!.subscription!.expiryDate!), null) : 0;
-
     bool isRental = Get.find<AuthController>().getModuleType() == 'rental';
 
     return Column(children: [
@@ -77,7 +75,7 @@ class _SubscriptionDetailsWidgetState extends State<SubscriptionDetailsWidget> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '${Get.find<SplashController>().configModel?.adminCommission} %',
+                          '${widget.subscriptionController.profileModel!.stores![0].comission} %',
                           style: robotoBold.copyWith(color: const Color(0xff006161), fontSize: 24),
                         ),
                         const SizedBox(width: Dimensions.paddingSizeSmall),
@@ -92,7 +90,7 @@ class _SubscriptionDetailsWidgetState extends State<SubscriptionDetailsWidget> {
                   const SizedBox(height: Dimensions.paddingSizeDefault),
 
                   Text(
-                    "${'vendor_will_pay'.tr} ${Get.find<SplashController>().configModel!.adminCommission}% ${'commission_to'.tr} ${Get.find<SplashController>().configModel!.businessName} ${'from_each_order_You_will_get_access_of_all'.tr}",
+                    "${'vendor_will_pay'.tr} ${widget.subscriptionController.profileModel!.stores![0].comission}% ${'commission_to'.tr} ${Get.find<SplashController>().configModel!.businessName} ${'from_each_order_You_will_get_access_of_all'.tr}",
                     style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7), height: 2), textAlign: TextAlign.start,
                   )
                   

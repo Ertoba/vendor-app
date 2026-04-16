@@ -9,6 +9,7 @@ import 'package:sixam_mart_store/features/review/widgets/customer_review_screen_
 import 'package:sixam_mart_store/features/review/widgets/review_card_widget.dart';
 import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart_store/features/store/domain/models/review_model.dart';
+import 'package:sixam_mart_store/features/review/widgets/review_summary_widget.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 
 class CustomerReviewScreen extends StatefulWidget {
@@ -31,58 +32,30 @@ class _CustomerReviewScreenState extends State<CustomerReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: CustomAppBarWidget(title: 'customer_reviews'.tr),
       body: GetBuilder<StoreController>(builder: (storeController) {
-
         List<ReviewModel>? searchReviewList;
-        if(storeController.isSearching) {
+        if (storeController.isSearching) {
           searchReviewList = storeController.searchReviewList;
         } else {
           searchReviewList = storeController.storeReviewList;
         }
 
-        return Column(children: [
-          Padding(
-            padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-            child: SizedBox(
-              height: 50,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(50),
-                child: SearchFieldWidget(
-                  fromReview: true,
-                  controller: _searchController,
-                  hint: '${'search_by_order_id_item_or_customer'.tr}...',
-                  suffixIcon: storeController.isSearching ? CupertinoIcons.clear_thick : CupertinoIcons.search,
-                  iconPressed: () {
-                    if (!storeController.isSearching) {
-                      if (_searchController.text.trim().isNotEmpty) {
-                        storeController.getStoreReviewList(Get.find<ProfileController>().profileModel!.stores![0].id, _searchController.text.trim());
-                      } else {
-                        showCustomSnackBar('write_order_id_food_name_for_search'.tr);
-                      }
-                    } else {
-                      _searchController.clear();
-                      storeController.getStoreReviewList(Get.find<ProfileController>().profileModel!.stores![0].id, "");
-                    }
-                  },
-                  onSubmit: (String text) {
-                    if (_searchController.text.trim().isNotEmpty) {
-                      storeController.getStoreReviewList(
-                          Get.find<ProfileController>().profileModel!.stores![0].id, _searchController.text.trim());
-                    } else {
-                      showCustomSnackBar('write_order_id_food_name_for_search'.tr);
-                    }
-                  },
-                ),
-
+        return SingleChildScrollView(
+          child: Column(children: [
+            SizedBox(height: Dimensions.paddingSizeDefault),
+            if (searchReviewList != null && !storeController.isSearching) ...[
+              ReviewSummaryWidget(
+                avgRating: Get.find<ProfileController>().profileModel!.stores![0].avgRating ?? 0,
+                totalReviews: Get.find<ProfileController>().profileModel!.stores![0].ratingCount ?? 0,
+                ratingBreakdown: _calculateRatingBreakdown(storeController.storeReviewList ?? []),
               ),
-            ),
-          ),
-
-          Expanded(
-            child: searchReviewList != null ? searchReviewList.isNotEmpty ? ListView.builder(
+              const SizedBox(height: Dimensions.paddingSizeDefault),
+            ],
+          
+            searchReviewList != null ? searchReviewList.isNotEmpty ? ListView.builder(
+              physics: NeverScrollableScrollPhysics(),
               itemCount: searchReviewList.length,
               shrinkWrap: true,
               padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
@@ -93,9 +66,21 @@ class _CustomerReviewScreenState extends State<CustomerReviewScreen> {
                 );
               },
             ) : Padding(padding: EdgeInsets.only(top: context.height * 0.35), child: Text('no_review_found'.tr)) : const CustomerReviewScreenShimmer(),
-          ),
-        ]);
+          ]),
+        );
       }),
     );
+  }
+
+  List<int> _calculateRatingBreakdown(List<ReviewModel> reviews) {
+    List<int> breakdown = [0, 0, 0, 0, 0];
+    for (var review in reviews) {
+      if (review.rating == 5) breakdown[0]++;
+      else if (review.rating == 4) breakdown[1]++;
+      else if (review.rating == 3) breakdown[2]++;
+      else if (review.rating == 2) breakdown[3]++;
+      else if (review.rating == 1) breakdown[4]++;
+    }
+    return breakdown;
   }
 }

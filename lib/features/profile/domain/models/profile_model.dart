@@ -220,6 +220,8 @@ class Store {
   bool? itemSection;
   double? avgRating;
   int? ratingCount;
+  int? totalOrder;
+  int? totalItems;
   bool? active;
   bool? gstStatus;
   String? gstCode;
@@ -239,8 +241,8 @@ class Store {
   bool? cutlery;
   String? metaTitle;
   String? metaDescription;
-  String? metaKeyWord;
   String? metaImageFullUrl;
+  String? metaKeyWord;
   String? announcementMessage;
   String? storeBusinessModel;
   int? isAnnouncementActive;
@@ -248,6 +250,7 @@ class Store {
   double? extraPackagingAmount;
   bool? isHalalActive;
   double? minimumStockForWarning;
+  MetaSeoData? metaData;
 
   Store({
     this.id,
@@ -273,6 +276,8 @@ class Store {
     this.itemSection,
     this.avgRating,
     this.ratingCount,
+    this.totalOrder,
+    this.totalItems,
     this.active,
     this.gstStatus,
     this.gstCode,
@@ -327,6 +332,8 @@ class Store {
     itemSection = json['item_section'];
     avgRating = json['avg_rating']?.toDouble();
     ratingCount = json['rating_count'];
+    totalItems = json['total_items'];
+    totalOrder = json['total_order'];
     active = json['active'];
     gstStatus = json['gst_status'];
     gstCode = json['gst_code'];
@@ -351,8 +358,8 @@ class Store {
     cutlery = json['cutlery'];
     metaTitle = json['meta_title'];
     metaDescription = json['meta_description'];
-    metaKeyWord = json['meta_key_word'];
     metaImageFullUrl = json['meta_image_full_url'];
+    metaKeyWord = json['meta_key_word'];
     announcementMessage = json['announcement_message'];
     storeBusinessModel = json['store_business_model'];
     isAnnouncementActive = json['announcement'];
@@ -360,6 +367,7 @@ class Store {
     extraPackagingAmount = json['extra_packaging_amount']?.toDouble();
     isHalalActive = json['halal_tag_status'] ?? false;
     minimumStockForWarning = json['minimum_stock_for_warning']?.toDouble();
+    metaData = json['meta_data'] != null ? MetaSeoData.fromJson(json['meta_data']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -387,6 +395,8 @@ class Store {
     data['item_section'] = itemSection;
     data['avg_rating'] = avgRating;
     data['rating_count '] = ratingCount;
+    data['total_items'] = totalItems;
+    data['total_order'] = totalOrder;
     data['active'] = active;
     data['gst_status'] = gstStatus;
     data['gst_code'] = gstCode;
@@ -412,8 +422,8 @@ class Store {
     data['cutlery'] = cutlery;
     data['meta_title'] = metaTitle;
     data['meta_description'] = metaDescription;
-    data['meta_key_word'] = metaKeyWord;
     data['meta_image_full_url'] = metaImageFullUrl;
+    data['meta_key_word'] = metaKeyWord;
     data['announcement_message'] = announcementMessage;
     data['store_business_model'] = storeBusinessModel;
     data['announcement'] = isAnnouncementActive;
@@ -421,9 +431,71 @@ class Store {
     data['extra_packaging_amount'] = extraPackagingAmount;
     data['halal_tag_status'] = isHalalActive;
     data['minimum_stock_for_warning'] = minimumStockForWarning;
+    if (metaData != null) {
+      data['meta_data'] = metaData!.toJson();
+    }
     return data;
   }
 }
+
+class MetaSeoData {
+  String? metaIndex;
+  String? metaNoFollow;
+  String? metaNoArchive;
+  String? metaNoSnippet;
+  String? metaMaxSnippet;
+  String? metaNoImageIndex;
+  String? metaMaxImagePreview;
+  String? metaMaxSnippetValue;
+  String? metaMaxVideoPreview;
+  String? metaMaxImagePreviewValue;
+  String? metaMaxVideoPreviewValue;
+
+  MetaSeoData({
+    this.metaIndex,
+    this.metaNoFollow,
+    this.metaNoArchive,
+    this.metaNoSnippet,
+    this.metaMaxSnippet,
+    this.metaNoImageIndex,
+    this.metaMaxImagePreview,
+    this.metaMaxSnippetValue,
+    this.metaMaxVideoPreview,
+    this.metaMaxImagePreviewValue,
+    this.metaMaxVideoPreviewValue
+  });
+
+  MetaSeoData.fromJson(Map<String, dynamic> json) {
+    metaIndex = json['meta_index']?.toString();
+    metaNoFollow = json['meta_no_follow']?.toString();
+    metaNoArchive = json['meta_no_archive']?.toString();
+    metaNoSnippet = json['meta_no_snippet']?.toString();
+    metaMaxSnippet = json['meta_max_snippet']?.toString();
+    metaNoImageIndex = json['meta_no_image_index']?.toString();
+    metaMaxImagePreview = json['meta_max_image_preview']?.toString();
+    metaMaxSnippetValue = json['meta_max_snippet_value']?.toString();
+    metaMaxVideoPreview = json['meta_max_video_preview']?.toString();
+    metaMaxImagePreviewValue = json['meta_max_image_preview_value']?.toString();
+    metaMaxVideoPreviewValue = json['meta_max_video_preview_value']?.toString();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['meta_index'] = metaIndex;
+    data['meta_no_follow'] = metaNoFollow;
+    data['meta_no_archive'] = metaNoArchive;
+    data['meta_no_snippet'] = metaNoSnippet;
+    data['meta_max_snippet'] = metaMaxSnippet;
+    data['meta_no_image_index'] = metaNoImageIndex;
+    data['meta_max_image_preview'] = metaMaxImagePreview;
+    data['meta_max_snippet_value'] = metaMaxSnippetValue;
+    data['meta_max_video_preview'] = metaMaxVideoPreview;
+    data['meta_max_image_preview_value'] = metaMaxImagePreviewValue;
+    data['meta_max_video_preview_value'] = metaMaxVideoPreviewValue;
+    return data;
+  }
+}
+
 
 class EmployeeInfo {
   int? id;

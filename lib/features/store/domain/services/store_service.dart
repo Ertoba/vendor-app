@@ -56,8 +56,8 @@ class StoreService implements StoreServiceInterface {
   }
 
   @override
-  Future<Response> addItem(Item item, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName) async {
-    return await storeRepositoryInterface.addItem(item, image, images, savedImages, attributes, isAdd, tags, nutrition, allergicIngredients, genericName);
+  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName) async {
+    return await storeRepositoryInterface.addItem(item, metaImage, image, images, savedImages, attributes, isAdd, tags, nutrition, allergicIngredients, genericName);
   }
 
   @override

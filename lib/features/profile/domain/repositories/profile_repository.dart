@@ -18,6 +18,9 @@ class ProfileRepository implements ProfileRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.profileUri);
     if (response.statusCode == 200) {
       profileModel = ProfileModel.fromJson(response.body);
+      if (profileModel.stores != null && profileModel.stores!.isNotEmpty) {
+        print('RECEIVED FROM API - Halal: ${profileModel.stores![0].isHalalActive}, Veg: ${profileModel.stores![0].veg}, Non-Veg: ${profileModel.stores![0].nonVeg}');
+      }
     }
     return profileModel;
   }

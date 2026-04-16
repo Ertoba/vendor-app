@@ -28,31 +28,29 @@ class _PickupTimeInputState extends State<PickupTimeInput> {
           ),
           child: Row(children: [
             Expanded(
+              flex: 2,
               child: TextField(
                 controller: widget.minTimeController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
-                  hintText: 'min_20'.tr,
+                  hintText: 'mini'.tr,
                   hintStyle: robotoRegular.copyWith(color: Theme.of(context).disabledColor),
                   border: InputBorder.none,
                 ),
               ),
             ),
 
-            Container(
-              height: 25,
-              width: 1,
-              color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
-            ),
+            Container(height: 25, width: 1, color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
 
             Expanded(
+              flex: 2,
               child: TextField(
                 controller: widget.maxTimeController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
-                  hintText: 'max_30'.tr,
+                  hintText: 'maxi'.tr,
                   hintStyle: robotoRegular.copyWith(color: Theme.of(context).disabledColor),
                   border: InputBorder.none,
                 ),
@@ -60,6 +58,7 @@ class _PickupTimeInputState extends State<PickupTimeInput> {
             ),
 
             Expanded(
+              flex: 3,
               child: CustomDropdownButton(
                 items: storeController.durations,
                 isBorder: false,
@@ -82,7 +81,6 @@ class _PickupTimeInputState extends State<PickupTimeInput> {
             child: Text('approximate_delivery_time'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeSmall)),
           ),
         ),
-
       ]);
     });
   }

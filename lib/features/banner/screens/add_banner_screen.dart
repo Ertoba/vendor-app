@@ -31,6 +31,7 @@ class _AddBannerScreenState extends State<AddBannerScreen> with TickerProviderSt
 
   final List<FocusNode> _titleFocusNode = [];
   final FocusNode _urlFocusNode = FocusNode();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final List<Language>? _languageList = Get.find<SplashController>().configModel!.language;
 
@@ -86,10 +87,17 @@ class _AddBannerScreenState extends State<AddBannerScreen> with TickerProviderSt
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-                child: SingleChildScrollView(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('title'.tr, style: robotoBold),
-                    const SizedBox(height: Dimensions.paddingSizeSmall),
+                child: Form(
+                  key: _formKey,
+                  child: SingleChildScrollView(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      RichText(text: TextSpan(
+                        children: [
+                          TextSpan(text: 'title'.tr, style: robotoBold.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color)),
+                          TextSpan(text: ' *'.tr, style: robotoMedium.copyWith(color: Colors.red)),
+                        ],
+                      )),
+                      const SizedBox(height: Dimensions.paddingSizeSmall),
 
                     Container(
                       padding: const EdgeInsets.only(
@@ -136,13 +144,25 @@ class _AddBannerScreenState extends State<AddBannerScreen> with TickerProviderSt
                           focusNode: _titleFocusNode[_tabController!.index],
                           nextFocus: _tabController!.index == _languageList!.length-1 ? _urlFocusNode : _titleFocusNode[_tabController!.index+1],
                           showTitle: false,
+                          required: true,
+                          validator: (value) {
+                            if (_tabController!.index == 0 && (value == null || value.trim().isEmpty)) {
+                              return 'enter_title'.tr;
+                            }
+                            return null;
+                          },
                         ),
 
                       ]),
                     ),
                     const SizedBox(height: Dimensions.paddingSizeLarge),
 
-                    Text('redirection_url_link'.tr, style: robotoBold),
+                    RichText(text: TextSpan(
+                      children: [
+                        TextSpan(text: 'redirection_url_link'.tr, style: robotoBold.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color)),
+                        TextSpan(text: ' *', style: robotoBold.copyWith(color: Colors.red)),
+                      ],
+                    )),
                     const SizedBox(height: Dimensions.paddingSizeSmall),
 
                     Container(
@@ -156,12 +176,27 @@ class _AddBannerScreenState extends State<AddBannerScreen> with TickerProviderSt
                         showLabelText: false,
                         controller: _urlController,
                         focusNode: _urlFocusNode,
+                        inputType: TextInputType.url,
                         inputAction: TextInputAction.done,
+                        required: true,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'enter_url'.tr;
+                          } else if (!UrlValidator.isValidUrl(value.trim())) {
+                            return 'enter_valid_url'.tr;
+                          }
+                          return null;
+                        },
                       ),
                     ),
                     const SizedBox(height: Dimensions.paddingSizeLarge),
 
-                    Text('upload_banner'.tr, style: robotoBold),
+                    RichText(text: TextSpan(
+                      children: [
+                        TextSpan(text: 'upload_banner'.tr, style: robotoBold.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color)),
+                        TextSpan(text: ' *'.tr, style: robotoMedium.copyWith(color: Colors.red)),
+                      ],
+                    )),
                     const SizedBox(height: Dimensions.paddingSizeSmall),
 
                     Container(
@@ -201,13 +236,13 @@ class _AddBannerScreenState extends State<AddBannerScreen> with TickerProviderSt
                                   child: InkWell(
                                     onTap: () => storeController.pickImage(true, false),
                                     child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                      const Icon(Icons.cloud_upload, color: Colors.teal),
-                                      const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                                      Text(
-                                        "drag_drop_file_or_browse_file".tr,
-                                        style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeSmall),
-                                      ),
+                                      if (storeController.rawLogo == null && (widget.storeBannerListModel?.imageFullUrl == null || widget.storeBannerListModel!.imageFullUrl!.isEmpty)) ...[
+                                        const Icon(Icons.cloud_upload, color: Colors.teal),
+                                        const SizedBox(height: Dimensions.paddingSizeSmall),
+                                        Text("drag_drop_file_or_browse_file".tr,
+                                          style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeSmall),
+                                        ),
+                                      ],
                                     ]),
                                   ),
                                 ),
@@ -221,7 +256,7 @@ class _AddBannerScreenState extends State<AddBannerScreen> with TickerProviderSt
                         Align(
                           alignment: Alignment.center,
                           child: Text(
-                            "banner_images_ration_5:1".tr,
+                            "banner_images_ration_3:1".tr,
                             style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall),
                           ),
                         ),
@@ -242,6 +277,7 @@ class _AddBannerScreenState extends State<AddBannerScreen> with TickerProviderSt
                 ),
               ),
             ),
+          ),
 
             SafeArea(
               child: Padding(
@@ -250,39 +286,26 @@ class _AddBannerScreenState extends State<AddBannerScreen> with TickerProviderSt
                   isLoading: bannerController.isLoading,
                   buttonText: _update ? 'update_banner'.tr : 'add_banner'.tr,
                   onPressed: () {
-
-                    bool defaultLanguageDataNull = false;
-                    for(int index=0; index<_languageList.length; index++) {
-                      if(_languageList[index].key == 'en') {
-                        if (_titleController[index].text.trim().isEmpty) {
-                          defaultLanguageDataNull = true;
+                    if (_formKey.currentState!.validate()) {
+                      if (!_update && storeController.rawLogo == null) {
+                        showCustomSnackBar('upload_a_banner'.tr);
+                      } else {
+                        List<Translation> translations = [];
+                        for(int index = 0; index < _languageList.length; index++) {
+                          translations.add(Translation(
+                            locale: _languageList[index].key, key: 'name',
+                            value: _titleController[index].text.trim().isNotEmpty ? _titleController[index].text.trim() : _titleController[0].text.trim(),
+                          ));
                         }
-                        break;
-                      }
-                    }
-
-                    if(defaultLanguageDataNull) {
-                      showCustomSnackBar('enter_title'.tr);
-                    }else if((UrlValidator.isValidUrl(_urlController.text) && _urlController.text.isNotEmpty)) {
-                      showCustomSnackBar('enter_valid_url'.tr);
-                    }else if(!_update && storeController.rawLogo == null) {
-                      showCustomSnackBar('upload_banner'.tr);
-                    }else{
-                      List<Translation> translations = [];
-                      for(int index = 0; index < _languageList.length; index++) {
-                        translations.add(Translation(
-                          locale: _languageList[index].key, key: 'name',
-                          value: _titleController[index].text.trim().isNotEmpty ? _titleController[index].text.trim() : _titleController[0].text.trim(),
-                        ));
-                      }
-                      _storeBannerListModel?.id = _storeBannerListModel?.id;
-                      _storeBannerListModel?.translations = [];
-                      _storeBannerListModel?.translations!.addAll(translations);
-                      _storeBannerListModel?.defaultLink = _urlController.text.trim();
-                      if(_update){
-                        bannerController.updateBanner(banner: _storeBannerListModel, image: storeController.rawLogo);
-                      }else{
-                        bannerController.addBanner(banner: _storeBannerListModel, image: storeController.rawLogo!);
+                        _storeBannerListModel?.id = _storeBannerListModel?.id;
+                        _storeBannerListModel?.translations = [];
+                        _storeBannerListModel?.translations!.addAll(translations);
+                        _storeBannerListModel?.defaultLink = _urlController.text.trim();
+                        if(_update){
+                          bannerController.updateBanner(banner: _storeBannerListModel, image: storeController.rawLogo);
+                        }else{
+                          bannerController.addBanner(banner: _storeBannerListModel, image: storeController.rawLogo!);
+                        }
                       }
                     }
                   },

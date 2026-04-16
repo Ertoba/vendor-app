@@ -30,7 +30,7 @@ class _AnimatedBorderContainerState extends State<AnimatedBorderContainer> with 
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _controller,
-      builder: (_, __) {
+      builder: (_, _) {
         return Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(Dimensions.radiusDefault),

@@ -25,6 +25,7 @@ class ReviewReplyScreen extends StatefulWidget {
 class _ReviewReplyScreenState extends State<ReviewReplyScreen> {
 
   final TextEditingController _replyController = TextEditingController();
+  bool _isExpanded = false;
 
   @override
   void initState() {
@@ -81,7 +82,38 @@ class _ReviewReplyScreenState extends State<ReviewReplyScreen> {
                   ]),
                   const SizedBox(height: Dimensions.paddingSizeDefault),
 
-                  Text(widget.review.customerName ?? '', style: robotoBold),
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(
+                      widget.review.comment ?? '',
+                      style: robotoRegular,
+                      maxLines: _isExpanded ? null : 3,
+                      overflow: _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                    ),
+
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final textSpan = TextSpan(text: widget.review.comment ?? '', style: robotoRegular);
+                        final textPainter = TextPainter(
+                          text: textSpan,
+                          maxLines: 3,
+                          textDirection: TextDirection.ltr,
+                        )..layout(maxWidth: constraints.maxWidth);
+
+                        if (!textPainter.didExceedMaxLines) return const SizedBox();
+
+                        return GestureDetector(
+                          onTap: () => setState(() => _isExpanded = !_isExpanded),
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: Dimensions.paddingSizeExtraSmall),
+                            child: Text(
+                              _isExpanded ? 'view_less'.tr : 'view_more'.tr,
+                              style: robotoMedium.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ]),
                   const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
                   Text(widget.review.comment ?? '', style: robotoRegular),

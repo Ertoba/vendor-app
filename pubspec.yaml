@@ -58,6 +58,7 @@ dependencies:
   #Rental Module
   dropdown_button2: ^2.3.9
   lottie: ^3.3.2
+  marquee: ^2.3.0
   syncfusion_flutter_datepicker: ^31.2.16
 
 dev_dependencies:

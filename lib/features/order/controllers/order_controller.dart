@@ -216,7 +216,10 @@ class OrderController extends GetxController implements GetxService {
       orderId: orderID, status: status, otp: status == 'delivered' ? _otp : null, processingTime: processingTime, reason: reason,
     );
     ResponseModel responseModel = await orderServiceInterface.updateOrderStatus(updateStatusBody, pickedPrescriptions);
-    Get.back(result: responseModel.isSuccess);
+    // Only close dialog if one is open (like confirmation dialogs)
+    if(Get.isDialogOpen == true) {
+      Get.back(result: responseModel.isSuccess);
+    }
     if(responseModel.isSuccess) {
       if(back && fromNotification) {
         Get.offAllNamed(RouteHelper.getInitialRoute());

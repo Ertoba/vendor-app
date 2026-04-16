@@ -86,9 +86,18 @@ class CustomTextFieldWidget extends StatefulWidget {
 
 class CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
   bool _obscureText = true;
+  late int _currentLength;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentLength = widget.controller?.text.length ?? 0;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final maxLength = widget.maxLength;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -101,7 +110,7 @@ class CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
           controller: widget.controller,
           focusNode: widget.focusNode,
           validator: widget.validator,
-          style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge),
+          style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge, color: widget.isEnabled ? Theme.of(context).textTheme.bodyLarge?.color : Theme.of(context).textTheme.bodyLarge?.color),
           textInputAction: widget.inputAction,
           keyboardType: widget.isAmount ? const TextInputType.numberWithOptions(decimal: true) : widget.isNumber ? TextInputType.number : widget.inputType,
           cursorColor: Theme.of(context).primaryColor,
@@ -204,6 +213,7 @@ class CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
         ),
 
         widget.divider ? const Padding(padding: EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge), child: Divider()) : const SizedBox(),
+
       ],
     );
   }

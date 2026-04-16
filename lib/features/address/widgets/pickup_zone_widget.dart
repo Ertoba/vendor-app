@@ -28,7 +28,7 @@ class PickupZoneWidget extends StatelessWidget {
             );
           }).toList(),
           showTitle: false,
-          hintText: 'select_pick_zone'.tr,
+          hintText:  'select_pick_zone'.tr,
           onChanged: (String? value) {
             final selectedZone = addressController.zoneList?.firstWhere((zone) => zone.name == value);
             if (selectedZone != null) {

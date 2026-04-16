@@ -35,6 +35,7 @@ class FundPaymentDialogWidget extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Get.back();
+                Get.back();
               },
               style: TextButton.styleFrom(
                 backgroundColor: Theme.of(context).disabledColor.withValues(alpha: 0.3), minimumSize: const Size(1130, 40), padding: EdgeInsets.zero,

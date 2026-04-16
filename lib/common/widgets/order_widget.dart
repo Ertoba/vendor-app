@@ -19,10 +19,17 @@ class OrderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+      padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
         color: Theme.of(context).cardColor,
         border: Border.all(color: Theme.of(context).hintColor.withValues(alpha: 0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.white.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4)),
+        ],
       ),
       child: CustomInkWellWidget(
         onTap: () => Get.toNamed(RouteHelper.getOrderDetailsRoute(orderModel.id)),
@@ -30,7 +37,6 @@ class OrderWidget extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
           child: Column(children: [
-
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -38,32 +44,32 @@ class OrderWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(children: [
-                      Text('order'.tr, style: robotoMedium),
+                      Text('order'.tr, style: robotoRegular.copyWith(color: Theme.of(context).hintColor)),
                       Text(' # ${orderModel.id}', style: robotoBold),
                       Text(' (${orderModel.detailsCount} ${orderModel.detailsCount! < 2 ? 'item'.tr : 'items'.tr})', style: robotoRegular.copyWith(color: Theme.of(context).hintColor)),
                     ]),
 
-                    showStatus ? Container(
+                    Container(
                       padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeExtraSmall),
                       decoration: BoxDecoration(
-                        color: orderModel.orderStatus == 'delivered' ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+                        color: orderModel.orderStatus == 'pending' ? Colors.blueAccent.withValues(alpha: 0.1) : orderModel.orderStatus == 'confirmed' ? Colors.teal.withValues(alpha: 0.1) : orderModel.orderStatus == 'delivered' ? Colors.indigo.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        orderModel.orderType == 'dine_in' && orderModel.orderStatus == 'delivered' ? 'served'.tr : orderModel.orderStatus!.tr,
+                        orderModel.orderStatus! == 'picked_up' ? 'item'.tr + ' ' + 'on_the_way'.tr : orderModel.orderStatus!.tr,
                         style: robotoMedium.copyWith(
                           fontSize: Dimensions.fontSizeExtraSmall,
-                          color: orderModel.orderStatus == 'delivered' ? Colors.green : Colors.red,
+                          color: orderModel.orderStatus == 'pending' ? Colors.blueAccent : orderModel.orderStatus == 'confirmed' ? Colors.teal : orderModel.orderStatus == 'delivered' ? Colors.indigo : Colors.red,
                         ),
                       ),
-                    ) : const SizedBox(),
+                    ),
                   ],
                 ),
                 const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
                 Text(
-                  DateConverterHelper.beforeTimeFormat(orderModel.createdAt!),
+                  DateConverterHelper.utcToDateTime(orderModel.createdAt!),
                   style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.5)),
                 ),
               ],
@@ -84,7 +90,7 @@ class OrderWidget extends StatelessWidget {
                   orderModel.orderType == 'delivery' ? 'home_delivery'.tr : orderModel.orderType!.tr,
                   style: robotoMedium.copyWith(
                     fontSize: Dimensions.fontSizeSmall,
-                    color: orderModel.orderType == 'delivery' ? Colors.blue : Theme.of(context).primaryColor,
+                    color: orderModel.orderType == 'delivery' ? Colors.indigo : orderModel.orderType == 'take_away' ? Colors.orangeAccent : Theme.of(context).primaryColor,
                   ),
                 ),
 

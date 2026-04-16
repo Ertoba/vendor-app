@@ -1,5 +1,4 @@
 import 'package:sixam_mart_store/util/dimensions.dart';
-import 'package:sixam_mart_store/util/images.dart';
 import 'package:sixam_mart_store/util/styles.dart';
 import 'package:flutter/material.dart';
 
@@ -12,22 +11,12 @@ class CountWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
+        padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault),
         child: Column(children: [
 
-          Text(title, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).cardColor)),
+          Text(count.toString() , style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraLarge)),
           const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-
-            Image.asset(Images.order, color: Theme.of(context).cardColor, height: 12, width: 12),
-            const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-
-            Text(count.toString(), style: robotoMedium.copyWith(
-              fontSize: Dimensions.fontSizeExtraLarge, color: Theme.of(context).cardColor,
-            )),
-
-          ]),
+          Text(title, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).hintColor)),
 
         ]),
       ),

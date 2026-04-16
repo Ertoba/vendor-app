@@ -153,7 +153,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           ) : const SizedBox(),
                           SizedBox(height: profileController.profileModel!.adjustable! ? Dimensions.paddingSizeLarge : 0),
 
-                          (profileController.profileModel!.balance! > 0 && profileController.profileModel!.balance! > profileController.profileModel!.cashInHands! && Get.find<SplashController>().configModel!.disbursementType == 'manual') ? InkWell(
+                          (profileController.profileModel!.balance! > 0&& profileController.profileModel!.balance! > profileController.profileModel!.cashInHands!  && Get.find<SplashController>().configModel!.disbursementType == 'manual') ? InkWell(
                             onTap: () {
                               Get.bottomSheet(const WithdrawRequestBottomSheetWidget(), isScrollControlled: true);
                             },

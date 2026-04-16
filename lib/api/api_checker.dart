@@ -9,7 +9,7 @@ class ApiChecker {
       Get.find<AuthController>().clearSharedData();
       Get.offAllNamed(RouteHelper.getSignInRoute());
     }else {
-      showCustomSnackBar(response.statusText ?? 'Request failed (${response.statusCode ?? 0})');
+      showCustomSnackBar(response.statusText);
     }
   }
 }

@@ -107,6 +107,54 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
     }
   }
 
+
+  bool _hasChanges(AdvertisementController adsController) {
+    final original = widget.adsDetailsModel!;
+    if (adsController.selectedAdsType != (original.addType ?? '')) return true;
+    if (adsController.isReviewChecked != (original.isReviewActive == 1)) return true;
+    if (adsController.isRatingsChecked != (original.isRatingActive == 1)) return true;
+
+    final originalDateRange =
+        '${DateConverterHelper.stringToMDY(original.startDate ?? '')} - ${DateConverterHelper.stringToMDY(original.endDate ?? '')}';
+    if ((validationController?.text ?? '') != originalDateRange) return true;
+
+    for (int i = 0; i < _languageList!.length; i++) {
+      final langKey = _languageList[i].key;
+      String originalTitle = i == 0 ? (original.title ?? '') : '';
+      String originalDesc  = i == 0 ? (original.description ?? '') : '';
+      if (i > 0) {
+        original.translations?.forEach((t) {
+          if (t.locale == langKey && t.key == 'title')   originalTitle = t.value ?? '';
+          if (t.locale == langKey && t.key == 'description') originalDesc  = t.value ?? '';
+        });
+      }
+      if (titleController[i].text.trim() != originalTitle.trim()) return true;
+      if (descriptionController[i].text.trim() != originalDesc.trim()) return true;
+    }
+
+    if (adsController.pickedVideoFile != null) return true;
+    if (adsController.pickedProfileImage != null) return true;
+    if (adsController.pickedCoverImage != null) return true;
+
+    if (original.videoAttachmentFullUrl != null &&
+        adsController.networkVideoFile == null &&
+        adsController.pickedVideoFile == null) {
+      return true;
+    }
+    if (original.profileImageFullUrl != null &&
+        adsController.networkProfileImage == null &&
+        adsController.pickedProfileImage == null) {
+      return true;
+    }
+    if (original.coverImageFullUrl != null &&
+        adsController.networkCoverImage == null &&
+        adsController.pickedCoverImage == null) {
+      return true;
+    }
+
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AdvertisementController>(
@@ -194,6 +242,7 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
                             capitalization: TextCapitalization.sentences,
                             inputAction: TextInputAction.done,
                             isEnabled : false,
+                            required: true,
                             hideEnableText: true,
                             suffixChild: Icon(Icons.date_range_rounded, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)),
                             validator: (value) {
@@ -246,6 +295,7 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
                             focusNode: _titleFocus[multiLanguageTabController!.index],
                             nextFocus: multiLanguageTabController!.index != _languageList.length - 1 ? _descriptionFocus[multiLanguageTabController!.index] : _descriptionFocus[0],
                             validator: (value) => (value == null || value.isEmpty) ? "enter_title".tr : null,
+                            required: true,
                           ),
                           const SizedBox(height: Dimensions.paddingSizeLarge),
 
@@ -260,6 +310,7 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
                             maxLines: 2,
                             maxLength: 100,
                             validator: (value) => (value == null || value.isEmpty) ? "enter_description".tr : null,
+                            required: true,
                           ),
                         ]),
 
@@ -303,7 +354,12 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
 
                   const SizedBox(height: Dimensions.paddingSizeLarge),
 
-                  Text('upload_files'.tr, style: robotoMedium),
+                  RichText(text: TextSpan(
+                    children: [
+                      TextSpan(text: 'upload_files'.tr, style: robotoMedium.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color)),
+                      TextSpan(text: ' *'.tr, style: robotoMedium.copyWith(color: Colors.red)),
+                    ],
+                  )),
                   const SizedBox(height: Dimensions.paddingSizeSmall),
 
                   Container(
@@ -490,11 +546,7 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
                             ),
                           ),
                         ),
-
-
                       ]),
-
-
                     ]),
                   ),
                 ]),
@@ -539,6 +591,11 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
                               if(widget.fromCopy!) {
                                 adsController.copyAddAdvertisement(adsId: widget.adsDetailsModel!.id!, titleController: titleController, descriptionController: descriptionController, languageList: _languageList);
                               } else {
+
+                                if (!_hasChanges(adsController)) {
+                                  Get.back();
+                                  return;
+                                }
                                 adsController.editAdvertisement(widget.adsDetailsModel!, isFromDetailsPage: true, validationController: validationController!, titleController: titleController, descriptionController: descriptionController, languageList: _languageList);
                               }
                             }
@@ -547,6 +604,11 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
                               if(widget.fromCopy!){
                                 adsController.copyAddAdvertisement(adsId: widget.adsDetailsModel!.id!, titleController: titleController, descriptionController: descriptionController, languageList: _languageList);
                               }else{
+
+                                if (!_hasChanges(adsController)) {
+                                  Get.back();
+                                  return;
+                                }
                                 adsController.editAdvertisement(widget.adsDetailsModel!, isFromDetailsPage: true, validationController: validationController!, titleController: titleController, descriptionController: descriptionController, languageList: _languageList);
                               }
                             }

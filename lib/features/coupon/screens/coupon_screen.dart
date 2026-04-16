@@ -33,7 +33,7 @@ class _CouponScreenState extends State<CouponScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBarWidget(title: 'coupon'.tr),
+      appBar: CustomAppBarWidget(title: 'coupon_list'.tr),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Get.to(() => const AddCouponScreen()),
         child: Icon(Icons.add_circle_outline, size: 30, color: Theme.of(context).cardColor),
@@ -101,85 +101,52 @@ class _CouponScreenState extends State<CouponScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall, horizontal: Dimensions.paddingSizeDefault),
                                 child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-
-                                  Align(
-                                    alignment: Alignment.topRight,
+                                  Align(alignment: Alignment.topRight,
                                     child: PopupMenuButton(
                                         itemBuilder: (context) {
                                           bool status = couponController.coupons![index].status == 1 ? true : false;
                                           return <PopupMenuEntry>[
+                                            PopupMenuItem(value: 'status', child: Column(children: [
+                                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                                Text('status'.tr, style: robotoMedium),
+                                                SizedBox(width: 50),
+                                                Container(width: 40,
+                                                  decoration: BoxDecoration(
+                                                    color: status ? Colors.teal : Theme.of(context).hintColor,
+                                                    borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+                                                  ),
+                                                  padding: const EdgeInsets.all(1),
+                                                  child: Align(alignment: status ? Alignment.centerRight : Alignment.centerLeft,
+                                                    child: Container(height: 20, width: 20, decoration: BoxDecoration(shape: BoxShape.circle, color: Theme.of(context).cardColor,)),
+                                                  ),
+                                                ),
+                                              ]),
+                                            ])),
 
-                                            PopupMenuItem(
-                                              value: 'status',
-                                              child: Column(
-                                                children: [
-                                                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                                    Text('status'.tr, style: robotoMedium),
-
-                                                    Container(
-                                                      width: 40,
-                                                      decoration: BoxDecoration(
-                                                        color: status ? Theme.of(context).primaryColor : Theme.of(context).hintColor,
-                                                        borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
-                                                      ),
-                                                      padding: const EdgeInsets.all(1),
-                                                      child: Align(
-                                                        alignment: status ? Alignment.centerRight : Alignment.centerLeft,
-                                                        child: Container(
-                                                          height: 20, width: 20,
-                                                          decoration: BoxDecoration(
-                                                            shape: BoxShape.circle,
-                                                            color: Theme.of(context).cardColor,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ]),
-                                                  const SizedBox(height: Dimensions.paddingSizeSmall),
-                                                  const Divider(height: 1),
-                                                ],
-                                              ),
+                                            PopupMenuItem(value: 'view',
+                                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                                Text('view'.tr, style: robotoMedium),
+                                                const Icon(Icons.remove_red_eye, size:24),
+                                              ]),
                                             ),
 
-                                            PopupMenuItem(
-                                              value: 'view',
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text('view'.tr, style: robotoMedium),
-
-                                                  const Icon(Icons.remove_red_eye, size: 20),
-                                                ],
-                                              ),
-                                            ),
-
-                                            PopupMenuItem(
-                                              value: 'edit',
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text('edit_coupon'.tr, style: robotoMedium),
-
-                                                  Container(
-                                                    padding: const EdgeInsets.all(2),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.blue,
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    child: const Icon(Icons.edit_outlined, color: Colors.white, size: 16),
+                                            PopupMenuItem(value: 'edit',
+                                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                                  Text('edit'.tr, style: robotoMedium),
+                                                  Container(padding: const EdgeInsets.all(4),
+                                                    decoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+                                                    child: const Icon(Icons.edit_outlined, color: Colors.white, size: 14),
                                                   ),
                                                 ],
                                               ),
                                             ),
 
-                                            PopupMenuItem(
-                                              value: 'delete',
+                                            PopupMenuItem(value: 'delete',
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
-                                                  Text('delete_coupon'.tr, style: robotoMedium),
-
-                                                  Icon(CupertinoIcons.trash_fill, color: Theme.of(context).colorScheme.error, size: 20),
+                                                  Text('delete'.tr, style: robotoMedium),
+                                                  Icon(CupertinoIcons.trash_fill, color: Theme.of(context).colorScheme.error, size: 22),
                                                 ],
                                               ),
                                             ),
@@ -191,10 +158,10 @@ class _CouponScreenState extends State<CouponScreen> {
                                         child: Container(
                                           padding: const EdgeInsets.all(3),
                                           decoration: BoxDecoration(
-                                            color: Theme.of(context).primaryColor.withValues(alpha: 0.15),
+                                            color: Theme.of(context).hintColor.withValues(alpha: 0.15),
                                             borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                                           ),
-                                          child: Icon(Icons.more_vert, size: 20, color: Theme.of(context).primaryColor),
+                                          child: Icon(Icons.more_vert, size: 20, color: Theme.of(context).hintColor),
                                         ),
                                         onSelected: (dynamic value) {
                                           if(value == 'status'){
@@ -236,8 +203,8 @@ class _CouponScreenState extends State<CouponScreen> {
                                   const SizedBox(height: 5),
 
                                   FittedBox(
-                                    child: Text('${DateConverterHelper.stringToLocalDateOnly(couponController.coupons![index].startDate!)}  ${'to'.tr} ${DateConverterHelper.stringToLocalDateOnly(couponController.coupons![index].expireDate!)}',
-                                      style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall),
+                                    child: Text('${DateConverterHelper.stringToLocalDateOnly(couponController.coupons![index].startDate!)}  - ${DateConverterHelper.stringToLocalDateOnly(couponController.coupons![index].expireDate!)}',
+                                      style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
                                     ),
                                   ),
                                   const SizedBox(height: 5),

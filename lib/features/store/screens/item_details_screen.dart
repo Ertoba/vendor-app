@@ -33,7 +33,6 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
   @override
   void initState() {
     super.initState();
-
     item = widget.product;
   }
 
@@ -322,11 +321,9 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                     Text('generic_name'.tr, style: robotoMedium),
                     const SizedBox(height: Dimensions.paddingSizeSmall),
 
-                    Text(
-                      item.genericName!.join(', '),
+                    Text(item.genericName!.join(', '),
                       style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
                     ),
-
                   ]),
                 ) : const SizedBox(),
 

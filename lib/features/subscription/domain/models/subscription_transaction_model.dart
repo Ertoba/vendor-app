@@ -85,7 +85,7 @@ class Transactions {
     packageId = json['package_id'];
     storeId = json['store_id'];
     storeSubscriptionId = json['store_subscription_id'];
-    price = json['price']?.toDouble();
+    price = json['price'];
     validity = json['validity'];
     paymentMethod = json['payment_method'];
     paymentStatus = json['payment_status'];

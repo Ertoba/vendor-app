@@ -16,7 +16,7 @@ abstract class StoreRepositoryInterface<T> extends RepositoryInterface<Schedules
   Future<dynamic> getAttributeList(Item? item);
   Future<bool> updateStoreBasicInfo(Store store, XFile? logo, XFile? cover, List<Translation> translation, XFile? metaImage);
   Future<dynamic> updateStore(Store store, String min, String max, String type);
-  Future<dynamic> addItem(Item item, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName);
+  Future<dynamic> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName);
   Future<dynamic> deleteItem(int? itemID, bool pendingItem);
   Future<List<ReviewModel>?> getStoreReviewList(int? storeID, String? searchText);
   Future<dynamic> getItemReviewList(int? itemID);

@@ -146,8 +146,16 @@ class SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _globalKey,
-      backgroundColor: const Color(0xFFF75D04),
-      body: const SizedBox.expand(),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Image.asset(Images.logo, width: 200),
+            const SizedBox(height: Dimensions.paddingSizeSmall),
+            Text('suffix_name'.tr, style: robotoMedium, textAlign: TextAlign.center),
+          ]),
+        ),
+      ),
     );
   }
 }

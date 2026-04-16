@@ -286,6 +286,36 @@ class StoreController extends GetxController implements GetxService {
   String? _availableTimeEnds;
   String? get availableTimeEnds => _availableTimeEnds;
 
+  String? _metaIndex = 'index';
+  String? get metaIndex => _metaIndex;
+
+  String? _noFollow;
+  String? get noFollow => _noFollow;
+
+  String? _noImageIndex;
+  String? get noImageIndex => _noImageIndex;
+
+  String? _noArchive;
+  String? get noArchive => _noArchive;
+
+  String? _noSnippet;
+  String? get noSnippet => _noSnippet;
+
+  String? _maxSnippet;
+  String? get maxSnippet => _maxSnippet;
+
+  String? _maxVideoPreview;
+  String? get maxVideoPreview => _maxVideoPreview;
+
+  String? _maxImagePreview;
+  String? get maxImagePreview => _maxImagePreview;
+
+  final List<String> _imagePreviewType = ['large', 'medium', 'small'];
+  List<String> get imagePreviewType => _imagePreviewType;
+
+  String _imagePreviewSelectedType = 'large';
+  String get imagePreviewSelectedType => _imagePreviewSelectedType;
+
   void initItemData({Item? item, bool isFood = false, bool isGrocery = false, bool isPharmacy = false}) {
     if(isFood || isGrocery) {
       _getNutritionSuggestionList();
@@ -362,6 +392,11 @@ class StoreController extends GetxController implements GetxService {
     _isOrganic = isOrganic;
   }
 
+  void setType(String val) {
+    _type = val;
+    update();
+  }
+
   void toggleRecommendedProduct(int? productID) async {
     bool isSuccess = await storeServiceInterface.updateRecommendedProductStatus(productID, _isRecommended ? 0 : 1);
     if(isSuccess) {
@@ -423,6 +458,19 @@ class StoreController extends GetxController implements GetxService {
     _isSearchVisible = !_isSearchVisible;
     update();
   }
+
+  void resetFilters() {
+    _type = 'all';
+    _categoryId = 0;
+    _categoryIndex = 0;
+    _isSearching = false;
+    _isSearchVisible = false;
+    _itemSize = null; // Reset item size to show shimmer while reloading
+    update();
+    // Reload item list with default filters
+    getItemList(offset: '1', type: 'all', search: '', categoryId: 0);
+  }
+
 
   Future<void> getItemList({required String offset, required String type, required String search, int? categoryId, bool willUpdate = true}) async {
 
@@ -726,7 +774,7 @@ class StoreController extends GetxController implements GetxService {
       genericName = genericNameData ?? '';
     }
 
-    Response response = await storeServiceInterface.addItem(item, _rawLogo, _rawImages, _savedImages, fields, isAdd, tags, nutrition, allergicIngredients, genericName);
+    Response response = await storeServiceInterface.addItem(item, _pickedMetaImage, _rawLogo, _rawImages, _savedImages, fields, isAdd, tags, nutrition, allergicIngredients, genericName);
     if(response.statusCode == 200) {
       Get.offAll(() => const DashboardScreen(pageIndex: 2));
       showCustomSnackBar(response.body['message'], isError: false);
@@ -911,7 +959,6 @@ class StoreController extends GetxController implements GetxService {
     bool isSuccess = await storeServiceInterface.deleteSchedule(scheduleID);
     if(isSuccess) {
       _scheduleList!.removeWhere((schedule) => schedule.id == scheduleID);
-      Get.back();
       showCustomSnackBar('schedule_removed_successfully'.tr, isError: false);
     }
     _scheduleLoading = false;
@@ -972,6 +1019,51 @@ class StoreController extends GetxController implements GetxService {
     if(notify) {
       update();
     }
+  }
+
+  void setGstEnabled(bool value) {
+    _isGstEnabled = value;
+    update();
+  }
+
+  void setExtraPackagingEnabled(bool value) {
+    _isExtraPackagingEnabled = value;
+    update();
+  }
+
+  void setScheduleOrderEnabled(bool value) {
+    _isScheduleOrderEnabled = value;
+    update();
+  }
+
+  void setDeliveryEnabled(bool value) {
+    _isDeliveryEnabled = value;
+    update();
+  }
+
+  void setCutleryEnabled(bool value) {
+    _isCutleryEnabled = value;
+    update();
+  }
+
+  void setFreeDeliveryEnabled(bool value) {
+    _isFreeDeliveryEnabled = value;
+    update();
+  }
+
+  void setTakeAwayEnabled(bool value) {
+    _isTakeAwayEnabled = value;
+    update();
+  }
+
+  void setPrescriptionStatusEnable(bool value) {
+    _isPrescriptionStatusEnable = value;
+    update();
+  }
+
+  void setHalalEnabled(bool value) {
+    _isHalalEnabled = value;
+    update();
   }
 
   Future<void> getUnitList(Item? item) async {
@@ -1549,4 +1641,62 @@ class StoreController extends GetxController implements GetxService {
     update();
   }
 
+  void setMetaIndex(String? index) {
+    _metaIndex = index;
+    update();
+  }
+
+  void setNoFollow(String? noFollow) {
+    _noFollow = noFollow;
+    update();
+  }
+
+  void setNoImageIndex(String? noImageIndex) {
+    _noImageIndex = noImageIndex;
+    update();
+  }
+
+  void setNoArchive(String? noArchive) {
+    _noArchive = noArchive;
+    update();
+  }
+
+  void setNoSnippet(String? noSnippet) {
+    _noSnippet = noSnippet;
+    update();
+  }
+
+  void setMaxSnippet(String? maxSnippet) {
+    _maxSnippet = maxSnippet;
+    update();
+  }
+
+  void setMaxVideoPreview(String? maxVideoPreview) {
+    _maxVideoPreview = maxVideoPreview;
+    update();
+  }
+
+  void setMaxImagePreview(String? maxImagePreview) {
+    _maxImagePreview = maxImagePreview;
+    update();
+  }
+
+  void setImagePreviewType(String type) {
+    _imagePreviewSelectedType = type;
+    update();
+  }
+
+  void initializeMetaData(MetaSeoData? metaData) {
+    if (metaData != null) {
+      _metaIndex = metaData.metaIndex.toString();
+      _noFollow = metaData.metaNoFollow;
+      _noImageIndex = metaData.metaNoImageIndex;
+      _noArchive = metaData.metaNoArchive;
+      _noSnippet = metaData.metaNoSnippet;
+      _maxSnippet = metaData.metaMaxSnippet.toString();
+      _maxVideoPreview = metaData.metaMaxVideoPreview.toString();
+      _maxImagePreview = metaData.metaMaxImagePreview.toString();
+      _imagePreviewSelectedType = metaData.metaMaxImagePreviewValue ?? '';
+    }
+  }
 }

@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:sixam_mart_store/features/splash/controllers/splash_controller.dart';
 
+import '../../../profile/domain/models/profile_model.dart';
+
 class ItemModel {
   int? _totalSize;
   String? _limit;
@@ -102,6 +104,10 @@ class Item {
   int? isRejected;
   String? note;
   List<TaxData>? taxData;
+  String? metaTitle;
+  String? metaDescription;
+  String? metaImageFullUrl;
+  MetaSeoData? metaData;
 
   Item({
     this.id,
@@ -157,6 +163,10 @@ class Item {
     this.isRejected,
     this.note,
     this.taxData,
+    this.metaTitle,
+    this.metaDescription,
+    this.metaImageFullUrl,
+    this.metaData,
   });
 
   Item.fromJson(Map<String, dynamic> json) {
@@ -299,6 +309,10 @@ class Item {
       taxData = <TaxData>[];
       json['tax_data'].forEach((v) { taxData!.add(TaxData.fromJson(v)); });
     }
+    metaTitle = json['meta_title'];
+    metaDescription = json['meta_description'];
+    metaImageFullUrl = json['meta_image'];
+    metaData = json['meta_data'] != null ? MetaSeoData.fromJson(json['meta_data']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -384,6 +398,12 @@ class Item {
     data['note'] = note;
     if (taxData != null) {
       data['tax_data'] = taxData!.map((v) => v.toJson()).toList();
+    }
+    data['meta_title'] = metaTitle;
+    data['meta_description'] = metaDescription;
+    data['meta_image'] = metaImageFullUrl;
+    if (metaData != null) {
+      data['meta_data'] = metaData!.toJson();
     }
     return data;
   }

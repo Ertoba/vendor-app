@@ -36,32 +36,20 @@ class OrderButtonWidget extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-            border: Border.all(color: Theme.of(context).disabledColor, width: 0.5),
-            color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).cardColor,
+            color: Colors.transparent,
+            border: Border(bottom: BorderSide(color: isSelected ? Theme.of(context).primaryColor : Colors.transparent, width: 1)),
           ),
           alignment: Alignment.center,
-          child: Row(
-            children: [
-              Text(
-                title,
-                maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: robotoMedium.copyWith(
-                  fontSize: Dimensions.fontSizeSmall,
-                  color: isSelected ? Theme.of(context).cardColor : Theme.of(context).textTheme.bodyLarge!.color,
-                ),
+          child: Row(children: [
+              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).hintColor),
               ),
 
               !fromHistory ? Container(
                 margin: const EdgeInsets.only(left: Dimensions.paddingSizeExtraSmall),
                 padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall, vertical: 2),
-                child: Text(
-                  '($length)',
-                  maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: robotoMedium.copyWith(
-                    fontSize: Dimensions.fontSizeSmall,
-                    color: isSelected ? Theme.of(context).cardColor : Theme.of(context).textTheme.bodyLarge!.color,
-                  ),
+                child: Text('($length)', maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).hintColor),
                 ),
               ) : const SizedBox(),
             ],

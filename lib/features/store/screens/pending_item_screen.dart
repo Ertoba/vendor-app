@@ -72,9 +72,7 @@ class _PendingItemScreenState extends State<PendingItemScreen> with SingleTicker
                       child: Text('new_product'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
                     ),
                     const SizedBox(width: 40),
-
                     PopupMenuButton(
-
                       itemBuilder: (context) {
                         return <PopupMenuEntry>[
                           getMenuItem(Get.find<StoreController>().statusList[0], context),
@@ -99,7 +97,7 @@ class _PendingItemScreenState extends State<PendingItemScreen> with SingleTicker
                           Get.find<StoreController>().offset.toString(), Get.find<StoreController>().statusList[index],
                         );
                       },
-                    ),
+                    )
                   ]),
 
                   Expanded(

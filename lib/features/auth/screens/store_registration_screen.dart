@@ -166,6 +166,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
 
                     Visibility(
                       visible: authController.storeStatus == 0.1,
+                      maintainState: true,
                       child: Form(
                         key: _formKeyLogin,
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -232,6 +233,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                     Row(children: [
                                       Text('vendor_logo'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7))),
                                       Text(' (${'1:1'})', style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall)),
+                                      Text(' *'.tr, style: robotoRegular.copyWith(color: Colors.red, fontSize: Dimensions.fontSizeDefault)),
                                     ]),
                                     const SizedBox(height: Dimensions.paddingSizeDefault),
 
@@ -249,13 +251,20 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                             child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
 
                                               Icon(CupertinoIcons.photo_camera_solid, size: 30, color: Theme.of(context).disabledColor.withValues(alpha: 0.6)),
-                                              const SizedBox(height: Dimensions.paddingSizeSmall),
 
                                               Padding(
                                                 padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
                                                 child: Text(
                                                   'upload_vendor_logo'.tr,
-                                                  style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7)), textAlign: TextAlign.center,
+                                                  style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7), fontSize: Dimensions.fontSizeSmall), textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
+                                                child: Text(
+                                                  'thumbnail_image_format'.tr,
+                                                  style: robotoRegular.copyWith(color: Theme.of(context).disabledColor.withValues(alpha: 0.6), fontSize: Dimensions.fontSizeSmall),
+                                                  textAlign: TextAlign.center,
                                                 ),
                                               ),
 
@@ -303,6 +312,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                     Row(children: [
                                       Text('vendor_cover'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7))),
                                       Text(' (${'3:1'})', style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall)),
+                                      Text(' *'.tr, style: robotoRegular.copyWith(color: Colors.red, fontSize: Dimensions.fontSizeDefault)),
                                     ]),
                                     const SizedBox(height: Dimensions.paddingSizeDefault),
 
@@ -323,7 +333,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
 
                                               Text(
                                                 'upload_vendor_cover'.tr,
-                                                style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7)), textAlign: TextAlign.center,
+                                                style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7), fontSize: Dimensions.fontSizeSmall), textAlign: TextAlign.center,
                                               ),
 
                                               Padding(
@@ -353,19 +363,14 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                               padding: const EdgeInsets.all(0),
                                               radius: const Radius.circular(Dimensions.radiusDefault),
                                             ),
-                                            child: Center(
-                                              child: Visibility(
-                                                visible: authController.pickedCover != null,
-                                                child: Container(
-                                                  padding: const EdgeInsets.all(25),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(width: 3, color: Colors.white),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: const Icon(CupertinoIcons.photo_camera_solid, color: Colors.white, size: 50),
-                                                ),
+                                            child: Center(child: Visibility(
+                                              visible: authController.pickedCover != null,
+                                              child: Container(
+                                                padding: const EdgeInsets.all(25),
+                                                decoration: BoxDecoration(border: Border.all(width: 3, color: Colors.white), shape: BoxShape.circle),
+                                                child: const Icon(CupertinoIcons.photo_camera_solid, color: Colors.white, size: 50),
                                               ),
-                                            ),
+                                            )),
                                           ),
                                         ),
                                       ),
@@ -403,38 +408,36 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                 onTap: () {
                                   Get.dialog(const CustomTimePickerWidget());
                                 },
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    Container(
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).cardColor,
-                                        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                        border: Border.all(color: Theme.of(context).disabledColor, width: 0.5),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
-                                      child: Row(children: [
-                                        Expanded(child: Text(
-                                          '${authController.storeMinTime} : ${authController.storeMaxTime} ${authController.storeTimeUnit}',
-                                          style: robotoMedium,
-                                        )),
-                                        Icon(Icons.access_time_filled, color: Theme.of(context).primaryColor,)
-                                      ]),
+                                child: Stack(clipBehavior: Clip.none, children: [
+                                  Container(
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).cardColor,
+                                      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                      border: Border.all(color: Theme.of(context).disabledColor, width: 0.5),
                                     ),
+                                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+                                    child: Row(children: [
+                                      Expanded(child: Text(
+                                        '${authController.storeMinTime} : ${authController.storeMaxTime} ${authController.storeTimeUnit}',
+                                        style: robotoMedium,
+                                      )),
+                                      Icon(Icons.access_time_filled, color: Theme.of(context).primaryColor,)
+                                    ]),
+                                  ),
 
-                                    Positioned(
-                                      left: 10, top: -15,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).cardColor,
-                                        ),
-                                        padding: const EdgeInsets.all(5),
-                                        child: Text('select_time'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
-                                      ),
+                                  Positioned(
+                                    left: 10, top: -15,
+                                    child: Container(
+                                      decoration: BoxDecoration(color: Theme.of(context).cardColor),
+                                      padding: const EdgeInsets.all(5),
+                                      child: RichText(text: TextSpan(children: [
+                                        TextSpan(text:'select_time'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeDefault)),
+                                        TextSpan(text:' *'.tr, style: robotoRegular.copyWith(color: Colors.red, fontSize: Dimensions.fontSizeDefault)),
+                                      ])),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ]),
                               ),
                             ]),
                           ),
@@ -476,43 +479,33 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                     authController.setTinExpireDate(pickedDate);
                                   }
                                 },
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    Container(
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).cardColor,
-                                        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                        border: Border.all(color: Theme.of(context).disabledColor, width: 0.5),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+                                child: Stack(clipBehavior: Clip.none, children: [
+                                  Container(
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).cardColor,
+                                      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                      border: Border.all(color: Theme.of(context).disabledColor, width: 0.5),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+                                    child: Row(children: [
+                                      Expanded(child: Text(authController.tinExpireDate ?? 'select_date'.tr, style: robotoMedium)),
+                                      Icon(Icons.calendar_month, color: Theme.of(context).primaryColor),
+                                    ]),
+                                  ),
+
+                                  Positioned(
+                                    left: 10, top: -15,
+                                    child: Container(
+                                      decoration: BoxDecoration(color: Theme.of(context).cardColor,),
+                                      padding: const EdgeInsets.all(5),
                                       child: Row(children: [
-                                        Expanded(child: Text(
-                                          authController.tinExpireDate ?? 'select_date'.tr,
-                                          style: robotoMedium,
-                                        )),
-                                        Icon(Icons.calendar_month, color: Theme.of(context).primaryColor),
+                                        Text('expire_date'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
+                                        // Text(' *', style: robotoRegular.copyWith(color: Colors.red)),
                                       ]),
                                     ),
-
-                                    Positioned(
-                                      left: 10, top: -15,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).cardColor,
-                                        ),
-                                        padding: const EdgeInsets.all(5),
-                                        child: Row(
-                                          children: [
-                                            Text('expire_date'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
-                                            // Text(' *', style: robotoRegular.copyWith(color: Colors.red)),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ]),
                               ),
                               const SizedBox(height: Dimensions.paddingSizeLarge),
 
@@ -522,9 +515,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                               const SizedBox(height: Dimensions.paddingSizeLarge),
 
                               authController.tinFiles!.isEmpty ? InkWell(
-                                onTap: () {
-                                  authController.pickFiles();
-                                },
+                                onTap: () => authController.pickFiles(),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraLarge),
                                   child: DottedBorder(
@@ -541,30 +532,19 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                         color: Get.isDarkMode ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFFAFAFA),
                                         borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                                       ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          const SizedBox(width: Dimensions.paddingSizeSmall),
-                                          CustomAssetImageWidget(Images.uploadIcon, height: 40, width: 40, color: Get.isDarkMode ? Colors.grey : null),
-                                          const SizedBox(width: Dimensions.paddingSizeSmall),
-                                          RichText(
-                                            textAlign: TextAlign.center,
-                                            text: TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: 'click_to_upload'.tr,
-                                                  style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: Colors.blue),
-                                                ),
-                                                const TextSpan(text: '\n'),
-                                                TextSpan(
-                                                  text: 'or_drag_and_drop'.tr,
-                                                  style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7)),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                        const SizedBox(width: Dimensions.paddingSizeSmall),
+                                        CustomAssetImageWidget(Images.uploadIcon, height: 40, width: 40, color: Get.isDarkMode ? Colors.grey : null),
+                                        const SizedBox(width: Dimensions.paddingSizeSmall),
+                                        RichText(
+                                          textAlign: TextAlign.center,
+                                          text: TextSpan(children: [
+                                            TextSpan(text: 'click_to_upload'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: Colors.blue)),
+                                            const TextSpan(text: '\n'),
+                                            TextSpan(text: 'or_drag_and_drop'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7))),
+                                          ]),
+                                        ),
+                                      ]),
                                     ),
                                   ),
                                 ),
@@ -579,97 +559,59 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                   ),
                                   child: SizedBox(
                                     width: double.infinity,
-                                    child: Stack(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
-                                          height: 120,
-                                          width: double.infinity,
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFFAFAFA),
-                                            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Flexible(
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Builder(
-                                                      builder: (context) {
-                                                        final filePath = authController.tinFiles![0].paths[0];
-                                                        final fileName = filePath!.split('/').last.toLowerCase();
+                                    child: Stack(children: [
+                                      Container(
+                                        padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
+                                        height: 120,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(color: const Color(0xFFFAFAFA), borderRadius: BorderRadius.circular(Dimensions.radiusDefault)),
+                                        child: Row(children: [
+                                          Flexible(
+                                            child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                              Builder(builder: (context) {
+                                                final filePath = authController.tinFiles![0].paths[0];
+                                                final fileName = filePath!.split('/').last.toLowerCase();
 
-                                                        if (fileName.endsWith('.pdf')) {
-                                                          // Show PDF preview
-                                                          return Row(
-                                                            children: [
-                                                              const Icon(Icons.picture_as_pdf, size: 40, color: Colors.red),
-                                                              const SizedBox(width: 10),
-                                                              Expanded(
-                                                                child: Text(
-                                                                  fileName,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                ),
-                                                              ),
-                                                              const SizedBox(width: 35),
-                                                            ],
-                                                          );
-                                                        } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
-                                                          // Show Word document preview
-                                                          return Row(
-                                                            children: [
-                                                              const Icon(Icons.description, size: 40, color: Colors.blue),
-                                                              const SizedBox(width: 10),
-                                                              Expanded(
-                                                                child: Text(
-                                                                  fileName,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                ),
-                                                              ),
-                                                              const SizedBox(width: 35),
-                                                            ],
-                                                          );
-                                                        } else {
-                                                          // Show generic file preview
-                                                          return Row(
-                                                            children: [
-                                                              const Icon(Icons.insert_drive_file, size: 40, color: Colors.grey),
-                                                              const SizedBox(width: 10),
-                                                              Expanded(
-                                                                child: Text(
-                                                                  fileName,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                ),
-                                                              ),
-                                                              const SizedBox(width: 35),
-                                                            ],
-                                                          );
-                                                        }
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
+                                                if (fileName.endsWith('.pdf')) {
+                                                  // Show PDF preview
+                                                  return Row(children: [
+                                                    const Icon(Icons.picture_as_pdf, size: 40, color: Colors.red),
+                                                    const SizedBox(width: 10),
+                                                    Expanded(child: Text(fileName, overflow: TextOverflow.ellipsis)),
+                                                    const SizedBox(width: 35),
+                                                  ]);
+                                                } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
+                                                  // Show Word document preview
+                                                  return Row(children: [
+                                                    const Icon(Icons.description, size: 40, color: Colors.blue),
+                                                    const SizedBox(width: 10),
+                                                    Expanded(child: Text(fileName, overflow: TextOverflow.ellipsis)),
+                                                    const SizedBox(width: 35),
+                                                  ]);
+                                                } else {
+                                                  // Show generic file preview
+                                                  return Row(children: [
+                                                    const Icon(Icons.insert_drive_file, size: 40, color: Colors.grey),
+                                                    const SizedBox(width: 10),
+                                                    Expanded(child: Text(fileName, overflow: TextOverflow.ellipsis)),
+                                                    const SizedBox(width: 35),
+                                                  ]);
+                                                }
+                                              }),
+                                            ]),
+                                          ),
+                                        ]),
+                                      ),
+                                      Positioned(right: 0, top: 0,
+                                        child: InkWell(
+                                          onTap: () => authController.removeFile(0),
+                                          child: const Padding(
+                                            padding: EdgeInsets.all(Dimensions.paddingSizeSmall),
+                                            child: Icon(Icons.delete_forever, color: Colors.red),
                                           ),
                                         ),
-                                        Positioned(
-                                          right: 0,
-                                          top: 0,
-                                          child: InkWell(
-                                            onTap: () {
-                                              authController.removeFile(0);
-                                            },
-                                            child: const Padding(
-                                              padding: EdgeInsets.all(Dimensions.paddingSizeSmall),
-                                              child: Icon(Icons.delete_forever, color: Colors.red),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ]),
                                   ),
                                 ),
                               ),
@@ -846,6 +788,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
 
                     Visibility(
                       visible: authController.storeStatus == 0.6,
+                      maintainState: true,
                       child: Form(
                         key: _formKeySecond,
                         child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -935,7 +878,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
 
                               Column(children: [
                                 CustomTextFieldWidget(
-                                  hintText: '8+characters'.tr,
+                                  hintText: 'minimum_8_characters'.tr,
                                   controller: _passwordController,
                                   focusNode: _passwordFocus,
                                   nextFocus: _confirmPasswordFocus,
@@ -957,7 +900,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                   },
                                   required: true,
                                   labelText: 'password'.tr,
-                                  validator: (value) => ValidateCheck.validateEmptyText(value, "password_field_is_required".tr),
+                                  validator: (value) => ValidateCheck.validatePassword(value, "password_field_is_required".tr),
                                 ),
                                 authController.showPassView ? const PassViewWidget() : const SizedBox(),
 
@@ -965,7 +908,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                               const SizedBox(height: Dimensions.paddingSizeExtremeLarge),
 
                               CustomTextFieldWidget(
-                                hintText: '8+characters'.tr,
+                                hintText: 'minimum_8_characters'.tr,
                                 controller: _confirmPasswordController,
                                 focusNode: _confirmPasswordFocus,
                                 inputType: TextInputType.visiblePassword,
@@ -1128,8 +1071,6 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                               showCustomSnackBar('please_select_module_first'.tr);
                             }else if(isRentalModule && addressController.pickupZoneIdList.isEmpty) {
                               showCustomSnackBar('please_select_pickup_zone'.tr);
-                            }else if(defaultAddressNull) {
-                              showCustomSnackBar('enter_vendor_address'.tr);
                             }else if(addressController.selectedZoneIndex == -1) {
                               showCustomSnackBar('please_select_zone'.tr);
                             }/*else if(tin.isEmpty) {
@@ -1156,26 +1097,8 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                           }
                         }else if(authController.storeStatus == 0.6){
                           if(_formKeySecond!.currentState!.validate()){
-                            if(fName.isEmpty) {
-                              showCustomSnackBar('enter_your_first_name'.tr);
-                            }else if(lName.isEmpty) {
-                              showCustomSnackBar('enter_your_last_name'.tr);
-                            }else if(phone.isEmpty) {
-                              showCustomSnackBar('enter_phone_number'.tr);
-                            }else if(email.isEmpty) {
-                              showCustomSnackBar('enter_email_address'.tr);
-                            }else if(!GetUtils.isEmail(email)) {
-                              showCustomSnackBar('enter_a_valid_email_address'.tr);
-                            }else if(password.isEmpty) {
-                              showCustomSnackBar('enter_password'.tr);
-                            }else if(password.length < 6) {
-                              showCustomSnackBar('password_should_be'.tr);
-                            }else if(password != confirmPassword) {
-                              showCustomSnackBar('confirm_password_does_not_matched'.tr);
-                            }else {
-                              _scrollController.jumpTo(_scrollController.position.minScrollExtent);
-                              authController.storeStatusChange(0.9);
-                            }
+                            _scrollController.jumpTo(_scrollController.position.minScrollExtent);
+                            authController.storeStatusChange(0.9);
                           }
                         }else{
                           authController.storeStatusChange(0.9);
@@ -1183,16 +1106,18 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                       }else{
                         List<Translation> translation = [];
                         for(int index=0; index<_languageList.length; index++) {
-                          translation.add(Translation(
-                            locale: _languageList[index].key, key: 'name',
-                            value: _nameController[index].text.trim().isNotEmpty ? _nameController[index].text.trim()
-                                : _nameController[0].text.trim(),
-                          ));
-                          translation.add(Translation(
-                            locale: _languageList[index].key, key: 'address',
-                            value: _addressController[index].text.trim().isNotEmpty ? _addressController[index].text.trim()
-                                : _addressController[0].text.trim(),
-                          ));
+                          if(_nameController[index].text.trim().isNotEmpty) {
+                            translation.add(Translation(
+                              locale: _languageList[index].key, key: 'name',
+                              value: _nameController[index].text.trim(),
+                            ));
+                          }
+                          if(_addressController[index].text.trim().isNotEmpty) {
+                            translation.add(Translation(
+                              locale: _languageList[index].key, key: 'address',
+                              value: _addressController[index].text.trim(),
+                            ));
+                          }
                         }
 
                         Map<String, String> data = {};

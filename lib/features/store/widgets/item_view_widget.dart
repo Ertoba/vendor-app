@@ -3,7 +3,6 @@ import 'package:sixam_mart_store/features/store/controllers/store_controller.dar
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/common/widgets/item_shimmer_widget.dart';
 import 'package:sixam_mart_store/common/widgets/item_widget.dart';
-import 'package:sixam_mart_store/features/store/widgets/veg_filter_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -33,31 +32,16 @@ class ItemViewWidget extends StatelessWidget {
           );
         }
       }
-
-      if (scrollController.position.userScrollDirection == ScrollDirection.reverse) {
-        if(Get.find<StoreController>().isFabVisible){
-          Get.find<StoreController>().hideFab();
-        }
-      } else if (scrollController.position.userScrollDirection == ScrollDirection.forward) {
-        if(!Get.find<StoreController>().isFabVisible){
-          Get.find<StoreController>().showFab();
-        }
-      }
-
     });
     return GetBuilder<StoreController>(builder: (storeController) {
       return Column(children: [
-        const SizedBox(height: Dimensions.paddingSizeDefault),
-
-        !fromAllItems ? type != null ? VegFilterWidget(type: type, onSelected: onVegFilterTap) : const SizedBox() : const SizedBox(),
-
         storeController.itemList != null ? storeController.itemList!.isNotEmpty ? GridView.builder(
           key: UniqueKey(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisSpacing: Dimensions.paddingSizeLarge,
             mainAxisSpacing: 0.01,
             crossAxisCount: 1,
-            mainAxisExtent: 120,
+            mainAxisExtent: 104,
           ),
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,

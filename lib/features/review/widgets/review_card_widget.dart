@@ -6,6 +6,7 @@ import 'package:sixam_mart_store/features/splash/controllers/splash_controller.d
 import 'package:sixam_mart_store/features/store/domain/models/review_model.dart';
 import 'package:sixam_mart_store/helper/date_converter_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
+import 'package:sixam_mart_store/common/widgets/rating_bar_widget.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
 import 'package:sixam_mart_store/util/styles.dart';
@@ -24,29 +25,9 @@ class ReviewCardWidget extends StatelessWidget {
       ),
       child: Column(children: [
 
-        Container(
-          padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor.withValues(alpha: 0.8),
-            borderRadius: const BorderRadius.only(topLeft: Radius.circular(Dimensions.radiusSmall), topRight: Radius.circular(Dimensions.radiusSmall)),
-            boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha: 0.1), spreadRadius: 1, blurRadius: 5, offset: const Offset(0, 1))],
-          ),
-          child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-
-            Row(children: [
-              Text('${'review_id'.tr} # ', style: robotoRegular),
-              Text(review.reviewId != null ? review.reviewId.toString() : '', style: robotoBold),
-            ]),
-
-            Text(DateConverterHelper.utcToDateTime(review.createdAt!), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
-
-          ]),
-        ),
-
         Padding(
           padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
           child: Row(children: [
-
             ClipRRect(
               borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
               child: CustomImageWidget(
@@ -58,10 +39,37 @@ class ReviewCardWidget extends StatelessWidget {
             const SizedBox(width: Dimensions.paddingSizeDefault),
 
             Expanded(
-              child: Text(review.itemName ?? '', style: robotoBold, overflow: TextOverflow.ellipsis, maxLines: 1),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(review.itemName ?? '', style: robotoBold, overflow: TextOverflow.ellipsis, maxLines: 2),
+                const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                RatingBarWidget(rating: (review.rating ?? 0).toDouble(), ratingCount: null, size: 15),
+              ]),
             ),
             const SizedBox(width: Dimensions.paddingSizeDefault),
 
+            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Text(review.reviewId != null ? "${'review_id'.tr} # ${review.reviewId}" : '', style: robotoBold),
+              Text(
+                DateConverterHelper.utcToDateTime(review.createdAt!),
+                style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)
+              ),
+            ]),
+          ]),
+        ),
+
+        Divider(height: 0, thickness: 1, color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
+
+        Padding(
+          padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+          child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('reviewer'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
+              const SizedBox(height: Dimensions.paddingSizeSmall),
+              Text(review.customerName ?? '', style: robotoBold),
+            ]),
+
+            // Reply Button
             Get.find<SplashController>().configModel!.storeReviewReply ?? false ? CustomButtonWidget(
               onPressed: () => Get.toNamed(RouteHelper.getReviewReplyRoute(isGiveReply: review.reply != null ? false : true, review: review,  storeReviewReplyStatus: Get.find<SplashController>().configModel!.storeReviewReply!)),
               width: 95, height: 40,
@@ -80,27 +88,6 @@ class ReviewCardWidget extends StatelessWidget {
               buttonText: 'view'.tr,
               color: Theme.of(context).primaryColor,
             ),
-
-          ]),
-        ),
-
-        Divider(height: 0, thickness: 1, color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
-
-        Padding(
-          padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-            Text('reviewer'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
-            const SizedBox(height: Dimensions.paddingSizeSmall),
-
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-
-              Text(review.customerName ?? '', style: robotoBold),
-
-              Text(review.customerPhone ?? '', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor)),
-
-            ]),
-
           ]),
         ),
 

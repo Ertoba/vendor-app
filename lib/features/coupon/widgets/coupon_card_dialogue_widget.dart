@@ -15,6 +15,7 @@ import 'package:sixam_mart_store/util/styles.dart';
 import 'package:sixam_mart_store/common/widgets/confirmation_dialog_widget.dart';
 import 'package:sixam_mart_store/common/widgets/custom_loader_widget.dart';
 import 'package:sixam_mart_store/features/coupon/screens/add_coupon_screen.dart';
+import 'package:dotted_border/dotted_border.dart';
 
 class CouponCardDialogueWidget extends StatelessWidget {
   final CouponBodyModel couponBody;
@@ -23,134 +24,104 @@ class CouponCardDialogueWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 500,
+    return SizedBox(width: 500,
       child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(Dimensions.radiusLarge)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Flexible(
-              child: Stack(
-                children: [
+        decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.vertical(top: Radius.circular(Dimensions.radiusLarge))),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Flexible(child: Stack(children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: Dimensions.paddingSizeSmall, horizontal: Dimensions.paddingSizeDefault,
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall, horizontal: Dimensions.paddingSizeExtraLarge),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start,mainAxisSize: MainAxisSize.min, children: [
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const SizedBox(),
-
-                          Container(
-                            height: 5, width: 70,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).disabledColor.withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                            ),
+                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                        const SizedBox(),
+                        Container(height: 5, width: 70,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).disabledColor.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                           ),
+                        ),
 
-                          InkWell(
-                            onTap: () => Get.back(),
-                            child: Icon(Icons.close, color: Theme.of(context).hintColor, size: 20),
-                          ),
-                        ],
-                      ),
+                        InkWell(
+                          onTap: () => Get.back(),
+                          child: Icon(Icons.close, color: Theme.of(context).hintColor, size: 20),
+                        ),
+                      ]),
 
 
                       Padding(
                         padding: const EdgeInsets.only(top: Dimensions.paddingSizeSmall),
-                        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-                          Expanded(
-                            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        child: GetBuilder<CouponController>(builder: (couponController) {
+                          return Padding(padding: const EdgeInsets.only(top: Dimensions.paddingSizeSmall),
+                            child: Row(children: [
                               SizedBox(
                                 height: 50, width: 50,
                                 child: Image.asset(couponBody.discountType == 'percent' ? Images.fire : Images.cashIcon),
                               ),
-                              const SizedBox(height: Dimensions.paddingSizeSmall),
-                              Text(
-                                '${couponBody.title}',
-                                style: robotoMedium.copyWith(fontSize: 20), textDirection: TextDirection.ltr,
-                              ),
-                              Text(
-                                '${DateConverterHelper.stringToLocalDateOnly(couponBody.startDate!)} - ${DateConverterHelper.stringToLocalDateOnly(couponBody.startDate!)}',
-                                style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.6)),
-                              ),
-                            ]),
-                          ),
-
-                          // const Spacer(),
-
-                          GetBuilder<CouponController>(builder: (couponController) {
-                            return Padding(
-                              padding: const EdgeInsets.only(top: Dimensions.paddingSizeSmall),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
-                                      border: Border.all(color: Theme.of(context).disabledColor, width: 0.2),
-                                      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
-                                    child: Row(
-                                      children: [
-                                        Text('status'.tr, style: robotoMedium),
-
-                                        Transform.scale(
-                                          scale: 0.7,
-                                          child: CupertinoSwitch(
-                                            activeTrackColor: Theme.of(context).primaryColor,
-                                            value: couponController.coupons![index].status == 1 ? true : false,
-                                            onChanged: (bool status){
-                                              couponController.changeStatus(couponController.coupons![index].id, status).then((success) {
-                                                if(success){
-                                                  couponController.getCouponList();
-                                                }
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                      ],
+                              Spacer(),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
+                                  border: Border.all(color: Theme.of(context).disabledColor, width: 0.2),
+                                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
+                                child: Row(children: [
+                                  Text('status'.tr, style: robotoMedium),
+                                  Transform.scale(
+                                    scale: 0.7,
+                                    child: CupertinoSwitch(
+                                      activeTrackColor: Colors.teal,
+                                      value: couponController.coupons![index].status == 1 ? true : false,
+                                      onChanged: (bool status){
+                                        couponController.changeStatus(couponController.coupons![index].id, status).then((success) {
+                                          if(success){
+                                            couponController.getCouponList();
+                                          }
+                                        });
+                                      },
                                     ),
                                   ),
-                                  const SizedBox(width: Dimensions.paddingSizeSmall),
-
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
-                                      border: Border.all(color: Theme.of(context).disabledColor, width: 0.2),
-                                      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                    ),
-                                    child: CustomInkWellWidget(
-                                      onTap: () {
-                                        Get.back();
-                                        Get.dialog(ConfirmationDialogWidget(
-                                          icon: Images.warning, title: 'are_you_sure_to_delete'.tr, description: 'you_want_to_delete_this_coupon'.tr,
-                                          onYesPressed: () {
-                                            couponController.deleteCoupon(couponBody.id);
-                                          },
-                                        ), barrierDismissible: false);
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeSmall-3),
-                                        child: Icon(Icons.delete_forever, color: Colors.red),
-                                      ),
-                                    ),
-                                  )
-                                ],
+                                ]),
                               ),
-                            );
-                          }),
+                              const SizedBox(width: Dimensions.paddingSizeSmall),
 
-                        ]),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
+                                  border: Border.all(color: Theme.of(context).disabledColor, width: 0.2),
+                                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                ),
+                                child: CustomInkWellWidget(
+                                  onTap: () {
+                                    Get.back();
+                                    Get.dialog(ConfirmationDialogWidget(
+                                      icon: Images.warning, title: 'are_you_sure_to_delete'.tr, description: 'you_want_to_delete_this_coupon'.tr,
+                                      onYesPressed: () {
+                                        couponController.deleteCoupon(couponBody.id);
+                                      },
+                                    ), barrierDismissible: false);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeSmall-3),
+                                    child: Icon(Icons.delete_forever, color: Colors.red),
+                                  ),
+                                ),
+                              )
+                            ]),
+                          );
+                        }),
                       ),
+                      const SizedBox(height: Dimensions.paddingSizeSmall),
+                      Text(
+                        '${couponBody.title}',
+                        style: robotoMedium.copyWith(fontSize: 20), textDirection: TextDirection.ltr,
+                      ),
+                      const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                      Text(
+                        '${DateConverterHelper.stringToLocalDateOnly(couponBody.startDate!)} - ${DateConverterHelper.stringToLocalDateOnly(couponBody.startDate!)}',
+                        style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.6)),
+                      ),
+
 
                       const SizedBox(height: Dimensions.paddingSizeLarge),
 
@@ -159,13 +130,13 @@ class CouponCardDialogueWidget extends StatelessWidget {
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Theme.of(context).disabledColor.withValues(alpha: 0.1),
-                                border: Border.all(color: Theme.of(context).disabledColor, width: 0.2),
+                                color: Theme.of(context).disabledColor.withValues(alpha: 0.07),
+                                border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.2), width: 1),
                                 borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                               ),
                               padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                              child: Column(children: [
-                                Text('discount'.tr, style: robotoMedium.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.5))),
+                              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                Text('discount'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.5))),
                                 const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
                                 Text('${'${couponBody.couponType == 'free_delivery' ? 'free_delivery'.tr : couponBody.discountType != 'percent' ?
@@ -180,37 +151,47 @@ class CouponCardDialogueWidget extends StatelessWidget {
                           const SizedBox(width: Dimensions.paddingSizeSmall),
 
                           Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).disabledColor.withValues(alpha: 0.1),
-                                border: Border.all(color: Theme.of(context).disabledColor, width: 0.2),
-                                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                            child: DottedBorder(
+                              options: RoundedRectDottedBorderOptions(
+                                color: Theme.of(context).disabledColor.withValues(alpha: 0.3),
+                                strokeWidth: 1,
+                                strokeCap: StrokeCap.butt,
+                                dashPattern: const [5, 5],
+                                padding: const EdgeInsets.all(0),
+                                radius: const Radius.circular(Dimensions.radiusDefault),
                               ),
-                              padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(children: [
-                                      Text('coupon_code'.tr, style: robotoMedium.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.5))),
-                                      const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).disabledColor.withValues(alpha: 0.07),
+                                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                ),
+                                padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                        Text('coupon_code'.tr, style: robotoMedium.copyWith(
+                                           fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.5))),
+                                        const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-                                      Text(
-                                        '${couponBody.code}',
-                                        maxLines: 1, overflow: TextOverflow.ellipsis,
-                                        style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr,
-                                      ),
-                                    ]),
-                                  ),
+                                        Text(
+                                          '${couponBody.code}',
+                                          maxLines: 1, overflow: TextOverflow.ellipsis,
+                                          style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr,
+                                        ),
+                                      ]),
+                                    ),
 
-                                  IconButton(
-                                    onPressed: (){
-                                      Clipboard.setData(ClipboardData(text: couponBody.code!)).then((value) {
-                                        showCustomSnackBar('coupon_code_copied'.tr);
-                                      });
-                                    },
-                                    icon: Icon(Icons.copy, color: Colors.blue, size: 20),
-                                  ),
-                                ],
+                                    GestureDetector(
+                                      onTap: (){
+                                        Clipboard.setData(ClipboardData(text: couponBody.code!)).then((value) {
+                                          showCustomSnackBar('coupon_code_copied'.tr, isError: false);
+                                        });
+                                      },
+                                      child: Icon(Icons.copy, color: Colors.blue, size: 20),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -221,7 +202,7 @@ class CouponCardDialogueWidget extends StatelessWidget {
                       Container(
                         decoration: BoxDecoration(
                           color: Theme.of(context).cardColor,
-                          border: Border.all(color: Theme.of(context).disabledColor, width: 0.5),
+                          border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.2), width: 01),
                           borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                         ),
                         child: Column(children: [
@@ -254,7 +235,7 @@ class CouponCardDialogueWidget extends StatelessWidget {
                             Get.back();
                           },
                           buttonText: 'cancel'.tr,
-                          color: Theme.of(context).disabledColor.withValues(alpha: 0.3),
+                          color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
                           textColor: Theme.of(context).textTheme.bodyLarge!.color!,
                         ),
                       ),

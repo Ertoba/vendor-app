@@ -35,6 +35,14 @@ class ProfileController extends GetxController implements GetxService {
   bool _backgroundNotification = true;
   bool get backgroundNotification => _backgroundNotification;
 
+  bool _isStoreActive = true;
+  bool get isStoreActive => _isStoreActive;
+
+  void setStoreStatus(bool value) {
+    _isStoreActive = value;
+    update();
+  }
+
   void hideLowStockWarning(){
     _showLowStockWarning = !_showLowStockWarning;
   }
