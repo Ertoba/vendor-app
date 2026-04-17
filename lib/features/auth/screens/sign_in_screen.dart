@@ -67,7 +67,7 @@ class _SignInScreenState extends State<SignInScreen> {
           padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
           child: GetBuilder<AuthController>(builder: (authController) {
             return Column(children: [
-              Image.asset(Images.logo, width: 200),
+              Image.asset(Images.headerLogo, width: 180, fit: BoxFit.contain),
               const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
               Text('sign_in'.tr.toUpperCase(), style: robotoBold.copyWith(fontSize: Dimensions.fontSizeOverLarge)),

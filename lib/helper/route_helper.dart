@@ -153,7 +153,7 @@ class RouteHelper {
   static String getVerificationRoute(String email) => '$verification?email=$email';
   static String getMainRoute(String page) => '$main?page=$page';
   static String getForgotPassRoute() => forgotPassword;
-  static String getResetPasswordRoute(String? phone, String token, String page) => '$resetPassword?phone=$phone&token=$token&page=$page';
+  static String getResetPasswordRoute(String? phone, String token, String page) => '$resetPassword?phone=${phone ?? ''}&token=$token&page=$page';
   static String getOrderDetailsRoute(int? orderID, {bool? fromNotification}) => '$orderDetails?id=$orderID&from=${fromNotification.toString()}';
   static String getProfileRoute() => profile;
   static String getUpdateProfileRoute() => updateProfile;
