@@ -1458,8 +1458,8 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                           const SizedBox(width: Dimensions.paddingSizeSmall),
 
                           Expanded(
-                            flex: 2,
-                            child: CustomButtonWidget(buttonText: 'add'.tr, onPressed: (){
+                            flex: 3,
+                            child: CustomButtonWidget(buttonText: 'add'.tr, fontSize: Dimensions.fontSizeSmall, height: 50, onPressed: (){
                               if(_tagController.text != '' && _tagController.text.isNotEmpty) {
                                 storeController.setTag(_tagController.text.trim());
                                 _tagController.text = '';
