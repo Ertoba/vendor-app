@@ -286,7 +286,7 @@ class _StoreScreenState extends State<StoreScreen> with TickerProviderStateMixin
                               ),
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                  Text('items'.tr), Image.asset(Images.itemsIcon, width: 20, height: 20),
+                                  Flexible(child: Text('items'.tr, overflow: TextOverflow.ellipsis)), Image.asset(Images.itemsIcon, width: 20, height: 20),
                                 ]),
                                 SizedBox(height: Dimensions.paddingSizeDefault),
 
@@ -305,10 +305,10 @@ class _StoreScreenState extends State<StoreScreen> with TickerProviderStateMixin
                             ),
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                Text('orders'.tr), Image.asset(Images.ordersIcon, width: 20, height: 20),
+                                Flexible(child: Text('orders'.tr, overflow: TextOverflow.ellipsis)), Image.asset(Images.ordersIcon, width: 20, height: 20),
                               ]),
                               SizedBox(height: Dimensions.paddingSizeDefault),
-                              Text(store.totalOrder .toString(), style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Colors.indigo)),
+                              Text(store.totalOrder.toString(), style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Colors.indigo)),
                             ]),
                           )),
                         SizedBox(width: Dimensions.paddingSizeSmall),
@@ -325,11 +325,11 @@ class _StoreScreenState extends State<StoreScreen> with TickerProviderStateMixin
                               ),
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                  Text('ratings'.tr), Image.asset(Images.ratingsIcon, width: 20, height: 20),
+                                  Flexible(child: Text('ratings'.tr, overflow: TextOverflow.ellipsis)), Image.asset(Images.ratingsIcon, width: 20, height: 20),
                                 ]),
                                 SizedBox(height: Dimensions.paddingSizeDefault),
                                 Row(children: [
-                                  Text('${store.avgRating} ', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Colors.orange)),
+                                  Flexible(child: Text('${store.avgRating} ', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Colors.orange), overflow: TextOverflow.ellipsis)),
                                   Text(
                                     '(${store.ratingCount})', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall,
                                     color: Theme.of(context).hintColor, decoration: TextDecoration.underline, decorationColor: Theme.of(context).disabledColor)),
@@ -395,7 +395,7 @@ class _StoreScreenState extends State<StoreScreen> with TickerProviderStateMixin
                         SizedBox(width: Dimensions.paddingSizeDefault),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text('make_announcement'.tr, style: robotoBold),
-                          Text('This Will be Shown in the user app/web.'.tr, style: robotoRegular.copyWith(color: Theme.of(context).hintColor)),
+                          Text('announcement_shown_in_app'.tr, style: robotoRegular.copyWith(color: Theme.of(context).hintColor)),
                         ])),
                         ElevatedButton(onPressed: ()=> showAnnouncementBottomSheet(announcementStatus: store.isAnnouncementActive!, announcementMessage: store.announcementMessage ?? '', context: context),
                           style: ElevatedButton.styleFrom(
