@@ -135,7 +135,7 @@ class MenuScreen extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4, childAspectRatio: ResponsiveHelper.isTab(context) ? 1/1.5 : (1/1.22),
+            crossAxisCount: 4, childAspectRatio: ResponsiveHelper.isTab(context) ? 1/1.5 : (1/1.35),
             crossAxisSpacing: Dimensions.paddingSizeExtraSmall, mainAxisSpacing: Dimensions.paddingSizeExtraSmall,
           ),
           itemCount: menuList.length,
