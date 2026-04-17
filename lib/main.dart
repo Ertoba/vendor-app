@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:sixam_mart_store/features/home/widgets/trial_widget.dart';
 import 'package:sixam_mart_store/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart_store/common/controllers/theme_controller.dart';
@@ -23,6 +24,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterL
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting();
   Map<String, Map<String, String>> languages = await di.init();
 
   try {
