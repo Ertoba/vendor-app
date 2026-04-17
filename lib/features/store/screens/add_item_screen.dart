@@ -782,8 +782,8 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                             const SizedBox(width: Dimensions.paddingSizeSmall),
 
                             Expanded(
-                              flex: 2,
-                              child: CustomButtonWidget(buttonText: 'add'.tr, onPressed: (){
+                              flex: 3,
+                              child: CustomButtonWidget(buttonText: 'add'.tr, fontSize: Dimensions.fontSizeSmall, height: 50, onPressed: (){
                                 if(storeController.selectedNutritionList!.length >= 5) {
                                   showCustomSnackBar('you_can_select_or_add_maximum_5_nutrition'.tr, isError: true);
                                 }else{
@@ -931,8 +931,8 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                             const SizedBox(width: Dimensions.paddingSizeSmall),
 
                             Expanded(
-                              flex: 2,
-                              child: CustomButtonWidget(buttonText: 'add'.tr, onPressed: (){
+                              flex: 3,
+                              child: CustomButtonWidget(buttonText: 'add'.tr, fontSize: Dimensions.fontSizeSmall, height: 50, onPressed: (){
                                 if(storeController.selectedAllergicIngredientsList!.length >= 5) {
                                   showCustomSnackBar('you_can_select_or_add_maximum_5_allergic_ingredients'.tr, isError: true);
                                 }else{
@@ -999,10 +999,11 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                                   ),
                                 ),
 
-                                Text(
+                                Flexible(child: Text(
                                   'veg'.tr, style: robotoMedium.copyWith(
                                     fontSize: Dimensions.fontSizeSmall, color: storeController.isVeg ? Theme.of(context).textTheme.bodyLarge?.color : Theme.of(context).disabledColor),
-                                ),
+                                  overflow: TextOverflow.ellipsis,
+                                )),
 
                               ]),
                             ),
@@ -1016,10 +1017,11 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                                     fillColor: WidgetStateProperty.all<Color>(storeController.isVeg ? Theme.of(context).disabledColor : Theme.of(context).primaryColor),
                                   ),
                                 ),
-                                Text(
+                                Flexible(child: Text(
                                   'non_veg'.tr, style: robotoMedium.copyWith(
                                     fontSize: Dimensions.fontSizeSmall, color: storeController.isVeg ? Theme.of(context).disabledColor : Theme.of(context).textTheme.bodyLarge?.color),
-                                ),
+                                  overflow: TextOverflow.ellipsis,
+                                )),
                               ]),
                             ),
                           ]),
