@@ -262,10 +262,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 const SizedBox(width: Dimensions.paddingSizeSmall),
 
-                                Text(
+                                Flexible(child: Text(
                                   'campaign_orders_only'.tr,
                                   style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
-                                ),
+                                  maxLines: 2, overflow: TextOverflow.ellipsis,
+                                )),
                               ]),
                             ),
                           ) : const SizedBox(),
