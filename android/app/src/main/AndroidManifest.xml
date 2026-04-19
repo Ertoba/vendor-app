@@ -37,7 +37,7 @@
         </queries>
 
         <application
-            android:label="პორტალი"
+            android:label="მილი ვენდორი"
             android:name="${applicationName}"
             android:extractNativeLibs="true"
             android:requestLegacyExternalStorage="true"
