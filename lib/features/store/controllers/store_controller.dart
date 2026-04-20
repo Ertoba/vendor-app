@@ -1616,14 +1616,6 @@ class StoreController extends GetxController implements GetxService {
             descriptionControllerList?[tabController.index].text = aiController.titleDesModel!.description ?? '';
           }
         }).then((value) {
-          generateAndSetOtherData(
-            title: aiController.titleDesModel?.title ?? '',
-            description: aiController.titleDesModel?.description ?? '',
-            priceController: priceController,
-            discountController: discountController,
-            maxOrderQuantityController: maxOrderQuantityController,
-          );
-        }).then((value) {
           if(Get.find<SplashController>().getStoreModuleConfig().newVariation!){
             generateAndSetVariationData(
               title: aiController.titleDesModel?.title ?? '',
