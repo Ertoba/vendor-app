@@ -141,10 +141,12 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen>
   bool _hasChanges(AdvertisementController adsController) {
     final original = widget.adsDetailsModel!;
     if (adsController.selectedAdsType != (original.addType ?? '')) return true;
-    if (adsController.isReviewChecked != (original.isReviewActive == 1))
+    if (adsController.isReviewChecked != (original.isReviewActive == 1)) {
       return true;
-    if (adsController.isRatingsChecked != (original.isRatingActive == 1))
+    }
+    if (adsController.isRatingsChecked != (original.isRatingActive == 1)) {
       return true;
+    }
 
     final originalDateRange =
         '${DateConverterHelper.stringToMDY(original.startDate ?? '')} - ${DateConverterHelper.stringToMDY(original.endDate ?? '')}';
@@ -156,15 +158,18 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen>
       String originalDesc = i == 0 ? (original.description ?? '') : '';
       if (i > 0) {
         original.translations?.forEach((t) {
-          if (t.locale == langKey && t.key == 'title')
+          if (t.locale == langKey && t.key == 'title') {
             originalTitle = t.value ?? '';
-          if (t.locale == langKey && t.key == 'description')
+          }
+          if (t.locale == langKey && t.key == 'description') {
             originalDesc = t.value ?? '';
+          }
         });
       }
       if (titleController[i].text.trim() != originalTitle.trim()) return true;
-      if (descriptionController[i].text.trim() != originalDesc.trim())
+      if (descriptionController[i].text.trim() != originalDesc.trim()) {
         return true;
+      }
     }
 
     if (adsController.pickedVideoFile != null) return true;
@@ -1135,10 +1140,12 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen>
                             color: Theme.of(context).cardColor,
                           ),
                           const SizedBox(width: 2),
-                          Text(
-                            'preview'.tr,
-                            style: robotoRegular.copyWith(
-                              fontSize: Dimensions.fontSizeExtraSmall,
+                          Flexible(
+                            child: Text(
+                              'preview'.tr,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: robotoRegular.copyWith(fontSize: 8),
                             ),
                           ),
                         ],
