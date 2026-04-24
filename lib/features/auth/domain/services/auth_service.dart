@@ -114,7 +114,7 @@ class AuthService implements AuthServiceInterface {
         if(packageId == null) {
 
           saveUserToken(response.body['subscribed']['token'], response.body['subscribed']['zone_wise_topic'], type);
-          await updateToken();
+          try { await updateToken(); } catch (_) {}
           moduleType == 'rental' ? await Get.find<TaxiProfileController>().getProfile() : await Get.find<ProfileController>().getProfile();
 
           Get.toNamed(RouteHelper.getMySubscriptionRoute(fromNotification: true));
@@ -124,7 +124,7 @@ class AuthService implements AuthServiceInterface {
         }
       }else{
         saveUserToken(response.body['token'], response.body['zone_wise_topic'], type);
-        await updateToken();
+        try { await updateToken(); } catch (_) {}
         moduleType == 'rental' ? Get.find<TaxiProfileController>().getProfile() : Get.find<ProfileController>().getProfile();
         responseModel = ResponseModel(true, 'successful');
       }
