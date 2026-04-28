@@ -92,6 +92,8 @@ class SplashScreenState extends State<SplashScreen> {
             }
           }
         });
+      } else {
+        Timer(const Duration(seconds: 5), () => _route());
       }
     });
   }
@@ -181,7 +183,7 @@ class SplashScreenState extends State<SplashScreen> {
 
   Future<void> _handleDefaultRouting() async {
     if (Get.find<AuthController>().isLoggedIn()) {
-      await Get.find<AuthController>().updateToken();
+      try { await Get.find<AuthController>().updateToken(); } catch (_) {}
       Get.find<AuthController>().getModuleType() == 'rental'
           ? await Get.find<TaxiProfileController>().getProfile()
           : await Get.find<ProfileController>().getProfile();
