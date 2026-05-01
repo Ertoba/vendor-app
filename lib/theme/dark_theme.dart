@@ -3,8 +3,8 @@ import 'package:sixam_mart_store/util/app_constants.dart';
 
 ThemeData dark = ThemeData(
   fontFamily: AppConstants.fontFamily,
-  primaryColor: const Color(0xFFE06A18),
-  secondaryHeaderColor: const Color(0xFFD35701),
+  primaryColor: const Color(0xFF039D55),
+  secondaryHeaderColor: const Color(0xFF10B981),
   disabledColor: const Color(0xFF6f7275),
   brightness: Brightness.dark,
   hintColor: const Color(0xFFbebebe),
@@ -12,11 +12,11 @@ ThemeData dark = ThemeData(
   shadowColor: Colors.white.withValues(alpha: 0.03),
   scaffoldBackgroundColor: const Color(0xFF161617),
   textButtonTheme: TextButtonThemeData(
-    style: TextButton.styleFrom(foregroundColor: const Color(0xFFE06A18)),
+    style: TextButton.styleFrom(foregroundColor: const Color(0xFF039D55)),
   ),
   colorScheme: const ColorScheme.dark(
-    primary: Color(0xFFE06A18),
-    secondary: Color(0xFFE06A18),
+    primary: Color(0xFF039D55),
+    secondary: Color(0xFF039D55),
   ).copyWith(error: const Color(0xFFdd3135)),
   popupMenuTheme: const PopupMenuThemeData(
     color: Color(0xFF29292D),
