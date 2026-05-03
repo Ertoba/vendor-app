@@ -143,7 +143,10 @@ class StoreService implements StoreServiceInterface {
   @override
   bool hasAttributeData(List<AttributeModel>? attributeList){
     bool hasData = false;
-    for(AttributeModel attribute in attributeList!) {
+    if(attributeList == null || attributeList.isEmpty) {
+      return hasData;
+    }
+    for(AttributeModel attribute in attributeList) {
       if(attribute.active) {
         hasData = true;
         break;
@@ -167,12 +170,15 @@ class StoreService implements StoreServiceInterface {
 
   @override
   List<VariantTypeModel>? variationTypeList(List<AttributeModel>? attributeList, Item? item) {
+    if(attributeList == null || attributeList.isEmpty) {
+      return [];
+    }
     List<List<String>> mainList = [];
     int length = 1;
     bool hasData = false;
     List<int> indexList = [];
     List<VariantTypeModel>? variantTypeList = [];
-    for (var attribute in attributeList!) {
+    for (var attribute in attributeList) {
       if(attribute.active) {
         hasData = true;
         mainList.add(attribute.variants);
@@ -223,12 +229,15 @@ class StoreService implements StoreServiceInterface {
 
   @override
   int totalStock(List<AttributeModel>? attributeList, Item? item) {
+    if(attributeList == null || attributeList.isEmpty) {
+      return 0;
+    }
     List<List<String>> mainList = [];
     int length = 1;
     bool hasData = false;
     List<int> indexList = [];
     int totalStock = 0;
-    for (var attribute in attributeList!) {
+    for (var attribute in attributeList) {
       if(attribute.active) {
         hasData = true;
         mainList.add(attribute.variants);

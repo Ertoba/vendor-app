@@ -627,8 +627,8 @@ class StoreController extends GetxController implements GetxService {
       }
     }
     List<AttributeModel>? attributeList = await storeServiceInterface.getAttributeList(item);
+    _attributeList = [];
     if(attributeList != null) {
-      _attributeList = [];
       _attributeList!.addAll(attributeList);
     }
     if(Get.find<SplashController>().configModel!.moduleConfig!.module!.addOn!) {
@@ -1069,8 +1069,8 @@ class StoreController extends GetxController implements GetxService {
   Future<void> getUnitList(Item? item) async {
     _unitIndex = 0;
     List<UnitModel>? unitList = await storeServiceInterface.getUnitList();
+    _unitList = [];
     if(unitList != null) {
-      _unitList = [];
       _unitList!.addAll(unitList);
       _unitIndex = storeServiceInterface.setUnitIndex(_unitList, item, _unitIndex!);
     }

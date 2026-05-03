@@ -817,7 +817,7 @@ class _AddItemScreenState extends State<AddItemScreen>
                                             ),
 
                                             categoryController
-                                                            .selectedSubCategoryID !=
+                                                            .selectedCategoryID !=
                                                         null &&
                                                     categoryController
                                                             .subCategoryList !=
@@ -870,7 +870,7 @@ class _AddItemScreenState extends State<AddItemScreen>
                                             SizedBox(
                                               height:
                                                   categoryController
-                                                              .selectedSubCategoryID !=
+                                                              .selectedCategoryID !=
                                                           null &&
                                                       categoryController
                                                               .subCategoryList !=
