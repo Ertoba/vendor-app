@@ -611,7 +611,7 @@ class StoreController extends GetxController implements GetxService {
   }
 
   void getAttributeList(Item? item) async {
-    _attributeList = null;
+    _attributeList = [];
     _discountTypeIndex = 0;
     _rawLogo = null;
     _selectedAddons = [];
@@ -626,11 +626,17 @@ class StoreController extends GetxController implements GetxService {
         }
       }
     }
+    generateVariantTypes(item);
+    update();
+
     List<AttributeModel>? attributeList = await storeServiceInterface.getAttributeList(item);
     _attributeList = [];
     if(attributeList != null) {
       _attributeList!.addAll(attributeList);
     }
+    generateVariantTypes(item);
+    update();
+
     if(Get.find<SplashController>().configModel!.moduleConfig!.module!.addOn!) {
       List<int?> addonsIds = await Get.find<AddonController>().getAddonList();
       if(item != null && item.addOns != null) {
@@ -643,6 +649,7 @@ class StoreController extends GetxController implements GetxService {
       await getUnitList(item);
     }
     generateVariantTypes(item);
+    update();
   }
 
   void setDiscountTypeIndex(int index, bool notify) {

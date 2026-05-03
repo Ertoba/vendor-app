@@ -43,15 +43,18 @@ class CategoryController extends GetxController implements GetxService {
   int? get selectedSubCategoryIndex => _selectedSubCategoryIndex;
 
   Future<void> getCategoryList() async {
-    _categoryList = null;
+    if(_categoryList == null) {
+      _categoryList = [];
+      update();
+    }
     List<CategoryModel>? categoryList = await categoryServiceInterface.getCategoryList();
-    _categoryList = categoryList ?? [];
+    _categoryList = categoryList ?? _categoryList ?? [];
     update();
   }
 
   Future<void> getSubCategoryList(int categoryID) async {
     List<CategoryModel>? subCategoryList = await categoryServiceInterface.getSubCategoryList(categoryID);
-    _subCategoryList = subCategoryList ?? [];
+    _subCategoryList = subCategoryList ?? _subCategoryList ?? [];
     update();
   }
 
@@ -77,7 +80,7 @@ class CategoryController extends GetxController implements GetxService {
   void setSelectedCategory(String id, {bool isUpdate = true}) {
     _selectedCategoryID = id;
     _selectedSubCategoryID = null;
-    _subCategoryList = null;
+    _subCategoryList = [];
     getSubCategoryList(int.parse(id));
     if (isUpdate) update();
   }
