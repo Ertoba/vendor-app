@@ -845,7 +845,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                               const SizedBox(height: Dimensions.paddingSizeExtremeLarge),
 
                               CustomTextFieldWidget(
-                                hintText: 'enter_phone_number'.tr,
+                                hintText: 'XXX-XXXXXX',
                                 controller: _phoneController,
                                 focusNode: _phoneFocus,
                                 nextFocus: _emailFocus,

@@ -188,7 +188,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       const SizedBox(height: Dimensions.paddingSizeLarge),
 
                       TextFieldWidget(
-                        hintText: 'phone'.tr,
+                        hintText: 'XXX-XXXXXX',
                         labelText: 'phone'.tr,
                         controller: _phoneController,
                         focusNode: _phoneFocus,

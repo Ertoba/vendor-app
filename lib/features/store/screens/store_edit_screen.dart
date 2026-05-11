@@ -185,7 +185,7 @@ class _StoreEditScreenState extends State<StoreEditScreen> with TickerProviderSt
                 padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   CustomTextFieldWidget(
-                        hintText: 'xxx-xxxxxxx',
+                        hintText: 'XXX-XXXXXX',
                         labelText: 'phone_number'.tr,
                         controller: _contactController,
                         focusNode: _contactNode,
