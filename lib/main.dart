@@ -28,16 +28,7 @@ Future<void> main() async {
   Map<String, Map<String, String>> languages = await di.init();
 
   try {
-    if(GetPlatform.isAndroid) {
-      await Firebase.initializeApp(
-        options: const FirebaseOptions(
-          apiKey: "AIzaSyD6JxaFLqTr7SVBVixTG-3Zd4PdDCIXeMg",
-          appId: "1:294177416704:android:94db53c448b8f99e9e5ae5",
-          messagingSenderId: "294177416704",
-          projectId: "mili-a2a33",
-        ),
-      );
-    }else {
+    if(!GetPlatform.isWeb) {
       await Firebase.initializeApp();
     }
   } catch (_) {}
