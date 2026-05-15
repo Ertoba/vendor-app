@@ -262,7 +262,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                               Padding(
                                                 padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
                                                 child: Text(
-                                                  'thumbnail_image_format'.tr,
+                                                  'registration_image_format_maximum_10_mb'.tr,
                                                   style: robotoRegular.copyWith(color: Theme.of(context).disabledColor.withValues(alpha: 0.6), fontSize: Dimensions.fontSizeSmall),
                                                   textAlign: TextAlign.center,
                                                 ),
