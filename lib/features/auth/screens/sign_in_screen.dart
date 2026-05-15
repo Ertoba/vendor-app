@@ -101,7 +101,11 @@ class _SignInScreenState extends State<SignInScreen> {
                                     child: Center(
                                       child: Text(
                                         'vendor_owner'.tr,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center,
                                         style: robotoMedium.copyWith(
+                                          fontSize: Dimensions.fontSizeSmall,
                                           color:
                                               authController.vendorTypeIndex ==
                                                   0
@@ -138,7 +142,11 @@ class _SignInScreenState extends State<SignInScreen> {
                                     child: Center(
                                       child: Text(
                                         'vendor_employee'.tr,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center,
                                         style: robotoMedium.copyWith(
+                                          fontSize: Dimensions.fontSizeSmall,
                                           color:
                                               authController.vendorTypeIndex ==
                                                   1
@@ -221,7 +229,14 @@ class _SignInScreenState extends State<SignInScreen> {
                               onChanged: (bool? isChecked) =>
                                   authController.toggleRememberMe(),
                             ),
-                            title: Text('remember_me'.tr),
+                            title: Text(
+                              'remember_me'.tr,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: robotoRegular.copyWith(
+                                fontSize: Dimensions.fontSizeSmall,
+                              ),
+                            ),
                             contentPadding: EdgeInsets.zero,
                             dense: true,
                             horizontalTitleGap: 0,

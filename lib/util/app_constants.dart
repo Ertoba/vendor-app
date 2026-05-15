@@ -8,7 +8,7 @@ class AppConstants {
   ///Flutter SDK: 3.41.6
 
   static const String fontFamily = 'Roboto';
-  static const double limitOfPickedVideoSizeInMB = 50;
+  static const double limitOfPickedVideoSizeInMB = 25;
   static const double maxSizeOfASingleFile = 10;
 
   static const String baseUrl = 'https://mili.ge';
