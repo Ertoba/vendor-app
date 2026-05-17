@@ -285,19 +285,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                               padding: const EdgeInsets.all(0),
                                               radius: const Radius.circular(Dimensions.radiusDefault),
                                             ),
-                                            child: Center(
-                                              child: Visibility(
-                                                visible: authController.pickedLogo != null,
-                                                child: Container(
-                                                  padding: const EdgeInsets.all(25),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(width: 2, color: Colors.white),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: const Icon(CupertinoIcons.photo_camera_solid, color: Colors.white),
-                                                ),
-                                              ),
-                                            ),
+                                            child: const SizedBox.expand(),
                                           ),
                                         ),
                                       ),
@@ -363,14 +351,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                               padding: const EdgeInsets.all(0),
                                               radius: const Radius.circular(Dimensions.radiusDefault),
                                             ),
-                                            child: Center(child: Visibility(
-                                              visible: authController.pickedCover != null,
-                                              child: Container(
-                                                padding: const EdgeInsets.all(25),
-                                                decoration: BoxDecoration(border: Border.all(width: 3, color: Colors.white), shape: BoxShape.circle),
-                                                child: const Icon(CupertinoIcons.photo_camera_solid, color: Colors.white, size: 50),
-                                              ),
-                                            )),
+                                            child: const SizedBox.expand(),
                                           ),
                                         ),
                                       ),
