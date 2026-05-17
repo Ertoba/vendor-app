@@ -596,7 +596,7 @@
   "enter_url": "Enter URL",
   "drag_drop_file_or_browse_file": "Drag & drop file or Browse file",
   "banner_images_ration_5:1": "Banner Images Ration 5:1",
-  "image_format_maximum_size_2mb": "Image format : jpg, png, jpeg | Maximum size : 2MB",
+  "image_format_maximum_size_2mb": "Image format : jpg, png, jpeg | Maximum size : 10MB",
   "announcement": "Announcement",
   "announcement_content": "Announcement Content",
   "type_announcement": "Type announcement",

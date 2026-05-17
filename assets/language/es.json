@@ -592,7 +592,7 @@
   "enter_url": "Ingrese la URL",
   "drag_drop_file_or_browse_file": "Arrastrar y soltar archivos o buscar archivos",
   "banner_images_ration_5:1": "Imágenes de banner Ración 5:1",
-  "image_format_maximum_size_2mb": "Formato de imagen: jpg, png, jpeg | Tamaño máximo: 2 MB",
+  "image_format_maximum_size_2mb": "Formato de imagen: jpg, png, jpeg | Tamaño máximo: 10 MB",
   "announcement": "Anuncio",
   "announcement_content": "Contenido del anuncio",
   "type_announcement": "Tipo anuncio",

@@ -592,7 +592,7 @@
   "enter_url": "أدخل عنوان URL",
   "drag_drop_file_or_browse_file": "سحب وإسقاط الملف أو تصفح الملف",
   "banner_images_ration_5:1": "صور البانر حصص 5:1",
-  "image_format_maximum_size_2mb": "تنسيق الصورة: jpg، png، jpeg | الحد الأقصى للحجم: 2 ميجابايت",
+  "image_format_maximum_size_2mb": "تنسيق الصورة: jpg، png، jpeg | الحد الأقصى للحجم: 10 ميجابايت",
   "announcement": "إعلان",
   "announcement_content": "محتوى الإعلان",
   "type_announcement": "اكتب اعلان",
