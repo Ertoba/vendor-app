@@ -10,9 +10,7 @@ import 'package:sixam_mart_store/features/rental_module/profile/controllers/taxi
 import 'package:sixam_mart_store/features/rental_module/trips/screens/trip_details_screen.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
-import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
-import 'package:sixam_mart_store/util/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -183,7 +181,9 @@ class SplashScreenState extends State<SplashScreen> {
 
   Future<void> _handleDefaultRouting() async {
     if (Get.find<AuthController>().isLoggedIn()) {
-      try { await Get.find<AuthController>().updateToken(); } catch (_) {}
+      try {
+        await Get.find<AuthController>().updateToken();
+      } catch (_) {}
       Get.find<AuthController>().getModuleType() == 'rental'
           ? await Get.find<TaxiProfileController>().getProfile()
           : await Get.find<ProfileController>().getProfile();
@@ -203,7 +203,12 @@ class SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       key: _globalKey,
       backgroundColor: const Color(0xFF039D55),
-      body: const SizedBox.expand(),
+      body: Image.asset(
+        Images.splashScreen,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+      ),
     );
   }
 }
