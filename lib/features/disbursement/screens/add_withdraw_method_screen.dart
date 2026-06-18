@@ -26,6 +26,28 @@ class _AddWithDrawMethodScreenState extends State<AddWithDrawMethodScreen> {
     Get.find<DisbursementController>().setMethod(isUpdate: false, initCall: true);
   }
 
+  String _fieldTitle(DisbursementController controller, int index) {
+    final String inputName = controller.methodFields[index].inputName ?? '';
+
+    if (controller.isKeepzSplitSelected && inputName == DisbursementController.keepzReceiverIdentifierField) {
+      return controller.selectedKeepzReceiverType == 'IBAN' ? 'keepz_iban'.tr : 'keepz_branch_receiver_id'.tr;
+    }
+
+    return inputName.replaceAll('_', ' ');
+  }
+
+  String _fieldHint(DisbursementController controller, int index) {
+    final String inputName = controller.methodFields[index].inputName ?? '';
+
+    if (controller.isKeepzSplitSelected && inputName == DisbursementController.keepzReceiverIdentifierField) {
+      return controller.selectedKeepzReceiverType == 'IBAN'
+          ? 'GE00BG0000000000000000'
+          : '0cac1858-9444-43b2-9a64-a65b472de416';
+    }
+
+    return controller.methodFields[index].placeholder ?? '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return  GetBuilder<DisbursementController>(
@@ -87,16 +109,27 @@ class _AddWithDrawMethodScreenState extends State<AddWithDrawMethodScreen> {
                         itemCount: disbursementController.methodFields.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
+                          final String inputName = disbursementController.methodFields[index].inputName ?? '';
+
+                          if (disbursementController.isKeepzSplitSelected
+                              && inputName == DisbursementController.keepzReceiverTypeField) {
+                            return Column(children: [
+                              _KeepzReceiverTypeSelector(disbursementController: disbursementController),
+                              SizedBox(height: index != disbursementController.methodFields.length-1 ? Dimensions.paddingSizeLarge : 0),
+                            ]);
+                          }
+
                           return Column(children: [
 
                             Row(
                               children: [
                                 Expanded(
                                   child: TextFieldWidget(
-                                    titleText: disbursementController.methodFields[index].inputName.toString().replaceAll('_', ' '),
-                                    hintText: disbursementController.methodFields[index].placeholder??'',
+                                    titleText: _fieldTitle(disbursementController, index),
+                                    hintText: _fieldHint(disbursementController, index),
                                     controller: disbursementController.textControllerList[index],
-                                    capitalization: TextCapitalization.words,
+                                    capitalization: disbursementController.isKeepzSplitSelected
+                                        ? TextCapitalization.characters : TextCapitalization.words,
                                     inputType: disbursementController.methodFields[index].inputType == 'phone' ? TextInputType.phone : disbursementController.methodFields[index].inputType == 'number'
                                         ? TextInputType.number : disbursementController.methodFields[index].inputType == 'email' ? TextInputType.emailAddress : TextInputType.name,
                                     focusNode: disbursementController.focusList[index],
@@ -129,6 +162,18 @@ class _AddWithDrawMethodScreenState extends State<AddWithDrawMethodScreen> {
                                 ) : const SizedBox(),
                               ],
                             ),
+                            if (disbursementController.isKeepzSplitSelected
+                                && inputName == DisbursementController.keepzReceiverIdentifierField) ...[
+                              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                              Text(
+                                disbursementController.selectedKeepzReceiverType == 'IBAN'
+                                    ? 'keepz_iban_hint'.tr : 'keepz_branch_receiver_id_hint'.tr,
+                                style: robotoRegular.copyWith(
+                                  fontSize: Dimensions.fontSizeSmall,
+                                  color: Theme.of(context).hintColor,
+                                ),
+                              ),
+                            ],
                             SizedBox(height: index != disbursementController.methodFields.length-1 ? Dimensions.paddingSizeLarge : 0),
 
                           ]);
@@ -150,24 +195,12 @@ class _AddWithDrawMethodScreenState extends State<AddWithDrawMethodScreen> {
                     child: !disbursementController.isLoading ? CustomButtonWidget(
                       buttonText: 'add_method'.tr,
                       onPressed: () {
-                        bool fieldEmpty = false;
-                        for (var element in disbursementController.methodFields) {
-                          if(element.isRequired == 1){
-                            if(disbursementController.textControllerList[disbursementController.methodFields.indexOf(element)].text.isEmpty){
-                              fieldEmpty = true;
-                            }
-                          }
-                        }
+                        final String? validationError = disbursementController.validateSelectedMethod();
 
-                        if(fieldEmpty){
-                          showCustomSnackBar('required_fields_can_not_be_empty'.tr);
+                        if(validationError != null){
+                          showCustomSnackBar(validationError.tr);
                         }else{
-                          Map<String?, String> data = {};
-                          data['withdraw_method_id'] = disbursementController.widthDrawMethods![disbursementController.selectedMethodIndex!].id.toString();
-                          for (var result in disbursementController.methodFields) {
-                            data[result.inputName] = disbursementController.textControllerList[disbursementController.methodFields.indexOf(result)].text.trim();
-                          }
-                          disbursementController.addWithdrawMethod(data);
+                          disbursementController.addWithdrawMethod(disbursementController.buildWithdrawMethodPayload());
                         }
                       },
                     ) : const Center(child: CircularProgressIndicator()),
@@ -179,5 +212,66 @@ class _AddWithDrawMethodScreenState extends State<AddWithDrawMethodScreen> {
           );
         }
     );
+  }
+}
+
+class _KeepzReceiverTypeSelector extends StatelessWidget {
+  final DisbursementController disbursementController;
+  const _KeepzReceiverTypeSelector({required this.disbursementController});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('keepz_receiver_type'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
+      const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+
+      Row(children: DisbursementController.keepzReceiverTypes.map((type) {
+        final bool selected = disbursementController.selectedKeepzReceiverType == type;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(right: type == DisbursementController.keepzReceiverTypes.first ? Dimensions.paddingSizeSmall : 0),
+            child: InkWell(
+              onTap: () => disbursementController.setKeepzReceiverType(type),
+              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+              child: Container(
+                height: 48,
+                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                  color: selected ? Theme.of(context).primaryColor.withValues(alpha: 0.08) : Theme.of(context).cardColor,
+                  border: Border.all(
+                    color: selected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.5),
+                  ),
+                ),
+                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Icon(
+                    type == 'IBAN' ? Icons.account_balance : Icons.storefront,
+                    size: 18,
+                    color: selected ? Theme.of(context).primaryColor : Theme.of(context).hintColor,
+                  ),
+                  const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                  Flexible(
+                    child: Text(
+                      type == 'IBAN' ? 'keepz_iban_account'.tr : 'keepz_branch'.tr,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: robotoMedium.copyWith(
+                        color: selected ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyLarge!.color,
+                      ),
+                    ),
+                  ),
+                ]),
+              ),
+            ),
+          ),
+        );
+      }).toList()),
+
+      const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+      Text(
+        'keepz_split_receiver_default_note'.tr,
+        style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor),
+      ),
+    ]);
   }
 }

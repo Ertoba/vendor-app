@@ -1709,5 +1709,17 @@
   "your_takeaway_order_has_been_placed_successfully" : "Your takeaway order has been placed successfully. We are preparing it and will be ready for pickup soon.",
   "insert_delivery_location" : "Insert Delivery Location",
   "please_insert_delivery_location" : "Please add your  delivery location so we can check whether the store delivers to your area.",
-  "module_is_not_available" : "Module is not available"
+  "module_is_not_available" : "Module is not available",
+  "keepz_receiver_type": "Keepz Receiver Type",
+  "keepz_receiver_identifier": "Keepz Receiver Identifier",
+  "keepz_branch": "Branch",
+  "keepz_iban_account": "IBAN",
+  "keepz_branch_receiver_id": "Keepz Branch Receiver ID",
+  "keepz_iban": "Vendor IBAN",
+  "keepz_branch_receiver_id_hint": "Use the UUID provided by Keepz for the vendor branch.",
+  "keepz_iban_hint": "Use the vendor's Georgian IBAN without spaces.",
+  "keepz_split_receiver_default_note": "Keepz split uses this default receiver for direct vendor settlement.",
+  "please_select_keepz_receiver_type": "Please select Keepz receiver type",
+  "enter_valid_keepz_branch_receiver": "Please enter a valid Keepz branch receiver ID.",
+  "enter_valid_keepz_iban": "Please enter a valid Georgian IBAN."
 }

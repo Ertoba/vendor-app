@@ -12,6 +12,11 @@ class DisbursementController extends GetxController implements GetxService {
   final DisbursementServiceInterface disbursementServiceInterface;
   DisbursementController({required this.disbursementServiceInterface});
 
+  static const String keepzSplitMethodName = 'Keepz Split Receiver';
+  static const String keepzReceiverTypeField = 'keepz_receiver_type';
+  static const String keepzReceiverIdentifierField = 'keepz_receiver_identifier';
+  static const List<String> keepzReceiverTypes = ['BRANCH', 'IBAN'];
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
   
@@ -44,6 +49,18 @@ class DisbursementController extends GetxController implements GetxService {
 
   int? get index =>_index;
   int? _index = -1;
+
+  String _selectedKeepzReceiverType = keepzReceiverTypes.first;
+  String get selectedKeepzReceiverType => _selectedKeepzReceiverType;
+  bool get isKeepzSplitSelected {
+    if (_widthDrawMethods == null || _widthDrawMethods!.isEmpty || _selectedMethodIndex == null) {
+      return false;
+    }
+
+    final WidthDrawMethodModel selectedMethod = _widthDrawMethods![_selectedMethodIndex!];
+    return selectedMethod.methodName == keepzSplitMethodName
+        || (selectedMethod.methodFields ?? []).any((field) => field.inputName == keepzReceiverIdentifierField);
+  }
 
   Future<void> addWithdrawMethod(Map<String?, String> data) async {
     _isLoading = true;
@@ -141,9 +158,117 @@ class DisbursementController extends GetxController implements GetxService {
         _textControllerList.add(TextEditingController());
         _focusList.add(FocusNode());
       }
+      if (isKeepzSplitSelected) {
+        _selectedKeepzReceiverType = keepzReceiverTypes.first;
+        _setKeepzReceiverTypeController(_selectedKeepzReceiverType);
+      }
     }
     if(isUpdate) {
       update();
+    }
+  }
+
+  void setKeepzReceiverType(String type) {
+    if (!keepzReceiverTypes.contains(type)) {
+      return;
+    }
+
+    _selectedKeepzReceiverType = type;
+    _setKeepzReceiverTypeController(type);
+
+    final int identifierIndex = _fieldIndex(keepzReceiverIdentifierField);
+    if (identifierIndex != -1) {
+      _textControllerList[identifierIndex].clear();
+    }
+
+    update();
+  }
+
+  String? validateSelectedMethod() {
+    bool fieldEmpty = false;
+    for (var element in _methodFields) {
+      if(element.isRequired == 1){
+        if(_textControllerList[_methodFields.indexOf(element)].text.trim().isEmpty){
+          fieldEmpty = true;
+        }
+      }
+    }
+
+    if(fieldEmpty){
+      return 'required_fields_can_not_be_empty';
+    }
+
+    if (!isKeepzSplitSelected) {
+      return null;
+    }
+
+    final int typeIndex = _fieldIndex(keepzReceiverTypeField);
+    final int identifierIndex = _fieldIndex(keepzReceiverIdentifierField);
+
+    if (typeIndex == -1 || identifierIndex == -1) {
+      return 'required_fields_can_not_be_empty';
+    }
+
+    final String type = _textControllerList[typeIndex].text.trim().toUpperCase();
+    final String identifier = normalizeKeepzReceiverIdentifier(
+      type,
+      _textControllerList[identifierIndex].text,
+    );
+
+    if (!keepzReceiverTypes.contains(type)) {
+      return 'please_select_keepz_receiver_type';
+    }
+
+    if (type == 'IBAN' && !RegExp(r'^GE\d{2}[A-Z]{2}\d{16}$').hasMatch(identifier)) {
+      return 'enter_valid_keepz_iban';
+    }
+
+    if (type == 'BRANCH' && !RegExp(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', caseSensitive: false).hasMatch(identifier)) {
+      return 'enter_valid_keepz_branch_receiver';
+    }
+
+    return null;
+  }
+
+  Map<String?, String> buildWithdrawMethodPayload() {
+    Map<String?, String> data = {};
+    data['withdraw_method_id'] = _widthDrawMethods![_selectedMethodIndex!].id.toString();
+
+    for (var result in _methodFields) {
+      final int index = _methodFields.indexOf(result);
+      final String inputName = result.inputName ?? '';
+      String value = _textControllerList[index].text.trim();
+
+      if (isKeepzSplitSelected && inputName == keepzReceiverTypeField) {
+        value = value.toUpperCase();
+      }
+
+      if (isKeepzSplitSelected && inputName == keepzReceiverIdentifierField) {
+        value = normalizeKeepzReceiverIdentifier(_selectedKeepzReceiverType, value);
+      }
+
+      data[inputName] = value;
+    }
+
+    return data;
+  }
+
+  String normalizeKeepzReceiverIdentifier(String type, String value) {
+    if (type == 'IBAN') {
+      return value.replaceAll(RegExp(r'\s+'), '').toUpperCase();
+    }
+
+    return value.trim().toLowerCase();
+  }
+
+  int _fieldIndex(String inputName) {
+    return _methodFields.indexWhere((field) => field.inputName == inputName);
+  }
+
+  void _setKeepzReceiverTypeController(String type) {
+    final int typeIndex = _fieldIndex(keepzReceiverTypeField);
+    if (typeIndex != -1) {
+      _textControllerList[typeIndex].text = type;
     }
   }
   

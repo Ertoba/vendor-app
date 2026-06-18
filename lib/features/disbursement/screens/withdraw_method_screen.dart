@@ -24,6 +24,17 @@ class _WithdrawMethodScreenState extends State<WithdrawMethodScreen> {
 
   DisbursementHelper disbursementHelper = DisbursementHelper();
 
+  String _methodFieldLabel(String? inputName) {
+    switch (inputName) {
+      case DisbursementController.keepzReceiverTypeField:
+        return 'keepz_receiver_type'.tr;
+      case DisbursementController.keepzReceiverIdentifierField:
+        return 'keepz_receiver_identifier'.tr;
+      default:
+        return (inputName ?? '').replaceAll('_', ' ').toTitleCase();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -119,7 +130,7 @@ class _WithdrawMethodScreenState extends State<WithdrawMethodScreen> {
                               padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeDefault),
                               child: Row(children: [
                                 Expanded(
-                                  child: Text(method.methodFields![index].userInput!.replaceAll('_', ' ').toTitleCase(),
+                                  child: Text(_methodFieldLabel(method.methodFields![index].userInput),
                                     style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
                                 ),
                                 const Text(' :  ', style: robotoRegular),
