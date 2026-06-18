@@ -4,14 +4,19 @@ class DisbursementMethodBody {
   String? offset;
   List<Methods>? methods;
 
-  DisbursementMethodBody({this.totalSize, this.limit, this.offset, this.methods});
+  DisbursementMethodBody({
+    this.totalSize,
+    this.limit,
+    this.offset,
+    this.methods,
+  });
 
   DisbursementMethodBody.fromJson(Map<String, dynamic> json) {
     totalSize = json['total_size'];
     limit = json['limit'];
     offset = json['offset'];
+    methods = <Methods>[];
     if (json['methods'] != null) {
-      methods = <Methods>[];
       json['methods'].forEach((v) {
         methods!.add(Methods.fromJson(v));
       });
@@ -64,10 +69,28 @@ class Methods {
       json['method_fields'].forEach((v) {
         methodFields!.add(MethodFields.fromJson(v));
       });
+    } else {
+      methodFields = <MethodFields>[];
     }
-    isDefault = json['is_default'];
+    isDefault = _parseBool(json['is_default']);
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+  }
+
+  bool _parseBool(dynamic value) {
+    if (value is bool) {
+      return value;
+    }
+
+    if (value is int) {
+      return value == 1;
+    }
+
+    if (value is String) {
+      return value == '1' || value.toLowerCase() == 'true';
+    }
+
+    return false;
   }
 
   Map<String, dynamic> toJson() {
