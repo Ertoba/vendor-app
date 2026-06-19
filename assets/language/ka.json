@@ -613,7 +613,7 @@
   "this_item_has_been_rejected": "ეს ნივთი უარყოფილია",
   "no_banner_found": "ბანერი ვერ მოიძებნა",
   "available_time": "ხელმისაწვდომობის დრო",
-  "disbursement": "გადარიცხვა",
+  "disbursement": "ავტომატური ჩარიცხვა",
   "view_disbursement_history": "გადარიცხვის ისტორია",
   "disbursement_method_setup": "გადარიცხვის მეთოდი",
   "withdraw_methods": "განაღდების მეთოდები",

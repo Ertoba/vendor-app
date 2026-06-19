@@ -36,6 +36,12 @@ class PaymentController extends GetxController implements GetxService {
 
   List<WidthDrawMethodModel>? _widthDrawMethods;
   List<WidthDrawMethodModel>? get widthDrawMethods => _widthDrawMethods;
+  List<WidthDrawMethodModel> get manualWidthDrawMethods {
+    return _widthDrawMethods
+            ?.where((method) => !isKeepzSplitReceiver(method))
+            .toList() ??
+        <WidthDrawMethodModel>[];
+  }
 
   int? _methodIndex = 0;
   int? get methodIndex => _methodIndex;
@@ -67,36 +73,78 @@ class PaymentController extends GetxController implements GetxService {
   String? _digitalPaymentName;
   String? get digitalPaymentName => _digitalPaymentName;
 
-  Future<ResponseModel> makeCollectCashPayment(double amount, String paymentGatewayName) async {
+  Future<ResponseModel> makeCollectCashPayment(
+    double amount,
+    String paymentGatewayName,
+  ) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await paymentServiceInterface.makeCollectCashPayment(amount, paymentGatewayName);
+    ResponseModel responseModel = await paymentServiceInterface
+        .makeCollectCashPayment(amount, paymentGatewayName);
     _isLoading = false;
     update();
     return responseModel;
   }
 
-  void setMethod({bool isUpdate = true}){
+  bool isKeepzSplitReceiver(WidthDrawMethodModel method) {
+    final String methodName = method.methodName?.trim().toLowerCase() ?? '';
+    final bool hasKeepzReceiverField =
+        method.methodFields?.any((MethodFields field) {
+          final String inputName = field.inputName?.trim().toLowerCase() ?? '';
+          return inputName == 'keepz_receiver_identifier' ||
+              inputName == 'keepz_receiver_type';
+        }) ??
+        false;
+
+    return methodName == 'keepz split receiver' || hasKeepzReceiverField;
+  }
+
+  List<WidthDrawMethodModel> _withdrawMethodsForManualRequest(
+    bool excludeKeepzSplitReceiver,
+  ) {
+    final List<WidthDrawMethodModel> methods =
+        _widthDrawMethods ?? <WidthDrawMethodModel>[];
+    return excludeKeepzSplitReceiver ? manualWidthDrawMethods : methods;
+  }
+
+  void setMethod({
+    bool isUpdate = true,
+    bool excludeKeepzSplitReceiver = false,
+  }) {
     _methodList = [];
     _textControllerList = [];
     _methodFields = [];
     _focusList = [];
-    if(widthDrawMethods != null && widthDrawMethods!.isNotEmpty){
-      for(int i=0; i< widthDrawMethods!.length; i++){
-        _methodList.add(DropdownMenuItem<int>(value: i, child: SizedBox(
-          width: Get.context!.width-100,
-          child: Text(widthDrawMethods![i].methodName!, style: robotoBold),
-        )));
+    final List<WidthDrawMethodModel> methods = _withdrawMethodsForManualRequest(
+      excludeKeepzSplitReceiver,
+    );
+    if (methods.isNotEmpty) {
+      if (_methodIndex == null || _methodIndex! >= methods.length) {
+        _methodIndex = 0;
+      }
+      for (int i = 0; i < methods.length; i++) {
+        _methodList.add(
+          DropdownMenuItem<int>(
+            value: i,
+            child: SizedBox(
+              width: Get.context!.width - 100,
+              child: Text(methods[i].methodName!, style: robotoBold),
+            ),
+          ),
+        );
       }
       _textControllerList = [];
       _methodFields = [];
-      for (var field in widthDrawMethods![_methodIndex!].methodFields!) {
+      for (var field
+          in methods[_methodIndex!].methodFields ?? <MethodFields>[]) {
         _methodFields.add(field);
         _textControllerList.add(TextEditingController());
         _focusList.add(FocusNode());
       }
+    } else {
+      _methodIndex = null;
     }
-    if(isUpdate) {
+    if (isUpdate) {
       update();
     }
   }
@@ -108,8 +156,10 @@ class PaymentController extends GetxController implements GetxService {
   Future<void> updateBankInfo(BankInfoBodyModel bankInfoBody) async {
     _isLoading = true;
     update();
-    bool isSuccess = await paymentServiceInterface.updateBankInfo(bankInfoBody.toJson());
-    if(isSuccess) {
+    bool isSuccess = await paymentServiceInterface.updateBankInfo(
+      bankInfoBody.toJson(),
+    );
+    if (isSuccess) {
       Get.find<ProfileController>().getProfile();
       Get.back();
       showCustomSnackBar('bank_info_updated'.tr, isError: false);
@@ -119,8 +169,9 @@ class PaymentController extends GetxController implements GetxService {
   }
 
   Future<void> getWithdrawList() async {
-    List<WithdrawModel>? withdrawList = await paymentServiceInterface.getWithdrawList();
-    if(withdrawList != null) {
+    List<WithdrawModel>? withdrawList = await paymentServiceInterface
+        .getWithdrawList();
+    if (withdrawList != null) {
       _withdrawList = [];
       _allWithdrawList = [];
       _pendingWithdraw = 0;
@@ -134,8 +185,9 @@ class PaymentController extends GetxController implements GetxService {
   }
 
   Future<List<WidthDrawMethodModel>?> getWithdrawMethodList() async {
-    List<WidthDrawMethodModel>? widthDrawMethods = await paymentServiceInterface.getWithdrawMethodList();
-    if(widthDrawMethods != null) {
+    List<WidthDrawMethodModel>? widthDrawMethods = await paymentServiceInterface
+        .getWithdrawMethodList();
+    if (widthDrawMethods != null) {
       _widthDrawMethods = [];
       _widthDrawMethods!.addAll(widthDrawMethods);
     }
@@ -150,8 +202,9 @@ class PaymentController extends GetxController implements GetxService {
 
   Future<void> getWalletPaymentList() async {
     _transactions = null;
-    List<Transactions>? transactions = await paymentServiceInterface.getWalletPaymentList();
-    if(transactions != null) {
+    List<Transactions>? transactions = await paymentServiceInterface
+        .getWalletPaymentList();
+    if (transactions != null) {
       _transactions = [];
       _transactions!.addAll(transactions);
     }
@@ -162,11 +215,11 @@ class PaymentController extends GetxController implements GetxService {
     _adjustmentLoading = true;
     update();
     bool isSuccess = await paymentServiceInterface.makeWalletAdjustment();
-    if(isSuccess) {
+    if (isSuccess) {
       Get.back();
       Get.find<ProfileController>().getProfile();
       showCustomSnackBar('wallet_adjustment_successfully'.tr, isError: false);
-    }else {
+    } else {
       Get.back();
     }
     _adjustmentLoading = false;
@@ -176,11 +229,11 @@ class PaymentController extends GetxController implements GetxService {
   void filterWithdrawList(int index) {
     _filterIndex = index;
     _withdrawList = [];
-    if(index == 0) {
+    if (index == 0) {
       _withdrawList!.addAll(_allWithdrawList);
-    }else {
+    } else {
       for (var withdraw in _allWithdrawList) {
-        if(withdraw.status == _statusList[index]) {
+        if (withdraw.status == _statusList[index]) {
           _withdrawList!.add(withdraw);
         }
       }
@@ -192,7 +245,7 @@ class PaymentController extends GetxController implements GetxService {
     _isLoading = true;
     update();
     bool isSuccess = await paymentServiceInterface.requestWithdraw(data);
-    if(isSuccess) {
+    if (isSuccess) {
       Get.back();
       getWithdrawList();
       Get.find<ProfileController>().getProfile();
@@ -202,16 +255,15 @@ class PaymentController extends GetxController implements GetxService {
     update();
   }
 
-  void setPaymentIndex(int index){
+  void setPaymentIndex(int index) {
     _paymentIndex = index;
     update();
   }
 
-  void changeDigitalPaymentName(String? name, {bool canUpdate = true}){
+  void changeDigitalPaymentName(String? name, {bool canUpdate = true}) {
     _digitalPaymentName = name;
-    if(canUpdate) {
+    if (canUpdate) {
       update();
     }
   }
-
 }
