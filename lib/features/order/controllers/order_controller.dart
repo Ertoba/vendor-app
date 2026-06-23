@@ -221,6 +221,9 @@ class OrderController extends GetxController implements GetxService {
       Get.back(result: responseModel.isSuccess);
     }
     if(responseModel.isSuccess) {
+      if(_orderModel != null && _orderModel!.id == orderID) {
+        _orderModel!.orderStatus = status;
+      }
       if(back && fromNotification) {
         Get.offAllNamed(RouteHelper.getInitialRoute());
       }else if(back && !fromNotification){

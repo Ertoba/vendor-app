@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
@@ -28,7 +30,7 @@ class SliderButton extends StatefulWidget {
   final Alignment alignLabel;
   final BoxShadow boxShadow;
   final Widget icon;
-  final Function action;
+  final FutureOr<dynamic> Function() action;
 
   ///Make it false if you want to deactivate the shimmer effect.
   final bool shimmer;
@@ -81,6 +83,9 @@ class SliderButton extends StatefulWidget {
 class SliderButtonState extends State<SliderButton> {
   bool? flag;
   Widget? _child;
+  bool _isSubmitting = false;
+
+  bool get _isDisabled => widget.disable || _isSubmitting;
 
   @override
   void initState() {
@@ -98,7 +103,7 @@ class SliderButtonState extends State<SliderButton> {
     height: widget.height,
     width: widget.width,
     decoration: BoxDecoration(
-      color: widget.disable ? Colors.grey.shade700 : widget.backgroundColor,
+      color: _isDisabled ? Colors.grey.shade700 : widget.backgroundColor,
       borderRadius: BorderRadius.circular(widget.radius),
     ),
     alignment: Alignment.centerLeft,
@@ -107,12 +112,12 @@ class SliderButtonState extends State<SliderButton> {
       children: <Widget>[
         Container(
           alignment: widget.alignLabel,
-          child: widget.shimmer && !widget.disable ? Shimmer(
+          child: widget.shimmer && !_isDisabled ? Shimmer(
             color: widget.highlightedColor,
             child: widget.label!,
           ) : widget.label,
         ),
-        widget.disable ? Tooltip(
+        _isDisabled ? Tooltip(
           verticalOffset: 50,
           message: 'Button is disabled',
           child: Container(
@@ -136,7 +141,11 @@ class SliderButtonState extends State<SliderButton> {
             },
             ///gives direction of swipping in argument.
             onDismissed: (dir) async {
+              if (_isSubmitting) {
+                return;
+              }
               setState(() {
+                _isSubmitting = true;
                 if (widget.dismissible) {
                   flag = false;
                 } else {
@@ -144,15 +153,23 @@ class SliderButtonState extends State<SliderButton> {
                 }
               });
 
-              widget.action();
-              if (widget.vibrationFlag &&
-                  (await Vibration.hasVibrator())) {
-                try {
-                  Vibration.vibrate(duration: 200);
-                } catch (e) {
-                  if (kDebugMode) {
-                    print(e);
+              try {
+                await Future.sync(widget.action);
+                if (widget.vibrationFlag &&
+                    (await Vibration.hasVibrator())) {
+                  try {
+                    Vibration.vibrate(duration: 200);
+                  } catch (e) {
+                    if (kDebugMode) {
+                      print(e);
+                    }
                   }
+                }
+              } finally {
+                if (mounted) {
+                  setState(() {
+                    _isSubmitting = false;
+                  });
                 }
               }
             },

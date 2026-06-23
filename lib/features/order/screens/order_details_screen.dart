@@ -3074,7 +3074,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                 } else if (controllerOrderModel
                                                         .orderStatus ==
                                                     'processing') {
-                                                  Get.find<OrderController>()
+                                                  return Get.find<
+                                                        OrderController
+                                                      >()
                                                       .updateOrderStatus(
                                                         widget.orderId,
                                                         AppConstants.handover,
@@ -3137,7 +3139,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                       ),
                                                     );
                                                   } else {
-                                                    Get.find<OrderController>()
+                                                    return Get.find<
+                                                          OrderController
+                                                        >()
                                                         .updateOrderStatus(
                                                           controllerOrderModel
                                                               .id,
@@ -3192,7 +3196,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                       );
                                                     }
                                                   } else {
-                                                    Get.find<OrderController>()
+                                                    return Get.find<
+                                                          OrderController
+                                                        >()
                                                         .updateOrderStatus(
                                                           controllerOrderModel
                                                               .id,
@@ -3258,6 +3264,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                               ),
                                               dismissThresholds: 0.5,
                                               dismissible: false,
+                                              disable:
+                                                  orderController.isLoading,
                                               shimmer: true,
                                               width: 1170,
                                               height: 50,
