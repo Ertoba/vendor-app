@@ -1505,5 +1505,7 @@
   "coupon_active_des": "Define cuándo estará activo el cupón.",
   "type_a_message": "Escribe un mensaje",
   "reset_successful": "Restablecimiento exitoso",
-  "on_the_way": "En camino"
+  "on_the_way": "En camino",
+  "keepz_split_completed": "Keepz Split Settlements",
+  "keepz_split_history": "Keepz Split Settlement History"
 }

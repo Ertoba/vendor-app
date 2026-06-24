@@ -1506,5 +1506,7 @@
   "coupon_active_des": "حدد متى سيكون الكوبون نشطًا.",
   "type_a_message": "اكتب رسالة",
   "reset_successful": "تمت إعادة التعيين بنجاح",
-  "on_the_way": "في الطريق"
+  "on_the_way": "في الطريق",
+  "keepz_split_completed": "Keepz Split Settlements",
+  "keepz_split_history": "Keepz Split Settlement History"
 }

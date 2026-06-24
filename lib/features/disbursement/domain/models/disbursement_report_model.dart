@@ -5,8 +5,11 @@ class DisbursementReportModel {
   double? pending;
   double? completed;
   double? canceled;
+  int? keepzTotalSize;
+  double? keepzCompleted;
   int? completeDay;
   List<Disbursements>? disbursements;
+  List<KeepzSettlement>? keepzSettlements;
 
   DisbursementReportModel({
     this.totalSize,
@@ -15,8 +18,11 @@ class DisbursementReportModel {
     this.pending,
     this.completed,
     this.canceled,
+    this.keepzTotalSize,
+    this.keepzCompleted,
     this.completeDay,
     this.disbursements,
+    this.keepzSettlements,
   });
 
   DisbursementReportModel.fromJson(Map<String, dynamic> json) {
@@ -26,11 +32,19 @@ class DisbursementReportModel {
     pending = json['pending']?.toDouble();
     completed = json['completed']?.toDouble();
     canceled = json['canceled']?.toDouble();
+    keepzTotalSize = json['keepz_total_size'];
+    keepzCompleted = json['keepz_completed']?.toDouble();
     completeDay = json['complete_day'];
     if (json['disbursements'] != null) {
       disbursements = <Disbursements>[];
       json['disbursements'].forEach((v) {
         disbursements!.add(Disbursements.fromJson(v));
+      });
+    }
+    if (json['keepz_settlements'] != null) {
+      keepzSettlements = <KeepzSettlement>[];
+      json['keepz_settlements'].forEach((v) {
+        keepzSettlements!.add(KeepzSettlement.fromJson(v));
       });
     }
   }
@@ -43,11 +57,66 @@ class DisbursementReportModel {
     data['pending'] = pending;
     data['completed'] = completed;
     data['canceled'] = canceled;
+    data['keepz_total_size'] = keepzTotalSize;
+    data['keepz_completed'] = keepzCompleted;
     data['complete_day'] = completeDay;
     if (disbursements != null) {
       data['disbursements'] = disbursements!.map((v) => v.toJson()).toList();
     }
+    if (keepzSettlements != null) {
+      data['keepz_settlements'] = keepzSettlements!.map((v) => v.toJson()).toList();
+    }
     return data;
+  }
+}
+
+class KeepzSettlement {
+  String? paymentRequestId;
+  int? orderId;
+  int? storeId;
+  double? amount;
+  String? status;
+  String? transactionId;
+  String? receiverType;
+  String? receiverIdentifierMasked;
+  String? paidAt;
+
+  KeepzSettlement({
+    this.paymentRequestId,
+    this.orderId,
+    this.storeId,
+    this.amount,
+    this.status,
+    this.transactionId,
+    this.receiverType,
+    this.receiverIdentifierMasked,
+    this.paidAt,
+  });
+
+  KeepzSettlement.fromJson(Map<String, dynamic> json) {
+    paymentRequestId = json['payment_request_id'];
+    orderId = json['order_id'];
+    storeId = json['store_id'];
+    amount = json['amount']?.toDouble();
+    status = json['status'];
+    transactionId = json['transaction_id'];
+    receiverType = json['receiver_type'];
+    receiverIdentifierMasked = json['receiver_identifier_masked'];
+    paidAt = json['paid_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'payment_request_id': paymentRequestId,
+      'order_id': orderId,
+      'store_id': storeId,
+      'amount': amount,
+      'status': status,
+      'transaction_id': transactionId,
+      'receiver_type': receiverType,
+      'receiver_identifier_masked': receiverIdentifierMasked,
+      'paid_at': paidAt,
+    };
   }
 }
 

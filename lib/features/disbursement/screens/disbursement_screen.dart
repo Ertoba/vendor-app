@@ -25,6 +25,7 @@ class _DisbursementScreenState extends State<DisbursementScreen> {
   final JustTheController pendingToolTip = JustTheController();
   final JustTheController completedToolTip = JustTheController();
   final JustTheController cancelToolTip = JustTheController();
+  final JustTheController keepzToolTip = JustTheController();
 
   @override
   void initState() {
@@ -90,9 +91,67 @@ class _DisbursementScreenState extends State<DisbursementScreen> {
                     isCanceled: true,
                     canceledToolTip: cancelToolTip,
                   ),
+                  DisbursementStatusCardWidget(
+                    amount: disbursementController.disbursementReportModel!.keepzCompleted ?? 0,
+                    text: 'keepz_split_completed'.tr,
+                    isCompleted: true,
+                    completeToolTip: keepzToolTip,
+                  ),
                 ]),
               ),
             ),
+
+            if (disbursementController.disbursementReportModel!.keepzSettlements?.isNotEmpty ?? false) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                child: Text(
+                  'keepz_split_history'.tr,
+                  style: robotoBold.copyWith(
+                    fontSize: Dimensions.fontSizeLarge,
+                    color: Theme.of(context).textTheme.bodyLarge!.color,
+                  ),
+                ),
+              ),
+              ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeLarge),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: disbursementController.disbursementReportModel!.keepzSettlements!.length,
+                itemBuilder: (context, index) {
+                  KeepzSettlement settlement = disbursementController.disbursementReportModel!.keepzSettlements![index];
+                  return Column(children: [
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(PriceConverterHelper.convertPrice(settlement.amount), style: robotoMedium),
+                      subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text('${'order_id'.tr}: #${settlement.orderId}',
+                            style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
+                        if (settlement.receiverIdentifierMasked?.isNotEmpty ?? false)
+                          Text('${settlement.receiverType ?? ''}: ${settlement.receiverIdentifierMasked}',
+                              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
+                      ]),
+                      trailing: Column(crossAxisAlignment: CrossAxisAlignment.end, mainAxisAlignment: MainAxisAlignment.center, children: [
+                        if (settlement.paidAt != null)
+                          Text(
+                            DateConverterHelper.dateTimeStringForDisbursement(settlement.paidAt!),
+                            style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
+                          ),
+                        const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeExtraSmall),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                            color: Colors.green.withValues(alpha: 0.1),
+                          ),
+                          child: Text('completed'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Colors.green)),
+                        ),
+                      ]),
+                    ),
+                    const Divider(height: 2, thickness: 1),
+                  ]);
+                },
+              ),
+            ],
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
@@ -155,7 +214,9 @@ class _DisbursementScreenState extends State<DisbursementScreen> {
                   const Divider(height: 2, thickness: 1),
                 ]);
               },
-            ) : Padding(padding: const EdgeInsets.only(top: 200), child: Center(child: Text('no_history_available'.tr, style: robotoMedium))),
+            ) : (disbursementController.disbursementReportModel!.keepzSettlements?.isNotEmpty ?? false)
+                ? const SizedBox()
+                : Padding(padding: const EdgeInsets.only(top: 200), child: Center(child: Text('no_history_available'.tr, style: robotoMedium))),
 
           ]),
           ) : const Center(child: CircularProgressIndicator());
