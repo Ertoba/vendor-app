@@ -166,11 +166,14 @@ class DateConverterHelper {
   }
 
   static String dateTimeStringForDisbursement(String time) {
-    var newTime = '${time.substring(0, 10)} ${time.substring(11, 23)}';
-    return DateFormat(
-      'dd MMM, yyyy',
-      _dateLocale(),
-    ).format(DateFormat('yyyy-MM-dd HH:mm:ss').parse(newTime));
+    try {
+      return DateFormat(
+        'dd MMM, yyyy',
+        _dateLocale(),
+      ).format(DateTime.parse(time).toLocal());
+    } catch (_) {
+      return time;
+    }
   }
 
   // static int expireDifferanceInDays(DateTime dateTime) {

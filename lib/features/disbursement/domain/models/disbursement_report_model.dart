@@ -32,8 +32,8 @@ class DisbursementReportModel {
     pending = json['pending']?.toDouble();
     completed = json['completed']?.toDouble();
     canceled = json['canceled']?.toDouble();
-    keepzTotalSize = json['keepz_total_size'];
-    keepzCompleted = json['keepz_completed']?.toDouble();
+    keepzTotalSize = _toInt(json['keepz_total_size']);
+    keepzCompleted = _toDouble(json['keepz_completed']);
     completeDay = json['complete_day'];
     if (json['disbursements'] != null) {
       disbursements = <Disbursements>[];
@@ -64,7 +64,9 @@ class DisbursementReportModel {
       data['disbursements'] = disbursements!.map((v) => v.toJson()).toList();
     }
     if (keepzSettlements != null) {
-      data['keepz_settlements'] = keepzSettlements!.map((v) => v.toJson()).toList();
+      data['keepz_settlements'] = keepzSettlements!
+          .map((v) => v.toJson())
+          .toList();
     }
     return data;
   }
@@ -94,10 +96,10 @@ class KeepzSettlement {
   });
 
   KeepzSettlement.fromJson(Map<String, dynamic> json) {
-    paymentRequestId = json['payment_request_id'];
-    orderId = json['order_id'];
-    storeId = json['store_id'];
-    amount = json['amount']?.toDouble();
+    paymentRequestId = json['payment_request_id']?.toString();
+    orderId = _toInt(json['order_id']);
+    storeId = _toInt(json['store_id']);
+    amount = _toDouble(json['amount']);
     status = json['status'];
     transactionId = json['transaction_id'];
     receiverType = json['receiver_type'];
@@ -118,6 +120,23 @@ class KeepzSettlement {
       'paid_at': paidAt,
     };
   }
+}
+
+double? _toDouble(dynamic value) {
+  if (value is num) {
+    return value.toDouble();
+  }
+  return double.tryParse(value?.toString() ?? '');
+}
+
+int? _toInt(dynamic value) {
+  if (value is int) {
+    return value;
+  }
+  if (value is num) {
+    return value.toInt();
+  }
+  return int.tryParse(value?.toString() ?? '');
 }
 
 class Disbursements {
@@ -155,7 +174,9 @@ class Disbursements {
     status = json['status'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    withdrawMethod = json['withdraw_method'] != null ? WithdrawMethod.fromJson(json['withdraw_method']) : null;
+    withdrawMethod = json['withdraw_method'] != null
+        ? WithdrawMethod.fromJson(json['withdraw_method'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -205,7 +226,9 @@ class WithdrawMethod {
     deliveryManId = json['delivery_man_id'];
     withdrawalMethodId = json['withdrawal_method_id'];
     methodName = json['method_name'];
-    methodFields = json['method_fields'] != null ? MethodFields.fromJson(json['method_fields']) : null;
+    methodFields = json['method_fields'] != null
+        ? MethodFields.fromJson(json['method_fields'])
+        : null;
     isDefault = json['is_default'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
