@@ -689,6 +689,7 @@
   "enter_meta_title": "Introduce el metatítulo",
   "enter_meta_description": "Introduce la meta descripción",
   "please_upload_lower_size_file": "Por favor sube un archivo de menor tamaño",
+  "please_upload_image_within_5_mb": "Sube una imagen de hasta 5 MB",
   "product_status_updated_successfully": "Estado del producto actualizado exitosamente",
   "store_registration_successfully": "Registro de tienda exitoso",
   "the_product_will_be_published_once_it_receives_approval_from_the_admin": "El producto se publicará una vez que reciba la aprobación del administrador.",
@@ -1383,8 +1384,8 @@
   "edit_store_info": "Editar información de la tienda",
   "contact_info": "Información de contacto",
   "phone_number": "Número de teléfono",
-  "image_format_and_ratio_for_business_logo": "Subir JPG, JPEG, PNG Menos de 1MB (Relación 1:1)",
-  "image_format_and_ratio_for_business_cover": "Subir JPG, JPEG, PNG Menos de 1MB (Relación 2:1)",
+  "image_format_and_ratio_for_business_logo": "Subir JPG, JPEG, PNG hasta 5 MB (Relación 1:1)",
+  "image_format_and_ratio_for_business_cover": "Subir JPG, JPEG, PNG hasta 5 MB (Relación 2:1)",
   "meta_data": "Meta datos",
   "restaurant_edit_updated_successfully": "Edición del restaurante actualizada correctamente",
   "store_edit_updated_successfully": "Edición de la tienda actualizada correctamente",
@@ -1507,5 +1508,6 @@
   "reset_successful": "Restablecimiento exitoso",
   "on_the_way": "En camino",
   "keepz_split_completed": "Keepz Split Settlements",
-  "keepz_split_history": "Keepz Split Settlement History"
+  "keepz_split_history": "Keepz Split Settlement History",
+  "automatic_deposits": "Liquidaciones automáticas"
 }

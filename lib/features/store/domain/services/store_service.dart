@@ -17,6 +17,8 @@ import 'package:sixam_mart_store/features/store/domain/repositories/store_reposi
 import 'package:sixam_mart_store/features/store/domain/services/store_service_interface.dart';
 
 class StoreService implements StoreServiceInterface {
+  static const int _maxStoreImageBytes = 5 * 1024 * 1024;
+
   final StoreRepositoryInterface storeRepositoryInterface;
   StoreService({required this.storeRepositoryInterface});
 
@@ -129,13 +131,11 @@ class StoreService implements StoreServiceInterface {
   Future<XFile?> pickImageFromGallery() async {
     XFile? pickImage = await ImagePicker().pickImage(source: ImageSource.gallery);
     if(pickImage != null) {
-      pickImage.length().then((value) {
-        if (value > 2000000) {
-          showCustomSnackBar('please_upload_lower_size_file'.tr);
-        } else {
-          return pickImage;
-        }
-      });
+      final int fileSize = await pickImage.length();
+      if (fileSize > _maxStoreImageBytes) {
+        showCustomSnackBar('please_upload_image_within_5_mb'.tr);
+        return null;
+      }
     }
     return pickImage;
   }

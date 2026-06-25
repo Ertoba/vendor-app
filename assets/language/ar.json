@@ -690,6 +690,7 @@
   "enter_meta_title": "أدخل عنوان التعريف",
   "enter_meta_description": "أدخل الوصف التعريفي",
   "please_upload_lower_size_file": "الرجاء تحميل ملف بحجم أقل",
+  "please_upload_image_within_5_mb": "يرجى تحميل صورة بحجم يصل إلى 5 ميغابايت",
   "product_status_updated_successfully": "تم تحديث حالة المنتج بنجاح",
   "store_registration_successfully": "تم تسجيل المتجر بنجاح",
   "the_product_will_be_published_once_it_receives_approval_from_the_admin": "سيتم نشر المنتج بمجرد حصوله على موافقة المشرف",
@@ -1384,8 +1385,8 @@
   "edit_store_info": "تحرير معلومات المتجر",
   "contact_info": "معلومات الاتصال",
   "phone_number": "رقم الهاتف",
-  "image_format_and_ratio_for_business_logo": "ارفع JPG, JPEG, PNG أقل من 1 ميغابايت (النسبة 1:1)",
-  "image_format_and_ratio_for_business_cover": "ارفع JPG, JPEG, PNG أقل من 1 ميغابايت (النسبة 2:1)",
+  "image_format_and_ratio_for_business_logo": "ارفع JPG, JPEG, PNG حتى 5 ميغابايت (النسبة 1:1)",
+  "image_format_and_ratio_for_business_cover": "ارفع JPG, JPEG, PNG حتى 5 ميغابايت (النسبة 2:1)",
   "meta_data": "البيانات الوصفية",
   "restaurant_edit_updated_successfully": "تم تحديث تحرير المطعم بنجاح",
   "store_edit_updated_successfully": "تم تحديث تحرير المتجر بنجاح",
@@ -1508,5 +1509,6 @@
   "reset_successful": "تمت إعادة التعيين بنجاح",
   "on_the_way": "في الطريق",
   "keepz_split_completed": "Keepz Split Settlements",
-  "keepz_split_history": "Keepz Split Settlement History"
+  "keepz_split_history": "Keepz Split Settlement History",
+  "automatic_deposits": "التسويات التلقائية"
 }

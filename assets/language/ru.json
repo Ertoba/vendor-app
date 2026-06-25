@@ -1723,5 +1723,7 @@
   "enter_valid_keepz_branch_receiver": "Please enter a valid Keepz branch receiver ID.",
   "enter_valid_keepz_iban": "Please enter a valid Georgian IBAN.",
   "keepz_split_completed": "Keepz Split Settlements",
-  "keepz_split_history": "Keepz Split Settlement History"
+  "keepz_split_history": "Keepz Split Settlement History",
+  "automatic_deposits": "Автоматические зачисления",
+  "please_upload_image_within_5_mb": "Загрузите изображение размером до 5 МБ"
 }

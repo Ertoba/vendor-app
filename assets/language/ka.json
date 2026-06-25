@@ -690,6 +690,7 @@
   "enter_meta_title": "შეიყვანეთ მეტა სათაური",
   "enter_meta_description": "შეიყვანეთ მეტა აღწერა",
   "please_upload_lower_size_file": "გთხოვთ, ატვირთოთ ფაილი მაქსიმუმ 10 მბ-მდე",
+  "please_upload_image_within_5_mb": "გთხოვთ, ატვირთოთ ფოტო მაქსიმუმ 5 მბ-მდე",
   "product_status_updated_successfully": "პროდუქტის სტატუსი განახლდა",
   "store_registration_successfully": "მაღაზია დარეგისტრირდა",
   "the_product_will_be_published_once_it_receives_approval_from_the_admin": "პროდუქტი გამოქვეყნდება ადმინის დამტკიცების შემდეგ",
@@ -942,8 +943,8 @@
   "uh_oh_You_didnt_created_any_advertisement_yet": "ჯერ რეკლამა არ შეგიქმნიათ!",
   "by_creating_advertisement": "რეკლამის შექმნით უფრო მეტ მომხმარებელს მიაღწევთ.",
   "ads_preview": "რეკლამის გადახედვა",
-  "video_promotion": "ვიდეო პრომოცია",
-  "store_promotion": "მაღაზიის პრომოცია",
+  "video_promotion": "ვიდეო პრომო",
+  "store_promotion": "გვერდის პრომო",
   "video_size_greater_than": "ვიდეოს ზომა 10 მბ-ს აღემატება",
   "profile_size_greater_than": "პროფილის სურათის ზომა 10 მბ-ს აღემატება",
   "cover_image_size_greater_than": "სარეკლამო სურათის ზომა 10 მბ-ს აღემატება",
@@ -1393,8 +1394,8 @@
   "edit_store_info": "მაღაზიის ინფოს რედაქტირება",
   "contact_info": "საკონტაქტო ინფო",
   "phone_number": "ტელეფონის ნომერი",
-  "image_format_and_ratio_for_business_logo": "ფორმატები: JPG, JPEG, PNG | მაქს. 1 მბ | პროპორცია 1:1",
-  "image_format_and_ratio_for_business_cover": "ფორმატები: JPG, JPEG, PNG | მაქს. 1 მბ | პროპორცია 2:1",
+  "image_format_and_ratio_for_business_logo": "ფორმატები: JPG, JPEG, PNG | მაქს. 5 მბ | პროპორცია 1:1",
+  "image_format_and_ratio_for_business_cover": "ფორმატები: JPG, JPEG, PNG | მაქს. 5 მბ | პროპორცია 2:1",
   "meta_data": "მეტა მონაცემი",
   "restaurant_edit_updated_successfully": "რესტორნის ინფო განახლდა",
   "store_edit_updated_successfully": "მაღაზიის ინფო განახლდა",
@@ -1609,5 +1610,6 @@
   "yes_edit": "დიახ, რედაქტირება",
   "your_ad_is_running": "თქვენი რეკლამა გაშვებულია. თუ თქვენ დაარედაქტირებთ ამ რეკლამას, ის ჩამოთვლილი იქნება მომლოდინე და საჭიროებს დამტკიცებას ადმინისტრატორის მიერ. დამტკიცების შემდეგ ის კვლავ იმუშავებს.",
   "keepz_split_completed": "Keepz split ჩარიცხვები",
-  "keepz_split_history": "Keepz split ჩარიცხვების ისტორია"
+  "keepz_split_history": "Keepz split ჩარიცხვების ისტორია",
+  "automatic_deposits": "ავტომატური ჩარიცხვები"
 }

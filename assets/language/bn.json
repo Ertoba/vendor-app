@@ -689,6 +689,7 @@
   "enter_meta_title": "মেটা টাইটেল এন্ট্রি করুন",
   "enter_meta_description": "মেটা বর্ণনা এন্ট্রি করুন",
   "please_upload_lower_size_file": "অনুগ্রহ করে নিচু আকারের ফাইল আপলোড করুন",
+  "please_upload_image_within_5_mb": "অনুগ্রহ করে সর্বোচ্চ ৫ এমবি ছবি আপলোড করুন",
   "product_status_updated_successfully": "প্রডাক্ট স্ট্যাটাস আপডেট হয়েছে",
   "store_registration_successfully": "স্টোর নিবন্ধিত হয়েছে",
   "the_product_will_be_published_once_it_receives_approval_from_the_admin": "প্রডাক্টটি এডমিন থেকে অনুমোদন পেলে প্রকাশিত হবে",
@@ -1383,8 +1384,8 @@
   "edit_store_info": "স্টোর তথ্য সম্পাদনা করুন",
   "contact_info": "যোগাযোগের তথ্য",
   "phone_number": "ফোন নম্বর",
-  "image_format_and_ratio_for_business_logo": "JPG, JPEG, PNG ১ এমবির কম (অনুপাত ১:১)",
-  "image_format_and_ratio_for_business_cover": "JPG, JPEG, PNG ১ এমবির কম (অনুপাত ২:১)",
+  "image_format_and_ratio_for_business_logo": "JPG, JPEG, PNG সর্বোচ্চ ৫ এমবি (অনুপাত ১:১)",
+  "image_format_and_ratio_for_business_cover": "JPG, JPEG, PNG সর্বোচ্চ ৫ এমবি (অনুপাত ২:১)",
   "meta_data": "মেটা ডেটা",
   "restaurant_edit_updated_successfully": "রেস্টুরেন্ট সম্পাদনা সফলভাবে আপডেট হয়েছে",
   "store_edit_updated_successfully": "স্টোর সম্পাদনা সফলভাবে আপডেট হয়েছে",
@@ -1507,5 +1508,6 @@
   "reset_successful": "রিসেট সফল হয়েছে",
   "on_the_way": "পথে রয়েছে",
   "keepz_split_completed": "Keepz Split Settlements",
-  "keepz_split_history": "Keepz Split Settlement History"
+  "keepz_split_history": "Keepz Split Settlement History",
+  "automatic_deposits": "স্বয়ংক্রিয় নিষ্পত্তি"
 }

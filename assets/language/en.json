@@ -694,6 +694,7 @@
   "enter_meta_title": "Enter meta title",
   "enter_meta_description": "Enter meta description",
   "please_upload_lower_size_file": "Please upload a file up to 10MB",
+  "please_upload_image_within_5_mb": "Please upload an image up to 5MB",
   "product_status_updated_successfully": "Product status updated successfully",
   "store_registration_successfully": "Store registration successfully",
   "the_product_will_be_published_once_it_receives_approval_from_the_admin": "The product will be published once it receives approval from the admin",
@@ -1389,8 +1390,8 @@
   "edit_store_info" : "Edit Store Info",
   "contact_info" : "Contact Info",
   "phone_number" : "Phone Number",
-  "image_format_and_ratio_for_business_logo" : "Upload JPG, JPEG, PNG Less Than 1MB (Ratio 1:1)",
-  "image_format_and_ratio_for_business_cover" : "Upload JPG, JPEG, PNG Less Than 1MB (Ratio 2:1)",
+  "image_format_and_ratio_for_business_logo" : "Upload JPG, JPEG, PNG up to 5MB (Ratio 1:1)",
+  "image_format_and_ratio_for_business_cover" : "Upload JPG, JPEG, PNG up to 5MB (Ratio 2:1)",
   "meta_data" : "Meta Data",
   "restaurant_edit_updated_successfully" : "Restaurant Edit Updated Successfully",
   "store_edit_updated_successfully" : "Store Edit Updated Successfully",
@@ -1554,5 +1555,6 @@
   "your_ad_is_running" : "Your ad is running. If you edit this ad, it will be listed for pending and needs to be approved by the Admin. After the approval, it will be running again.",
   "yes_edit" : "Yes, Edit",
   "keepz_split_completed": "Keepz Split Settlements",
-  "keepz_split_history": "Keepz Split Settlement History"
+  "keepz_split_history": "Keepz Split Settlement History",
+  "automatic_deposits": "Automatic Settlements"
 }
