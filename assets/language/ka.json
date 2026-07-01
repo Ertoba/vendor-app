@@ -649,7 +649,7 @@
   "enter_valid_keepz_branch_receiver": "შეიყვანეთ სწორი Keepz branch receiver ID.",
   "enter_valid_keepz_iban": "შეიყვანეთ სწორი ქართული IBAN.",
   "pending_message": "ყველა მომლოდინე გადარიცხვა, რომელიც ადმინის ქმედებას ელის.",
-  "completed_message": "გადარიცხვის თანხა დასრულდა.",
+  "completed_message": "ავტომატურად დასრულებული გადარიცხვები.",
   "cancellation_message": "ყველა გაუქმებული გადარიცხვა.",
   "pay_online": "ონლაინ გადახდა",
   "payment": "გადახდა",
@@ -1609,7 +1609,7 @@
   "minimum_8_characters": "მინიმუმ 8 სიმბოლო",
   "yes_edit": "დიახ, რედაქტირება",
   "your_ad_is_running": "თქვენი რეკლამა გაშვებულია. თუ თქვენ დაარედაქტირებთ ამ რეკლამას, ის ჩამოთვლილი იქნება მომლოდინე და საჭიროებს დამტკიცებას ადმინისტრატორის მიერ. დამტკიცების შემდეგ ის კვლავ იმუშავებს.",
-  "keepz_split_completed": "Keepz split ჩარიცხვები",
-  "keepz_split_history": "Keepz split ჩარიცხვების ისტორია",
+  "keepz_split_completed": "ავტომატური ჩარიცხვები",
+  "keepz_split_history": "ავტომატური ჩარიცხვების ისტორია",
   "automatic_deposits": "ავტომატური ჩარიცხვები"
 }
