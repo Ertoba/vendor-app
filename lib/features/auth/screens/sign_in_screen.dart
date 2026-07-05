@@ -88,12 +88,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Image.asset(
-                            Images.authLogo,
-                            width: 150,
-                            height: 88,
-                            fit: BoxFit.contain,
-                          ),
+                          const _ThemedAuthLogo(),
                           const SizedBox(height: Dimensions.paddingSizeDefault),
                           Text(
                             'sign_in'.tr,
@@ -265,6 +260,68 @@ class _LoginBackground extends StatelessWidget {
   }
 }
 
+class _ThemedAuthLogo extends StatelessWidget {
+  const _ThemedAuthLogo();
+
+  @override
+  Widget build(BuildContext context) {
+    final Color primaryColor = Theme.of(context).primaryColor;
+
+    return SizedBox(
+      height: 104,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            top: 2,
+            child: Container(
+              width: 136,
+              height: 92,
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 86,
+            bottom: 10,
+            child: Icon(
+              Icons.inventory_2_outlined,
+              size: 34,
+              color: primaryColor.withValues(alpha: 0.10),
+            ),
+          ),
+          Positioned(
+            right: 86,
+            top: 12,
+            child: Icon(
+              Icons.storefront_rounded,
+              size: 42,
+              color: primaryColor.withValues(alpha: 0.12),
+            ),
+          ),
+          Container(
+            width: 160,
+            height: 84,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor.withValues(alpha: 0.92),
+              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+            ),
+            child: Image.asset(
+              Images.authLogo,
+              width: 146,
+              height: 78,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _RoleSelector extends StatelessWidget {
   final AuthController authController;
 
@@ -329,17 +386,21 @@ class _RoleSegment extends StatelessWidget {
       borderRadius: BorderRadius.circular(28),
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
+        duration: const Duration(milliseconds: 110),
+        curve: Curves.easeOutCubic,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: selected ? primaryColor.withValues(alpha: 0.10) : null,
+          color: selected ? primaryColor.withValues(alpha: 0.12) : null,
           borderRadius: BorderRadius.circular(28),
+          border: selected
+              ? Border.all(color: primaryColor.withValues(alpha: 0.22))
+              : null,
           boxShadow: selected
               ? [
                   BoxShadow(
-                    color: primaryColor.withValues(alpha: 0.14),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
+                    color: primaryColor.withValues(alpha: 0.06),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
                   ),
                 ]
               : null,
@@ -574,7 +635,7 @@ class _RegistrationEntry extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: robotoBold.copyWith(
-                      fontSize: Dimensions.fontSizeDefault,
+                      fontSize: Dimensions.fontSizeDefault * 0.5,
                     ),
                   ),
                   const SizedBox(height: Dimensions.paddingSizeExtraSmall),
@@ -584,7 +645,7 @@ class _RegistrationEntry extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: robotoRegular.copyWith(
                       color: Theme.of(context).hintColor,
-                      fontSize: Dimensions.fontSizeSmall,
+                      fontSize: Dimensions.fontSizeSmall * 0.5,
                       height: 1.35,
                     ),
                   ),
@@ -600,7 +661,7 @@ class _RegistrationEntry extends StatelessWidget {
                     'vendor_registration_cta_action'.tr,
                     style: robotoBold.copyWith(
                       color: primaryColor,
-                      fontSize: Dimensions.fontSizeDefault,
+                      fontSize: Dimensions.fontSizeDefault * 0.5,
                     ),
                   ),
                   const SizedBox(width: Dimensions.paddingSizeExtraSmall),
