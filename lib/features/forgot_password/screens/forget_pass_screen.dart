@@ -7,6 +7,7 @@ import 'package:sixam_mart_store/common/widgets/custom_app_bar_widget.dart';
 import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_store/common/widgets/custom_text_field_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 class ForgetPassScreen extends StatefulWidget {
@@ -130,89 +131,11 @@ class _ForgotPasswordIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color primaryColor = Theme.of(context).primaryColor;
-
     return SizedBox(
       height: 220,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 230,
-            height: 170,
-            decoration: BoxDecoration(
-              color: primaryColor.withValues(alpha: 0.07),
-              borderRadius: BorderRadius.circular(90),
-            ),
-          ),
-          Positioned(
-            bottom: 26,
-            child: Container(
-              width: 178,
-              height: 104,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    primaryColor.withValues(alpha: 0.16),
-                    primaryColor.withValues(alpha: 0.32),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                border: Border.all(color: primaryColor.withValues(alpha: 0.18)),
-              ),
-              child: Icon(
-                Icons.mark_email_read_outlined,
-                color: primaryColor,
-                size: 58,
-              ),
-            ),
-          ),
-          Positioned(
-            top: 42,
-            child: Container(
-              width: 118,
-              height: 112,
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                boxShadow: [
-                  BoxShadow(
-                    color: primaryColor.withValues(alpha: 0.10),
-                    blurRadius: 24,
-                    offset: const Offset(0, 12),
-                  ),
-                ],
-              ),
-              child: Icon(Icons.lock_rounded, color: primaryColor, size: 58),
-            ),
-          ),
-          Positioned(
-            right: 60,
-            bottom: 36,
-            child: Container(
-              width: 62,
-              height: 62,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: primaryColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: primaryColor.withValues(alpha: 0.18),
-                    blurRadius: 16,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.sync_rounded,
-                color: Colors.white,
-                size: 34,
-              ),
-            ),
-          ),
-        ],
+      child: SvgPicture.asset(
+        Images.vendorForgotPasswordIllustration,
+        fit: BoxFit.contain,
       ),
     );
   }
@@ -248,25 +171,12 @@ class _RecoverButton extends StatelessWidget {
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               ),
             )
-          : Stack(
-              alignment: Alignment.center,
-              children: [
-                Text(
-                  'next'.tr,
-                  style: robotoBold.copyWith(
-                    color: Colors.white,
-                    fontSize: Dimensions.fontSizeLarge,
-                  ),
-                ),
-                const Positioned(
-                  right: 18,
-                  child: Icon(
-                    Icons.arrow_forward_rounded,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-              ],
+          : Text(
+              'next'.tr,
+              style: robotoBold.copyWith(
+                color: Colors.white,
+                fontSize: Dimensions.fontSizeLarge,
+              ),
             ),
     );
   }
@@ -291,7 +201,7 @@ class _SecureMailCard extends StatelessWidget {
           const SizedBox(width: Dimensions.paddingSizeSmall),
           Expanded(
             child: Text(
-              'თქვენი მეილი  დაცულია',
+              'თქვენი მონაცემები უსაფრთხოდ ინახება',
               style: robotoBold.copyWith(
                 color: primaryColor,
                 fontSize: Dimensions.fontSizeDefault,
