@@ -105,7 +105,7 @@ class Images {
   static const String markerIcon = 'assets/image/markerIcon.png';
   static const String phoneFlip = 'assets/image/phone-flip.png';
   static const String vendorForgotPasswordIllustration =
-      'assets/image/mili_vendor_forgot_password.svg';
+      'assets/image/access_control_password_recovery.jpg';
   static const String userIcon = 'assets/image/userIcon.png';
   static const String mdiCashIcon = 'assets/image/mdi_cash.png';
   static const String itemsIcon = 'assets/image/items.png';

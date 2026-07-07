@@ -7,7 +7,6 @@ import 'package:sixam_mart_store/common/widgets/custom_app_bar_widget.dart';
 import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_store/common/widgets/custom_text_field_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 class ForgetPassScreen extends StatefulWidget {
@@ -133,7 +132,7 @@ class _ForgotPasswordIllustration extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 220,
-      child: SvgPicture.asset(
+      child: Image.asset(
         Images.vendorForgotPasswordIllustration,
         fit: BoxFit.contain,
       ),
