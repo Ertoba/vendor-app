@@ -202,7 +202,7 @@ class SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _globalKey,
-      backgroundColor: const Color(0xFF039D55),
+      backgroundColor: const Color(0xFF074E3C),
       body: Image.asset(
         Images.splashScreen,
         fit: BoxFit.cover,
