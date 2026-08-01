@@ -151,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 2,
         title: Padding(
           padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
-          child: Image.asset(Images.headerLogo, height: 30, fit: BoxFit.contain),
+          child: Image.asset(Images.brandMark, height: 34, fit: BoxFit.contain),
         ),
         actions: [IconButton(
           icon: GetBuilder<NotificationController>(builder: (notificationController) {

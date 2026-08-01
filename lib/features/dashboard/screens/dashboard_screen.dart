@@ -135,8 +135,9 @@ class DashboardScreenState extends State<DashboardScreen> {
                 _setPage(2);
               },
               child: Image.asset(
-                Get.find<AuthController>().getModuleType() == 'rental' ? Images.taxiHome : Images.restaurant,
-                height: 20, width: 20,
+                Get.find<AuthController>().getModuleType() == 'rental' ? Images.taxiHome : Images.brandMark,
+                height: Get.find<AuthController>().getModuleType() == 'rental' ? 20 : 28,
+                width: Get.find<AuthController>().getModuleType() == 'rental' ? 20 : 28,
                 color: Theme.of(context).cardColor,
               ),
             ),

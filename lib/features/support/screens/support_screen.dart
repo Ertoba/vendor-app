@@ -5,6 +5,7 @@ import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_store/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
+import 'package:sixam_mart_store/util/images.dart';
 import 'package:sixam_mart_store/util/styles.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -107,26 +108,7 @@ class _SupportHero extends StatelessWidget {
                   borderRadius: BorderRadius.circular(90),
                 ),
               ),
-              Container(
-                width: 104,
-                height: 104,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: primaryColor,
-                  boxShadow: [
-                    BoxShadow(
-                      color: primaryColor.withValues(alpha: 0.16),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.support_agent_rounded,
-                  color: Colors.white,
-                  size: 54,
-                ),
-              ),
+              Image.asset(Images.brandMark, height: 132, fit: BoxFit.contain),
               Positioned(
                 left: 80,
                 top: 48,
