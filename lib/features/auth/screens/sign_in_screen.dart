@@ -170,7 +170,6 @@ class _SignInScreenState extends State<SignInScreen> {
                             const _RegistrationEntry(),
                           ],
                           const SizedBox(height: Dimensions.paddingSizeDefault),
-                          const _TrustFooter(),
                         ],
                       ),
                     );
@@ -265,33 +264,10 @@ class _ThemedAuthLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color primaryColor = Theme.of(context).primaryColor;
-
     return SizedBox(
       height: 104,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned(
-            left: 86,
-            bottom: 10,
-            child: Icon(
-              Icons.inventory_2_outlined,
-              size: 34,
-              color: primaryColor.withValues(alpha: 0.10),
-            ),
-          ),
-          Positioned(
-            right: 86,
-            top: 12,
-            child: Icon(
-              Icons.storefront_rounded,
-              size: 42,
-              color: primaryColor.withValues(alpha: 0.12),
-            ),
-          ),
-          Image.asset(Images.brandMark, height: 94, fit: BoxFit.contain),
-        ],
+      child: Center(
+        child: Image.asset(Images.brandMark, height: 94, fit: BoxFit.contain),
       ),
     );
   }
@@ -506,36 +482,25 @@ class _PrimaryLoginButton extends StatelessWidget {
               ],
             )
           : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(width: 32),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.lock_outline_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      const SizedBox(width: Dimensions.paddingSizeSmall),
-                      Flexible(
-                        child: Text(
-                          'sign_in'.tr,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: robotoBold.copyWith(
-                            color: Colors.white,
-                            fontSize: Dimensions.fontSizeLarge,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.arrow_forward_rounded,
+                const Icon(
+                  Icons.lock_outline_rounded,
                   color: Colors.white,
-                  size: 24,
+                  size: 20,
+                ),
+                const SizedBox(width: Dimensions.paddingSizeSmall),
+                Flexible(
+                  child: Text(
+                    'sign_in'.tr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: robotoBold.copyWith(
+                      color: Colors.white,
+                      fontSize: Dimensions.fontSizeLarge,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -647,36 +612,6 @@ class _RegistrationEntry extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _TrustFooter extends StatelessWidget {
-  const _TrustFooter();
-
-  @override
-  Widget build(BuildContext context) {
-    final Color primaryColor = Theme.of(context).primaryColor;
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.verified_user_outlined, size: 18, color: primaryColor),
-            const SizedBox(width: Dimensions.paddingSizeSmall),
-            Flexible(
-              child: Text(
-                'vendor_data_security_note'.tr,
-                textAlign: TextAlign.center,
-                style: robotoMedium.copyWith(
-                  color: Theme.of(context).hintColor,
-                  fontSize: Dimensions.fontSizeDefault,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }
