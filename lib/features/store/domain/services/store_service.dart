@@ -304,28 +304,50 @@ class StoreService implements StoreServiceInterface {
 
   @override
   int? setBrandIndex(List<BrandModel>? brands, Item? item) {
-    int? brandIndex;
-    for(int index = 0; index < brands!.length; index++) {
-      if(item != null) {
-        if(brands[index].id.toString() == item.brandId.toString()) {
-          brandIndex = index;
-        }
-      }
+    if(brands == null || brands.isEmpty || item == null) {
+      return null;
     }
-    return brandIndex;
+
+    final int brandIndex = brands.indexWhere(
+      (brand) => brand.id.toString() == item.brandId.toString(),
+    );
+    if(brandIndex >= 0) {
+      return brandIndex;
+    }
+
+    brands.insert(
+      0,
+      BrandModel(id: item.brandId ?? 0, name: 'brand'.tr),
+    );
+    return 0;
   }
 
   @override
   int? setSuitableTagIndex(List<SuitableTagModel>? suitableTagList, Item? item) {
-    int? suitableTagIndex;
-    for(int index = 0; index < suitableTagList!.length; index++) {
-      if(item != null) {
-        if(suitableTagList[index].id.toString() == item.conditionId.toString()) {
-          suitableTagIndex = index;
-        }
-      }
+    if(suitableTagList == null || suitableTagList.isEmpty) {
+      return null;
     }
-    return suitableTagIndex;
+
+    if(item == null) {
+      suitableTagList.insert(
+        0,
+        SuitableTagModel(id: 0, name: 'suitable_for'.tr),
+      );
+      return 0;
+    }
+
+    final int suitableTagIndex = suitableTagList.indexWhere(
+      (tag) => tag.id.toString() == item.conditionId.toString(),
+    );
+    if(suitableTagIndex >= 0) {
+      return suitableTagIndex;
+    }
+
+    suitableTagList.insert(
+      0,
+      SuitableTagModel(id: item.conditionId ?? 0, name: 'suitable_for'.tr),
+    );
+    return 0;
   }
 
   @override
