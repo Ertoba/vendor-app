@@ -4,6 +4,7 @@ import 'package:sixam_mart_store/features/auth/controllers/auth_controller.dart'
 import 'package:sixam_mart_store/features/auth/domain/models/module_permission_model.dart';
 import 'package:sixam_mart_store/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_store/features/profile/domain/models/profile_model.dart';
+import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
 import 'package:get/get.dart';
@@ -51,8 +52,23 @@ class ProfileController extends GetxController implements GetxService {
     ProfileModel? profileModel = await profileServiceInterface.getProfileInfo();
     if (profileModel != null) {
       _profileModel = profileModel;
-      Get.find<SplashController>().setModule(_profileModel!.stores![0].module!.id, _profileModel!.stores![0].module!.moduleType);
-      profileServiceInterface.updateHeader(_profileModel!.stores![0].module!.id);
+      final store = _profileModel?.stores?.isNotEmpty == true
+          ? _profileModel!.stores!.first
+          : null;
+      final module = store?.module;
+
+      if (module?.id != null && module?.moduleType != null) {
+        Get.find<SplashController>().setModule(module!.id, module.moduleType);
+        profileServiceInterface.updateHeader(module.id);
+
+        if (module.moduleType == 'ecommerce' && Get.isRegistered<StoreController>()) {
+          try {
+            await Get.find<StoreController>().getBrandList(null);
+          } catch (error) {
+            debugPrint('Brand list preload failed: $error');
+          }
+        }
+      }
       _allowModulePermission(_profileModel?.roles);
     }
     update();
