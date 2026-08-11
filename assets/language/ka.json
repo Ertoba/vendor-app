@@ -638,9 +638,9 @@
   "add_method": "მეთოდის დამატება",
   "keepz_receiver_type": "Keepz მიმღების ტიპი",
   "keepz_receiver_identifier": "Keepz მიმღების იდენტიფიკატორი",
-  "keepz_branch": "Branch",
+  "keepz_branch": "ფილალი",
   "keepz_iban_account": "IBAN",
-  "keepz_branch_receiver_id": "Keepz Branch Receiver ID",
+  "keepz_branch_receiver_id": "Keepz ფილიალის მიმღების ID",
   "keepz_iban": "ვენდორის IBAN",
   "keepz_branch_receiver_id_hint": "შეიყვანეთ Keepz-ის მიერ ვენდორის branch-ისთვის მოწოდებული UUID.",
   "keepz_iban_hint": "შეიყვანეთ ვენდორის ქართული IBAN გამოტოვებების გარეშე.",
@@ -1626,5 +1626,14 @@
   "your_ad_is_running": "თქვენი რეკლამა გაშვებულია. თუ თქვენ დაარედაქტირებთ ამ რეკლამას, ის ჩამოთვლილი იქნება მომლოდინე და საჭიროებს დამტკიცებას ადმინისტრატორის მიერ. დამტკიცების შემდეგ ის კვლავ იმუშავებს.",
   "keepz_split_completed": "ავტომატური ჩარიცხვები",
   "keepz_split_history": "ავტომატური ჩარიცხვების ისტორია",
-  "automatic_deposits": "ავტომატური ჩარიცხვები"
+  "automatic_deposits": "ავტომატური ჩარიცხვები",
+  "enter_vendor_name": "შეიყვანეთ ვენდორის სახელი",
+  "select_vendor_logo": "აირჩიეთ ვენდორის ლოგო",
+  "campaign_foods": "კამპანიის საკვები",
+  "AI_Chat_Assistant": "AI ჩატ-ასისტენტი",
+  "AI_Chat_Assistant_read_only_hint": "პასუხობს მომხმარებლის კითხვებს კალათების, შეკვეთების, ანგარიშებისა და გადახდების შეცვლის გარეშე. არასოდეს გააზიაროთ პაროლები, ბარათის მონაცემები ან ერთჯერადი კოდები.",
+  "ai_chat_disabled": "AI ჩატი ამჟამად გამორთულია.",
+  "ai_chat_daily_limit_reached": "AI ჩატის დღიური ლიმიტი ამოწურულია.",
+  "ai_chat_temporarily_unavailable": "AI ჩატი დროებით მიუწვდომელია. გთხოვთ, მოგვიანებით სცადოთ.",
+  "verified_store": "ვერიფიცირებული მაღაზია"
 }

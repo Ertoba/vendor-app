@@ -113,10 +113,40 @@ class _AddItemScreenState extends State<AddItemScreen>
   final bool storeHalalActive =
       Get.find<ProfileController>().profileModel!.stores![0].isHalalActive!;
 
-  final List<Language>? _languageList =
-      Get.find<SplashController>().configModel!.language;
+  late final List<Language> _languageList;
   TabController? _tabController;
   final List<Tab> _tabs = [];
+
+  static List<Language> _buildItemLanguageList(
+    List<Language>? configuredLanguages,
+  ) {
+    final Map<String, Language> configuredByCode = {
+      for (final language in configuredLanguages ?? <Language>[])
+        if (language.key != null) language.key!: language,
+    };
+    const List<MapEntry<String, String>> requiredLanguages = [
+      MapEntry('en', 'English'),
+      MapEntry('ka', 'ქართული'),
+      MapEntry('ru', 'Русский'),
+    ];
+
+    return requiredLanguages.map((requiredLanguage) {
+      final Language? configured = configuredByCode[requiredLanguage.key];
+      return Language(
+        key: requiredLanguage.key,
+        value: configured?.value?.trim().isNotEmpty == true
+            ? configured!.value
+            : requiredLanguage.value,
+      );
+    }).toList();
+  }
+
+  int get _defaultLanguageIndex {
+    final int englishIndex = _languageList.indexWhere(
+      (language) => language.key == 'en',
+    );
+    return englishIndex >= 0 ? englishIndex : 0;
+  }
 
   @override
   void initState() {
@@ -140,7 +170,10 @@ class _AddItemScreenState extends State<AddItemScreen>
     }
     storeController.clearVatTax();
 
-    _tabController = TabController(length: _languageList!.length, vsync: this);
+    _languageList = _buildItemLanguageList(
+      Get.find<SplashController>().configModel!.language,
+    );
+    _tabController = TabController(length: _languageList.length, vsync: this);
     _tabs.addAll(_languageList.map((lang) => Tab(text: lang.value)));
 
     for (int index = 0; index < _languageList.length; index++) {
@@ -549,7 +582,7 @@ class _AddItemScreenState extends State<AddItemScreen>
                                                                     .text
                                                                     .trim(),
                                                             langCode:
-                                                                _languageList![_tabController!
+                                                                _languageList[_tabController!
                                                                         .index]
                                                                     .key!,
                                                           )
@@ -712,7 +745,7 @@ class _AddItemScreenState extends State<AddItemScreen>
                                                       .index],
                                               nextFocus:
                                                   _tabController!.index !=
-                                                      _languageList!.length - 1
+                                                      _languageList.length - 1
                                                   ? _descriptionFocusList[_tabController!
                                                         .index]
                                                   : _descriptionFocusList[0],
@@ -5265,7 +5298,8 @@ class _AddItemScreenState extends State<AddItemScreen>
                                                 ? _nameControllerList[index]
                                                       .text
                                                       .trim()
-                                                : _nameControllerList[0].text
+                                                : _nameControllerList[_defaultLanguageIndex]
+                                                      .text
                                                       .trim(),
                                           ),
                                         );
@@ -5281,7 +5315,7 @@ class _AddItemScreenState extends State<AddItemScreen>
                                                 ? _descriptionControllerList[index]
                                                       .text
                                                       .trim()
-                                                : _descriptionControllerList[0]
+                                                : _descriptionControllerList[_defaultLanguageIndex]
                                                       .text
                                                       .trim(),
                                           ),

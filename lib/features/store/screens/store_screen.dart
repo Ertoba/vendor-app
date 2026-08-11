@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:marquee/marquee.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:sixam_mart_store/common/widgets/custom_app_bar_widget.dart';
+import 'package:sixam_mart_store/common/widgets/verified_seller_badge.dart';
 import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_store/features/store/widgets/announcement_bottom_sheet_widget.dart';
@@ -220,8 +221,14 @@ class _StoreScreenState extends State<StoreScreen> with TickerProviderStateMixin
                           SizedBox(width: 75),
                           // Store Details
                           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text(store.name ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,
-                              style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraLarge)),
+                            Row(children: [
+                              Flexible(child: Text(store.name ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,
+                                style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraLarge))),
+                              if (store.verifiedSeller == true) ...[
+                                const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                const VerifiedSellerBadge(verified: true),
+                              ],
+                            ]),
                             Text(store.address ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,
                               style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
                           ])),

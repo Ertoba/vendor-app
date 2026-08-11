@@ -251,6 +251,7 @@ class Store {
   bool? isHalalActive;
   double? minimumStockForWarning;
   MetaSeoData? metaData;
+  bool? verifiedSeller;
 
   Store({
     this.id,
@@ -306,6 +307,7 @@ class Store {
     this.extraPackagingAmount,
     this.isHalalActive,
     this.minimumStockForWarning,
+    this.verifiedSeller,
   });
 
   Store.fromJson(Map<String, dynamic> json) {
@@ -368,6 +370,7 @@ class Store {
     isHalalActive = json['halal_tag_status'] ?? false;
     minimumStockForWarning = json['minimum_stock_for_warning']?.toDouble();
     metaData = json['meta_data'] != null ? MetaSeoData.fromJson(json['meta_data']) : null;
+    verifiedSeller = json['verified_seller'] == true || json['verified_seller'].toString() == '1';
   }
 
   Map<String, dynamic> toJson() {
@@ -431,6 +434,7 @@ class Store {
     data['extra_packaging_amount'] = extraPackagingAmount;
     data['halal_tag_status'] = isHalalActive;
     data['minimum_stock_for_warning'] = minimumStockForWarning;
+    data['verified_seller'] = verifiedSeller;
     if (metaData != null) {
       data['meta_data'] = metaData!.toJson();
     }
