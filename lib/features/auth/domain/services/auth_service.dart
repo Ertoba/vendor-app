@@ -8,6 +8,7 @@ import 'package:sixam_mart_store/features/business/domain/models/package_model.d
 import 'package:sixam_mart_store/features/business/screens/subscription_payment_screen.dart';
 import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_store/features/rental_module/profile/controllers/taxi_profile_controller.dart';
+import 'package:sixam_mart_store/helper/api_error_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 
 class AuthService implements AuthServiceInterface {
@@ -81,7 +82,7 @@ class AuthService implements AuthServiceInterface {
 
   @override
   Future<bool> clearUserNumberAndPassword() async {
-    return await authRepositoryInterface.clearUserNumberAndPassword();
+    return authRepositoryInterface.clearUserNumberAndPassword();
   }
 
   @override
@@ -129,7 +130,13 @@ class AuthService implements AuthServiceInterface {
         responseModel = ResponseModel(true, 'successful');
       }
     } else {
-      responseModel = ResponseModel(false, response.statusText);
+      responseModel = ResponseModel(
+        false,
+        ApiErrorHelper.userMessage(
+          response.statusText,
+          statusCode: response.statusCode,
+        ),
+      );
     }
     return responseModel;
   }
