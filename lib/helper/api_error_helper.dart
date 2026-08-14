@@ -50,9 +50,7 @@ class ApiErrorHelper {
 
     final String message = (rawMessage ?? '').trim();
     if (message.isEmpty) {
-      return statusCode != null && statusCode >= 500
-          ? requestFailedMessage
-          : requestFailedMessage;
+      return requestFailedMessage;
     }
 
     final String normalized = message.toLowerCase();
@@ -92,7 +90,7 @@ class ApiErrorHelper {
       'stack trace',
       'traceback',
       'httpclient',
-      'formatException',
+      'formatexception',
       'typeerror',
       'nosuchmethoderror',
       'unhandled exception',
