@@ -76,6 +76,10 @@ class ApiErrorHelper {
       'invalid credentials',
       'email or password is incorrect',
       'wrong password',
+      // Known localized responses for Credential_do_not_match,_please_try_again.
+      'სერტიფიკატი არ ემთხვევა',
+      'სერთიფიკატი არ ემთხვევა',
+      'учетные данные не совпадают',
     ];
 
     if (statusCode == 401 && credentialMarkers.any(normalized.contains)) {
