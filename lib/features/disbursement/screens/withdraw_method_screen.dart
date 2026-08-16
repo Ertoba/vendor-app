@@ -106,7 +106,7 @@ class _WithdrawMethodScreenState extends State<WithdrawMethodScreen> {
                                     children: [
                                       Flexible(
                                         child: Text(
-                                          '${'payment_method'.tr} : ${method.methodName}',
+                                          '${'payment_method'.tr} : ${disbursementController.displayMethodName(method.methodName)}',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: robotoBold.copyWith(

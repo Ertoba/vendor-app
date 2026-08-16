@@ -44,6 +44,25 @@ class DisbursementController extends GetxController implements GetxService {
   List<WidthDrawMethodModel>? _widthDrawMethods;
   List<WidthDrawMethodModel>? get widthDrawMethods => _widthDrawMethods;
 
+  String displayMethodName(String? methodName) {
+    if (methodName == keepzSplitMethodName) {
+      return 'keepz_automatic_settlement'.tr;
+    }
+    return methodName ?? '';
+  }
+
+  String get selectedMethodName {
+    if (_widthDrawMethods == null ||
+        _widthDrawMethods!.isEmpty ||
+        _selectedMethodIndex == null ||
+        _selectedMethodIndex! >= _widthDrawMethods!.length) {
+      return 'select_payment_method'.tr;
+    }
+    return displayMethodName(
+      _widthDrawMethods![_selectedMethodIndex!].methodName,
+    );
+  }
+
   disburse.DisbursementMethodBody? _disbursementMethodBody;
   disburse.DisbursementMethodBody? get disbursementMethodBody =>
       _disbursementMethodBody;
@@ -180,7 +199,9 @@ class DisbursementController extends GetxController implements GetxService {
             child: SizedBox(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text('${_widthDrawMethods![i].methodName}'),
+                child: Text(
+                  displayMethodName(_widthDrawMethods![i].methodName),
+                ),
               ),
             ),
           ),

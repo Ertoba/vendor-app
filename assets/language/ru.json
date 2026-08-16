@@ -1741,6 +1741,7 @@
   "enter_valid_keepz_iban": "Пожалуйста, введите действительный грузинский IBAN.",
   "keepz_split_completed": "Разделенные расчеты Keepz",
   "keepz_split_history": "История разделенных расчетов Keepz",
+  "keepz_automatic_settlement": "Автоматическое зачисление Keepz",
   "automatic_deposits": "Автоматические зачисления",
   "please_upload_image_within_5_mb": "Загрузите изображение размером до 5 МБ",
   "customer_details": "Сведения о клиенте",

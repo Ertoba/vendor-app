@@ -81,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 20),
 
               Row(children: [
-                _isOwner ? ProfileCardWidget(title: 'since_joining'.tr, data: '${profileController.profileModel!.memberSinceDays} ${'days'.tr}') : const SizedBox(),
+                _isOwner ? ProfileCardWidget(title: 'days'.tr, data: '${profileController.profileModel!.memberSinceDays}') : const SizedBox(),
                 SizedBox(width: Get.find<ProfileController>().modulePermission!.order! && _isOwner ? Dimensions.paddingSizeSmall : 0),
                 Get.find<ProfileController>().modulePermission!.order! ? ProfileCardWidget(title: 'total_order'.tr, data: profileController.profileModel!.orderCount.toString()) : const SizedBox(),
               ]),

@@ -63,14 +63,12 @@ class _DisbursementScreenState extends State<DisbursementScreen> {
 
             SizedBox(
               height: 160,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: DisbursementStatusCardWidget(
-                  amount: disbursementController.disbursementReportModel!.keepzCompleted ?? 0,
-                  text: 'keepz_split_completed'.tr,
-                  isCompleted: true,
-                  completeToolTip: keepzToolTip,
-                ),
+              width: double.infinity,
+              child: DisbursementStatusCardWidget(
+                amount: disbursementController.disbursementReportModel!.keepzCompleted ?? 0,
+                text: 'keepz_split_completed'.tr,
+                isCompleted: true,
+                completeToolTip: keepzToolTip,
               ),
             ),
 

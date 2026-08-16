@@ -23,6 +23,7 @@ import 'package:sixam_mart_store/features/store/domain/models/variation_body_mod
 import 'package:sixam_mart_store/features/store/domain/models/attribute_model.dart';
 import 'package:sixam_mart_store/common/models/config_model.dart';
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
+import 'package:sixam_mart_store/helper/input_language_helper.dart';
 import 'package:sixam_mart_store/helper/type_converter.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
@@ -117,35 +118,8 @@ class _AddItemScreenState extends State<AddItemScreen>
   TabController? _tabController;
   final List<Tab> _tabs = [];
 
-  static List<Language> _buildItemLanguageList(
-    List<Language>? configuredLanguages,
-  ) {
-    final Map<String, Language> configuredByCode = {
-      for (final language in configuredLanguages ?? <Language>[])
-        if (language.key != null) language.key!: language,
-    };
-    const List<MapEntry<String, String>> requiredLanguages = [
-      MapEntry('en', 'English'),
-      MapEntry('ka', 'ქართული'),
-      MapEntry('ru', 'Русский'),
-    ];
-
-    return requiredLanguages.map((requiredLanguage) {
-      final Language? configured = configuredByCode[requiredLanguage.key];
-      return Language(
-        key: requiredLanguage.key,
-        value: configured?.value?.trim().isNotEmpty == true
-            ? configured!.value
-            : requiredLanguage.value,
-      );
-    }).toList();
-  }
-
   int get _defaultLanguageIndex {
-    final int englishIndex = _languageList.indexWhere(
-      (language) => language.key == 'en',
-    );
-    return englishIndex >= 0 ? englishIndex : 0;
+    return englishLanguageIndex(_languageList);
   }
 
   @override
@@ -170,7 +144,7 @@ class _AddItemScreenState extends State<AddItemScreen>
     }
     storeController.clearVatTax();
 
-    _languageList = _buildItemLanguageList(
+    _languageList = buildInputLanguageList(
       Get.find<SplashController>().configModel!.language,
     );
     _tabController = TabController(length: _languageList.length, vsync: this);

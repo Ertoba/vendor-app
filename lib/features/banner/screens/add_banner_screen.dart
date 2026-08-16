@@ -8,6 +8,7 @@ import 'package:sixam_mart_store/features/splash/controllers/splash_controller.d
 import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart_store/features/banner/controllers/banner_controller.dart';
 import 'package:sixam_mart_store/features/banner/domain/models/store_banner_list_model.dart';
+import 'package:sixam_mart_store/helper/input_language_helper.dart';
 import 'package:sixam_mart_store/helper/url_validator.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/styles.dart';
@@ -33,7 +34,8 @@ class _AddBannerScreenState extends State<AddBannerScreen> with TickerProviderSt
   final FocusNode _urlFocusNode = FocusNode();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final List<Language>? _languageList = Get.find<SplashController>().configModel!.language;
+  final List<Language> _languageList = buildInputLanguageList(Get.find<SplashController>().configModel!.language);
+  int get _defaultLanguageIndex => englishLanguageIndex(_languageList);
 
   TabController? _tabController;
   final List<Tab> _tabs = [];
@@ -48,7 +50,7 @@ class _AddBannerScreenState extends State<AddBannerScreen> with TickerProviderSt
     _update = widget.storeBannerListModel != null;
     _storeBannerListModel = widget.storeBannerListModel;
 
-    _tabController = TabController(length: _languageList!.length, vsync: this);
+    _tabController = TabController(length: _languageList.length, vsync: this);
     for (var language in _languageList) {
       _tabs.add(Tab(text: language.value));
     }
@@ -142,7 +144,7 @@ class _AddBannerScreenState extends State<AddBannerScreen> with TickerProviderSt
                           controller: _titleController[_tabController!.index],
                           capitalization: TextCapitalization.words,
                           focusNode: _titleFocusNode[_tabController!.index],
-                          nextFocus: _tabController!.index == _languageList!.length-1 ? _urlFocusNode : _titleFocusNode[_tabController!.index+1],
+                          nextFocus: _tabController!.index == _languageList.length-1 ? _urlFocusNode : _titleFocusNode[_tabController!.index+1],
                           showTitle: false,
                           required: true,
                           validator: (value) {
@@ -294,7 +296,7 @@ class _AddBannerScreenState extends State<AddBannerScreen> with TickerProviderSt
                         for(int index = 0; index < _languageList.length; index++) {
                           translations.add(Translation(
                             locale: _languageList[index].key, key: 'name',
-                            value: _titleController[index].text.trim().isNotEmpty ? _titleController[index].text.trim() : _titleController[0].text.trim(),
+                            value: _titleController[index].text.trim().isNotEmpty ? _titleController[index].text.trim() : _titleController[_defaultLanguageIndex].text.trim(),
                           ));
                         }
                         _storeBannerListModel?.id = _storeBannerListModel?.id;

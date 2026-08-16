@@ -24,6 +24,9 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterL
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (!GetPlatform.isWeb) {
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  }
   await initializeDateFormatting();
   Map<String, Map<String, String>> languages = await di.init();
 

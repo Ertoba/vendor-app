@@ -15,6 +15,10 @@ class BottomNavItemWidget extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: onTap as void Function()?,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
 
           Image.asset(

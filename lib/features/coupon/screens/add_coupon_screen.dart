@@ -9,6 +9,7 @@ import 'package:sixam_mart_store/common/models/config_model.dart';
 import 'package:sixam_mart_store/features/coupon/domain/models/coupon_body_model.dart';
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
 import 'package:sixam_mart_store/helper/date_converter_helper.dart';
+import 'package:sixam_mart_store/helper/input_language_helper.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/styles.dart';
 import 'package:sixam_mart_store/common/widgets/custom_app_bar_widget.dart';
@@ -44,7 +45,8 @@ class _AddCouponScreenState extends State<AddCouponScreen> with TickerProviderSt
   final FocusNode _minNode = FocusNode();
   final FocusNode _discountNode = FocusNode();
   final FocusNode _maxDiscountNode = FocusNode();
-  final List<Language>? _languageList = Get.find<SplashController>().configModel!.language;
+  final List<Language> _languageList = buildInputLanguageList(Get.find<SplashController>().configModel!.language);
+  int get _defaultLanguageIndex => englishLanguageIndex(_languageList);
   TabController? _tabController;
   final List<Tab> _tabs =[];
 
@@ -52,7 +54,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> with TickerProviderSt
   void initState() {
     super.initState();
 
-    _tabController = TabController(length: _languageList!.length, vsync: this);
+    _tabController = TabController(length: _languageList.length, vsync: this);
     _tabs.addAll(_languageList.map((lang) => Tab(text: lang.value)));
 
     if(widget.coupon != null){
@@ -424,7 +426,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> with TickerProviderSt
                   buttonText: widget.coupon == null ? 'add'.tr : 'update'.tr,
                   onPressed: (){
                     // Check if default language title (index 0) is filled
-                    bool defaultTitleEmpty = _titleController[0].text.trim().isEmpty;
+                    bool defaultTitleEmpty = _titleController[_defaultLanguageIndex].text.trim().isEmpty;
                     
                     String code = _codeController.text.trim();
                     String startDate = _startDateController.text.trim();
@@ -444,11 +446,11 @@ class _AddCouponScreenState extends State<AddCouponScreen> with TickerProviderSt
                       showCustomSnackBar('limit_for_same_user_cant_be_more_then_100'.tr);
                     }else {
                       List<Translation> translation = [];
-                      for(int index=0; index<_languageList!.length; index++) {
+                      for(int index=0; index<_languageList.length; index++) {
                         translation.add(Translation(
                           locale: _languageList[index].key, key: 'title',
                           value: _titleController[index].text.trim().isNotEmpty ? _titleController[index].text.trim()
-                              : _titleController[0].text.trim(),
+                              : _titleController[_defaultLanguageIndex].text.trim(),
                         ));
                       }
                       if(widget.coupon == null){

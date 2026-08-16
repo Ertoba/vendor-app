@@ -1571,6 +1571,7 @@
   "yes_edit" : "Yes, Edit",
   "keepz_split_completed": "Keepz Split Settlements",
   "keepz_split_history": "Keepz Split Settlement History",
+  "keepz_automatic_settlement": "Keepz automatic settlement",
   "automatic_deposits": "Automatic Settlements",
   "phone_number_can_not_be_edited": "Phone number can not be edited",
   "no_category": "No category",

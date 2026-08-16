@@ -112,15 +112,7 @@ class _AddWithDrawMethodScreenState extends State<AddWithDrawMethodScreen> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 8),
                               child: Text(
-                                disbursementController.widthDrawMethods !=
-                                            null &&
-                                        disbursementController
-                                            .widthDrawMethods!
-                                            .isNotEmpty
-                                    ? disbursementController
-                                          .widthDrawMethods![0]
-                                          .methodName!
-                                    : 'select_payment_method'.tr,
+                                disbursementController.selectedMethodName,
                               ),
                             ),
                           ),

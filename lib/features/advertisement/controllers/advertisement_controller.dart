@@ -334,17 +334,22 @@ class AdvertisementController extends GetxController implements GetxService {
       'is_rating_active': isReviewChecked ? "1" : "0",
       'is_review_active': isRatingsChecked ? "1" : "0",
     };
+    final languages = languageList!;
+    final titles = titleController!;
+    final descriptions = descriptionController!;
+    final int defaultIndex = languages.indexWhere((language) => language.key == 'en');
+    final int fallbackIndex = defaultIndex >= 0 ? defaultIndex : 0;
     List<Translation> translations = [];
-    for(int index=0; index<languageList!.length; index++) {
+    for(int index=0; index<languages.length; index++) {
       translations.add(Translation(
-        locale: languageList[index].key, key: 'title',
-        value: titleController![index].text.trim().isNotEmpty ? titleController[index].text.trim()
-            : titleController[0].text.trim(),
+        locale: languages[index].key, key: 'title',
+        value: titles[index].text.trim().isNotEmpty ? titles[index].text.trim()
+            : titles[fallbackIndex].text.trim(),
       ));
       translations.add(Translation(
-        locale: languageList[index].key, key: 'description',
-        value: descriptionController![index].text.trim().isNotEmpty ? descriptionController[index].text.trim()
-            : descriptionController[0].text.trim(),
+        locale: languages[index].key, key: 'description',
+        value: descriptions[index].text.trim().isNotEmpty ? descriptions[index].text.trim()
+            : descriptions[fallbackIndex].text.trim(),
       ));
     }
     body['translations'] = jsonEncode(translations.map((v) => v.toJson()).toList());
@@ -384,17 +389,22 @@ class AdvertisementController extends GetxController implements GetxService {
       'is_rating_active': isReviewChecked ? "1" : "0",
       'is_review_active': isRatingsChecked ? "1" : "0",
     };
+    final languages = languageList!;
+    final titles = titleController!;
+    final descriptions = descriptionController!;
+    final int defaultIndex = languages.indexWhere((language) => language.key == 'en');
+    final int fallbackIndex = defaultIndex >= 0 ? defaultIndex : 0;
     List<Translation> translations = [];
-    for(int index=0; index<languageList!.length; index++) {
+    for(int index=0; index<languages.length; index++) {
       translations.add(Translation(
-        locale: languageList[index].key, key: 'title',
-        value: titleController![index].text.trim().isNotEmpty ? titleController[index].text.trim()
-            : titleController[0].text.trim(),
+        locale: languages[index].key, key: 'title',
+        value: titles[index].text.trim().isNotEmpty ? titles[index].text.trim()
+            : titles[fallbackIndex].text.trim(),
       ));
       translations.add(Translation(
-        locale: languageList[index].key, key: 'description',
-        value: descriptionController![index].text.trim().isNotEmpty ? descriptionController[index].text.trim()
-            : descriptionController[0].text.trim(),
+        locale: languages[index].key, key: 'description',
+        value: descriptions[index].text.trim().isNotEmpty ? descriptions[index].text.trim()
+            : descriptions[fallbackIndex].text.trim(),
       ));
     }
     body['translations'] = jsonEncode(translations.map((v) => v.toJson()).toList());
@@ -440,17 +450,22 @@ class AdvertisementController extends GetxController implements GetxService {
       'is_review_active': isRatingsChecked ? "1" : "0",
     };
 
+    final languages = languageList!;
+    final titles = titleController!;
+    final descriptions = descriptionController!;
+    final int defaultIndex = languages.indexWhere((language) => language.key == 'en');
+    final int fallbackIndex = defaultIndex >= 0 ? defaultIndex : 0;
     List<Translation> translations = [];
-    for(int index=0; index<languageList!.length; index++) {
+    for(int index=0; index<languages.length; index++) {
       translations.add(Translation(
-        locale: languageList[index].key, key: 'title',
-        value: titleController![index].text.trim().isNotEmpty ? titleController[index].text.trim()
-            : titleController[0].text.trim(),
+        locale: languages[index].key, key: 'title',
+        value: titles[index].text.trim().isNotEmpty ? titles[index].text.trim()
+            : titles[fallbackIndex].text.trim(),
       ));
       translations.add(Translation(
-        locale: languageList[index].key, key: 'description',
-        value: descriptionController![index].text.trim().isNotEmpty ? descriptionController[index].text.trim()
-            : descriptionController[0].text.trim(),
+        locale: languages[index].key, key: 'description',
+        value: descriptions[index].text.trim().isNotEmpty ? descriptions[index].text.trim()
+            : descriptions[fallbackIndex].text.trim(),
       ));
     }
     body['translations'] = jsonEncode(translations.map((v) => v.toJson()).toList());

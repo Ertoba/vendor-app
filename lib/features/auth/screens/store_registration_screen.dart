@@ -19,6 +19,7 @@ import 'package:sixam_mart_store/features/splash/controllers/splash_controller.d
 import 'package:sixam_mart_store/features/store/domain/models/store_body_model.dart';
 import 'package:sixam_mart_store/common/models/config_model.dart';
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
+import 'package:sixam_mart_store/helper/input_language_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/helper/validate_check.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
@@ -60,7 +61,8 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
   final FocusNode _confirmPasswordFocus = FocusNode();
-  final List<Language>? _languageList = Get.find<SplashController>().configModel!.language;
+  final List<Language> _languageList = buildInputLanguageList(Get.find<SplashController>().configModel!.language);
+  int get _defaultLanguageIndex => englishLanguageIndex(_languageList);
 
   final ScrollController _scrollController = ScrollController();
   String? _countryDialCode;
@@ -74,7 +76,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _languageList!.length, initialIndex: 0, vsync: this);
+    _tabController = TabController(length: _languageList.length, initialIndex: 0, vsync: this);
     _countryDialCode = CountryCode.fromCountryCode(Get.find<SplashController>().configModel!.country!).dialCode;
     for (var language in _languageList) {
       if (kDebugMode) {
@@ -108,8 +110,8 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
     return GetBuilder<AuthController>(builder: (authController) {
       return GetBuilder<AddressController>(builder: (addressController) {
 
-        if(addressController.storeAddress != null && _languageList!.isNotEmpty){
-          _addressController[0].text = addressController.storeAddress.toString();
+        if(addressController.storeAddress != null && _languageList.isNotEmpty){
+          _addressController[_defaultLanguageIndex].text = addressController.storeAddress.toString();
         }
 
         return PopScope(
@@ -215,7 +217,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                 labelText: 'vendor_name'.tr,
                                 controller: _nameController[_tabController!.index],
                                 focusNode: _nameFocus[_tabController!.index],
-                                nextFocus: _tabController!.index != _languageList!.length-1 ? _addressFocus[_tabController!.index] : _addressFocus[0],
+                                nextFocus: _tabController!.index != _languageList.length-1 ? _addressFocus[_tabController!.index] : _addressFocus[0],
                                 inputType: TextInputType.name,
                                 prefixImage: Images.shopIcon,
                                 capitalization: TextCapitalization.words,
@@ -375,7 +377,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                           const SizedBox(height: Dimensions.paddingSizeDefault),
 
                           addressController.zoneList != null ? SelectLocationAndModuleViewWidget(
-                            fromView: true,  addressController: _addressController[0], addressFocus: _addressFocus[0],
+                            fromView: true,  addressController: _addressController[_defaultLanguageIndex], addressFocus: _addressFocus[_defaultLanguageIndex],
                           ) : const Center(child: CircularProgressIndicator()),
 
                           const SizedBox(height: Dimensions.paddingSizeLarge),

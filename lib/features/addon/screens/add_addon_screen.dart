@@ -8,6 +8,7 @@ import 'package:sixam_mart_store/features/splash/controllers/splash_controller.d
 import 'package:sixam_mart_store/common/models/config_model.dart';
 import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
+import 'package:sixam_mart_store/helper/input_language_helper.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/common/widgets/custom_button_widget.dart';
 import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
@@ -29,7 +30,8 @@ class _AddAddonScreenState extends State<AddAddonScreen> with TickerProviderStat
   final TextEditingController _priceController = TextEditingController();
   final List<FocusNode> _nameNodes = [];
   final FocusNode _priceNode = FocusNode();
-  final List<Language>? _languageList = Get.find<SplashController>().configModel!.language;
+  final List<Language> _languageList = buildInputLanguageList(Get.find<SplashController>().configModel!.language);
+  int get _defaultLanguageIndex => englishLanguageIndex(_languageList);
   TabController? _tabController;
   final List<Tab> _tabs = [];
   late bool _update;
@@ -37,7 +39,7 @@ class _AddAddonScreenState extends State<AddAddonScreen> with TickerProviderStat
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _languageList!.length, initialIndex: 0, vsync: this);
+    _tabController = TabController(length: _languageList.length, initialIndex: 0, vsync: this);
     for (var language in _languageList) {
       if (kDebugMode) {
         print(language);
@@ -151,11 +153,11 @@ class _AddAddonScreenState extends State<AddAddonScreen> with TickerProviderStat
                             ),
 
                             CustomTextFieldWidget(
-                              hintText: '${'name'.tr} (${_languageList?[_tabController!.index].value}) *',
+                              hintText: '${'name'.tr} (${_languageList[_tabController!.index].value}) *',
                               labelText: 'name'.tr,
                               controller: _nameControllers[_tabController!.index],
                               focusNode: _nameNodes[_tabController!.index],
-                              nextFocus: _tabController!.index != _languageList!.length-1 ? _priceNode : _priceNode,
+                              nextFocus: _tabController!.index != _languageList.length-1 ? _priceNode : _priceNode,
                               inputType: TextInputType.name,
                               capitalization: TextCapitalization.words,
                               showTitle: false,
@@ -289,7 +291,7 @@ class _AddAddonScreenState extends State<AddAddonScreen> with TickerProviderStat
                 isLoading: addonController.isLoading,
                 onPressed: () {
 
-                  String name = _nameControllers[0].text.trim();
+                  String name = _nameControllers[_defaultLanguageIndex].text.trim();
                   String price = _priceController.text.trim();
 
                   if(name.isEmpty) {
@@ -305,7 +307,7 @@ class _AddAddonScreenState extends State<AddAddonScreen> with TickerProviderStat
                     for(int index = 0; index < _languageList.length; index++) {
                       nameList.add(Translation(
                         locale: _languageList[index].key, key: 'name',
-                        value: _nameControllers[index].text.trim().isNotEmpty ? _nameControllers[index].text.trim() : _nameControllers[0].text.trim(),
+                        value: _nameControllers[index].text.trim().isNotEmpty ? _nameControllers[index].text.trim() : _nameControllers[_defaultLanguageIndex].text.trim(),
                       ));
                     }
 
