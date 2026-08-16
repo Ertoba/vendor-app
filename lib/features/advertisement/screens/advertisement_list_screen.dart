@@ -216,7 +216,9 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
 
                           PopupMenuButton<PopupMenuModel>(
                             padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints.tightFor(width: 38, height: 38),
+                            constraints: const BoxConstraints(minWidth: 180, maxWidth: 260),
+                            position: PopupMenuPosition.under,
+                            offset: const Offset(0, 4),
                             shape: RoundedRectangleBorder(
                               borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusDefault)),
                               side: BorderSide(color: Theme.of(context).hintColor.withValues(alpha: 0.1)),
@@ -347,8 +349,8 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
                               }).toList();
                             },
                             child: SizedBox(
-                              width: 38,
-                              height: 38,
+                              width: 42,
+                              height: 42,
                               child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
