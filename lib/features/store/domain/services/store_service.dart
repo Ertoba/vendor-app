@@ -15,6 +15,7 @@ import 'package:sixam_mart_store/features/store/domain/models/variant_type_model
 import 'package:sixam_mart_store/features/store/domain/models/variation_body_model.dart';
 import 'package:sixam_mart_store/features/store/domain/repositories/store_repository_interface.dart';
 import 'package:sixam_mart_store/features/store/domain/services/store_service_interface.dart';
+import 'package:sixam_mart_store/features/store/domain/utils/variation_key_helper.dart';
 
 class StoreService implements StoreServiceInterface {
   static const int _maxStoreImageBytes = 5 * 1024 * 1024;
@@ -198,7 +199,7 @@ class StoreService implements StoreServiceInterface {
         double? price = 0;
         int? stock = 0;
         for(Variation variation in item.variations!) {
-          if(variation.type == value) {
+          if(canonicalVariationType(variation.type ?? '') == canonicalVariationType(value)) {
             price = variation.price;
             stock = variation.stock;
             break;

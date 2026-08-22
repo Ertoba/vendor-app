@@ -31,6 +31,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart_store/features/store/domain/services/store_service_interface.dart';
+import 'package:sixam_mart_store/features/store/domain/utils/variation_key_helper.dart';
 
 class StoreController extends GetxController implements GetxService {
   final StoreServiceInterface storeServiceInterface;
@@ -732,10 +733,6 @@ class StoreController extends GetxController implements GetxService {
     update();
   }
 
-  String _variationRequestKey(String value) {
-    return value.replaceAll(RegExp(r'\s+'), '').replaceAll('.', '_');
-  }
-
   Future<void> addItem(Item item, bool isAdd, {String? genericNameData}) async {
     _isLoading = true;
     update();
@@ -757,7 +754,7 @@ class StoreController extends GetxController implements GetxService {
         'attribute_id': jsonEncode(idList), 'choice_no': jsonEncode(idList), 'choice': jsonEncode(nameList)
       });
       for(int index=0; index<_variantTypeList!.length; index++) {
-        final String requestKey = _variationRequestKey(_variantTypeList![index].variantType);
+        final String requestKey = variationRequestKey(_variantTypeList![index].variantType);
         fields.addAll(<String, String> {
           'price_$requestKey': _variantTypeList![index].priceController.text.trim(),
           'stock_$requestKey': _variantTypeList![index].stockController.text.trim().isEmpty ? '0'
