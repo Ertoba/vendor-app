@@ -87,6 +87,16 @@ class StoreController extends GetxController implements GetxService {
   List<VariantTypeModel>? _variantTypeList;
   List<VariantTypeModel>? get variantTypeList => _variantTypeList;
 
+  List<String> _unresolvedTechnicalModels = <String>[];
+  List<String> get unresolvedTechnicalModels => _unresolvedTechnicalModels;
+
+  bool get _isTechnicalStore {
+    final stores = Get.find<ProfileController>().profileModel?.stores;
+    return stores != null &&
+        stores.isNotEmpty &&
+        stores.first.module?.moduleType == 'ecommerce';
+  }
+
   bool _isAvailable = true;
   bool get isAvailable => _isAvailable;
 
@@ -736,6 +746,12 @@ class StoreController extends GetxController implements GetxService {
   Future<void> addItem(Item item, bool isAdd, {String? genericNameData}) async {
     _isLoading = true;
     update();
+    if(_isTechnicalStore && _unresolvedTechnicalModels.isNotEmpty) {
+      _isLoading = false;
+      update();
+      showCustomSnackBar('technical_model_brand_required'.tr);
+      return;
+    }
     Map<String, String> fields = {};
     if(!Get.find<SplashController>().getStoreModuleConfig().newVariation! && _variantTypeList!.isNotEmpty) {
       List<int?> idList = [];
@@ -760,6 +776,18 @@ class StoreController extends GetxController implements GetxService {
           'stock_$requestKey': _variantTypeList![index].stockController.text.trim().isEmpty ? '0'
               : _variantTypeList![index].stockController.text.trim(),
         });
+      }
+      if(_isTechnicalStore) {
+        final String fallbackPrice = _variantTypeList!.first.priceController.text.trim().isNotEmpty
+            ? _variantTypeList!.first.priceController.text.trim()
+            : (item.price?.toString() ?? '0');
+        for(final VariationCombination combination in buildVariationCombinations(_attributeList)) {
+          if(!combination.isBrandModelCompatible) {
+            final String requestKey = variationRequestKey(combination.type);
+            fields.putIfAbsent('price_$requestKey', () => fallbackPrice);
+            fields.putIfAbsent('stock_$requestKey', () => '0');
+          }
+        }
       }
     }
     String tags = '';
@@ -815,8 +843,20 @@ class StoreController extends GetxController implements GetxService {
   }
 
   void generateVariantTypes(Item? item) {
-    _variantTypeList = storeServiceInterface.variationTypeList(_attributeList, item);
-    _totalStock = storeServiceInterface.totalStock(_attributeList, item);
+    final bool enforceCompatibility = _isTechnicalStore;
+    _unresolvedTechnicalModels = enforceCompatibility
+        ? findUnresolvedTechnicalModels(_attributeList)
+        : <String>[];
+    _variantTypeList = storeServiceInterface.variationTypeList(
+      _attributeList,
+      item,
+      enforceBrandModelCompatibility: enforceCompatibility,
+    );
+    _totalStock = storeServiceInterface.totalStock(
+      _attributeList,
+      item,
+      enforceBrandModelCompatibility: enforceCompatibility,
+    );
   }
 
   bool hasAttribute() {

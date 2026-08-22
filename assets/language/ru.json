@@ -2752,5 +2752,6 @@
   "ai_chat_disabled": "ИИ-чат сейчас отключен.",
   "ai_chat_daily_limit_reached": "Вы достигли дневного лимита ИИ-чата.",
   "ai_chat_temporarily_unavailable": "ИИ-чат временно недоступен. Повторите попытку позже.",
-  "verified_store": "Проверенный магазин"
+  "verified_store": "Проверенный магазин",
+  "technical_model_brand_required": "Укажите бренд в названии каждой модели или используйте узнаваемое название, например iPhone 11 Pro или Samsung A23."
 }

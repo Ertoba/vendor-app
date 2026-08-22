@@ -1636,5 +1636,6 @@
   "ai_chat_disabled": "AI ჩატი ამჟამად გამორთულია.",
   "ai_chat_daily_limit_reached": "AI ჩატის დღიური ლიმიტი ამოწურულია.",
   "ai_chat_temporarily_unavailable": "AI ჩატი დროებით მიუწვდომელია. გთხოვთ, მოგვიანებით სცადოთ.",
-  "verified_store": "ვერიფიცირებული მაღაზია"
+  "verified_store": "ვერიფიცირებული მაღაზია",
+  "technical_model_brand_required": "თითოეულ მოდელში მიუთითეთ ბრენდი ან გამოიყენეთ ცნობადი მოდელის სახელი, მაგალითად iPhone 11 Pro ან Samsung A23."
 }

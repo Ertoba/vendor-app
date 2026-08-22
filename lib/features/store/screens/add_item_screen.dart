@@ -5056,6 +5056,12 @@ class _AddItemScreenState extends State<AddItemScreen>
                                         'add_at_least_one_variant_for_every_attribute'
                                             .tr,
                                       );
+                                    } else if (storeController
+                                        .unresolvedTechnicalModels
+                                        .isNotEmpty) {
+                                      showCustomSnackBar(
+                                        'technical_model_brand_required'.tr,
+                                      );
                                     } else if (blankVariantPrice) {
                                       showCustomSnackBar(
                                         'enter_price_for_every_variant'.tr,

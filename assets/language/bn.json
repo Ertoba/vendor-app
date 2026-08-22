@@ -1525,5 +1525,6 @@
   "keepz_split_completed": "Keepz Split Settlements",
   "keepz_split_history": "Keepz Split Settlement History",
   "keepz_automatic_settlement": "Keepz স্বয়ংক্রিয় নিষ্পত্তি",
-  "automatic_deposits": "স্বয়ংক্রিয় নিষ্পত্তি"
+  "automatic_deposits": "স্বয়ংক্রিয় নিষ্পত্তি",
+  "technical_model_brand_required": "প্রতিটি মডেলের নামে ব্র্যান্ড যোগ করুন অথবা পরিচিত মডেলের নাম ব্যবহার করুন, যেমন iPhone 11 Pro বা Samsung A23।"
 }

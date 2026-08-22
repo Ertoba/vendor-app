@@ -1593,5 +1593,6 @@
   "ai_chat_disabled": "AI chat is currently disabled.",
   "ai_chat_daily_limit_reached": "You have reached the daily AI chat limit.",
   "ai_chat_temporarily_unavailable": "AI chat is temporarily unavailable. Please try again later.",
-  "verified_store": "Verified store"
+  "verified_store": "Verified store",
+  "technical_model_brand_required": "Include the brand in each model name or use a recognizable model, for example iPhone 11 Pro or Samsung A23."
 }

@@ -1526,5 +1526,6 @@
   "keepz_split_completed": "Keepz Split Settlements",
   "keepz_split_history": "Keepz Split Settlement History",
   "keepz_automatic_settlement": "التسوية التلقائية عبر Keepz",
-  "automatic_deposits": "التسويات التلقائية"
+  "automatic_deposits": "التسويات التلقائية",
+  "technical_model_brand_required": "أضف العلامة التجارية إلى اسم كل طراز أو استخدم اسم طراز معروفًا، مثل iPhone 11 Pro أو Samsung A23."
 }

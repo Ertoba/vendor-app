@@ -1525,5 +1525,6 @@
   "keepz_split_completed": "Keepz Split Settlements",
   "keepz_split_history": "Keepz Split Settlement History",
   "keepz_automatic_settlement": "Liquidación automática de Keepz",
-  "automatic_deposits": "Liquidaciones automáticas"
+  "automatic_deposits": "Liquidaciones automáticas",
+  "technical_model_brand_required": "Incluye la marca en el nombre de cada modelo o usa un modelo reconocible, por ejemplo iPhone 11 Pro o Samsung A23."
 }
