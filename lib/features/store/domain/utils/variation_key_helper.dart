@@ -1,4 +1,5 @@
 import 'package:sixam_mart_store/features/store/domain/models/attribute_model.dart';
+import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
 
 class VariationCombination {
   final String type;
@@ -98,6 +99,76 @@ List<String> findUnresolvedTechnicalModels(List<AttributeModel>? attributes) {
   final List<String> brands = activeAttributes[brandIndex].variants;
   return activeAttributes[modelIndex].variants
       .where((model) => resolveTechnicalModelBrandIndex(model, brands) == null)
+      .toList(growable: false);
+}
+
+List<int> compatibleTechnicalVariationIndexes(Item item) {
+  final List<ChoiceOptions> choices = item.choiceOptions ?? <ChoiceOptions>[];
+  final List<Variation> variations = item.variations ?? <Variation>[];
+  final int brandIndex = choices.indexWhere(
+    (choice) => isTechnicalBrandAttribute(choice.title),
+  );
+  final int modelIndex = choices.indexWhere(
+    (choice) => isTechnicalModelAttribute(choice.title),
+  );
+  if (brandIndex == -1 || modelIndex == -1) {
+    return List<int>.generate(variations.length, (index) => index);
+  }
+
+  final List<List<String>> options = choices
+      .map((choice) => choice.options ?? <String>[])
+      .toList(growable: false);
+  if (options.any((values) => values.isEmpty)) {
+    return List<int>.generate(variations.length, (index) => index);
+  }
+
+  final List<String> brands = options[brandIndex];
+  if (options[modelIndex].any(
+    (model) => resolveTechnicalModelBrandIndex(model, brands) == null,
+  )) {
+    return List<int>.generate(variations.length, (index) => index);
+  }
+  final List<int> indexes = List<int>.filled(options.length, 0);
+  final int combinationCount = options.fold<int>(
+    1,
+    (count, values) => count * values.length,
+  );
+  final Set<String> compatibleKeys = <String>{};
+
+  for (
+    int combinationIndex = 0;
+    combinationIndex < combinationCount;
+    combinationIndex++
+  ) {
+    final List<String> values = List<String>.generate(
+      options.length,
+      (index) => options[index][indexes[index]].trim(),
+      growable: false,
+    );
+    if (resolveTechnicalModelBrandIndex(values[modelIndex], brands) ==
+        indexes[brandIndex]) {
+      compatibleKeys.add(canonicalVariationType(values.join('-')));
+    }
+
+    for (int offset = 0; offset < indexes.length; offset++) {
+      final int index = indexes.length - 1 - offset;
+      if (indexes[index] < options[index].length - 1) {
+        indexes[index]++;
+        break;
+      }
+      indexes[index] = 0;
+    }
+  }
+
+  return variations
+      .asMap()
+      .entries
+      .where(
+        (entry) => compatibleKeys.contains(
+          canonicalVariationType(entry.value.type ?? ''),
+        ),
+      )
+      .map((entry) => entry.key)
       .toList(growable: false);
 }
 
