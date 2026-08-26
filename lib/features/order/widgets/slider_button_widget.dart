@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:vibration/vibration.dart';
 
@@ -96,7 +97,13 @@ class SliderButtonState extends State<SliderButton> {
 
   @override
   Widget build(BuildContext context) {
-    return flag == true ? _control() : widget.dismissible == true ? Container() : Container(child: _control());
+    return _isSubmitting
+        ? _control()
+        : flag == true
+        ? _control()
+        : widget.dismissible == true
+        ? Container()
+        : Container(child: _control());
   }
 
   Widget _control() => Container(
@@ -112,10 +119,39 @@ class SliderButtonState extends State<SliderButton> {
       children: <Widget>[
         Container(
           alignment: widget.alignLabel,
-          child: widget.shimmer && !_isDisabled ? Shimmer(
-            color: widget.highlightedColor,
-            child: widget.label!,
-          ) : widget.label,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 180),
+            child: _isSubmitting
+                ? Row(
+                    key: const ValueKey('slider_processing'),
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: widget.highlightedColor,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'processing'.tr,
+                        style: TextStyle(color: widget.highlightedColor),
+                      ),
+                    ],
+                  )
+                : FittedBox(
+                    key: const ValueKey('slider_idle'),
+                    fit: BoxFit.scaleDown,
+                    child: widget.shimmer && !_isDisabled
+                        ? Shimmer(
+                            color: widget.highlightedColor,
+                            child: widget.label!,
+                          )
+                        : widget.label,
+                  ),
+          ),
         ),
         _isDisabled ? Tooltip(
           verticalOffset: 50,
@@ -131,7 +167,18 @@ class SliderButtonState extends State<SliderButton> {
                 color: Colors.grey,
                 borderRadius: BorderRadius.circular(widget.radius),
               ),
-              child: Center(child: widget.icon),
+              child: Center(
+                child: _isSubmitting
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : widget.icon,
+              ),
             ),
           )) : Dismissible(
             key: const Key("cancel"),
@@ -164,6 +211,10 @@ class SliderButtonState extends State<SliderButton> {
                       print(e);
                     }
                   }
+                }
+              } catch (error) {
+                if (kDebugMode) {
+                  debugPrint('Slider action failed: $error');
                 }
               } finally {
                 if (mounted) {
