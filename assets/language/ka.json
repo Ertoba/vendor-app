@@ -1637,5 +1637,18 @@
   "ai_chat_daily_limit_reached": "AI ჩატის დღიური ლიმიტი ამოწურულია.",
   "ai_chat_temporarily_unavailable": "AI ჩატი დროებით მიუწვდომელია. გთხოვთ, მოგვიანებით სცადოთ.",
   "verified_store": "ვერიფიცირებული მაღაზია",
-  "technical_model_brand_required": "თითოეულ მოდელში მიუთითეთ ბრენდი ან გამოიყენეთ ცნობადი მოდელის სახელი, მაგალითად iPhone 11 Pro ან Samsung A23."
+  "technical_model_brand_required": "თითოეულ მოდელში მიუთითეთ ბრენდი ან გამოიყენეთ ცნობადი მოდელის სახელი, მაგალითად iPhone 11 Pro ან Samsung A23.",
+  "auth_ui_title": "კეთილი იყოს შენი დაბრუნება",
+  "auth_ui_otp_subtitle": "შეიყვანე ტელეფონის ნომერი — გამოგიგზავნით შესვლის კოდს.",
+  "auth_ui_manual_subtitle": "შედი ელფოსტით ან ტელეფონის ნომრით და პაროლით.",
+  "auth_ui_vendor_subtitle": "შენი მაღაზია, შეკვეთები და გუნდი ერთ სივრცეში.",
+  "auth_ui_courier_subtitle": "შედი ანგარიშში და მართე შენი მიტანები.",
+  "auth_ui_show_password": "პაროლის ჩვენება",
+  "auth_ui_hide_password": "პაროლის დამალვა",
+  "auth_ui_account_type": "ანგარიშის ტიპი",
+  "auth_ui_use_password": "პაროლით შესვლა",
+  "auth_ui_use_code": "ერთჯერადი კოდით შესვლა",
+  "auth_ui_send_code": "გაგრძელება",
+  "auth_ui_phone_hint": "ტელეფონის ნომერი",
+  "auth_ui_role": "პარტნიორი"
 }

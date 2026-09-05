@@ -5,11 +5,9 @@ import 'package:sixam_mart_store/features/splash/controllers/splash_controller.d
 import 'package:sixam_mart_store/features/rental_module/profile/controllers/taxi_profile_controller.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/helper/validate_check.dart';
-import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
-import 'package:sixam_mart_store/util/styles.dart';
 import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
-import 'package:sixam_mart_store/common/widgets/custom_text_field_widget.dart';
+import 'package:sixam_mart_store/features/auth/widgets/mili_auth_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -47,6 +45,7 @@ class _SignInScreenState extends State<SignInScreen> {
         .getIsStoreRegistrationSharedPref();
     if (canShowBottomSheet) {
       Future.delayed(const Duration(seconds: 1), () {
+        if (!mounted) return;
         showModalBottomSheet(
           context: Get.context!,
           isScrollControlled: true,
@@ -54,134 +53,153 @@ class _SignInScreenState extends State<SignInScreen> {
           builder: (con) => const StoreRegistrationSuccessBottomSheet(),
         ).then((value) {
           Get.find<AuthController>().saveIsStoreRegistrationSharedPref(false);
-          setState(() {});
+          if (mounted) setState(() {});
         });
       });
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: GetBuilder<AuthController>(
-          builder: (authController) {
-            final SplashController splashController =
-                Get.find<SplashController>();
-            final bool storeRegistrationEnabled =
-                splashController.configModel?.toggleStoreRegistration ?? false;
-
-            return Stack(
-              children: [
-                const _LoginBackground(),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        Dimensions.paddingSizeLarge,
-                        Dimensions.paddingSizeDefault,
-                        Dimensions.paddingSizeLarge,
-                        Dimensions.paddingSizeDefault,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const _ThemedAuthLogo(),
-                          const SizedBox(height: Dimensions.paddingSizeDefault),
-                          Text(
-                            'sign_in'.tr,
-                            textAlign: TextAlign.center,
-                            style: robotoBold.copyWith(
-                              fontSize: Dimensions.fontSizeOverLarge,
-                              color: Theme.of(
-                                context,
-                              ).textTheme.bodyLarge!.color,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: Dimensions.paddingSizeExtraSmall,
-                          ),
-                          Text(
-                            'vendor_login_subtitle'.tr,
-                            textAlign: TextAlign.center,
-                            style: robotoRegular.copyWith(
-                              fontSize: Dimensions.fontSizeDefault,
-                              height: 1.25,
-                              color: Theme.of(context).hintColor,
-                            ),
-                          ),
-                          const SizedBox(height: Dimensions.paddingSizeDefault),
-                          _RoleSelector(authController: authController),
-                          const SizedBox(height: Dimensions.paddingSizeDefault),
-                          Form(
-                            key: _formKeyLogin,
-                            child: Column(
-                              children: [
-                                CustomTextFieldWidget(
-                                  labelText: 'email'.tr,
-                                  hintText: 'example@email.com',
-                                  controller: _emailController,
-                                  focusNode: _emailFocus,
-                                  nextFocus: _passwordFocus,
-                                  inputType: TextInputType.emailAddress,
-                                  prefixImage: Images.mail,
-                                  required: true,
-                                  validator: (value) =>
-                                      ValidateCheck.validateEmail(value),
-                                ),
-                                const SizedBox(
-                                  height: Dimensions.paddingSizeDefault,
-                                ),
-                                CustomTextFieldWidget(
-                                  labelText: 'password'.tr,
-                                  hintText: 'enter_password'.tr,
-                                  controller: _passwordController,
-                                  focusNode: _passwordFocus,
-                                  inputAction: TextInputAction.done,
-                                  inputType: TextInputType.visiblePassword,
-                                  prefixIcon: Icons.lock_outline_rounded,
-                                  iconSize: 22,
-                                  isPassword: true,
-                                  required: true,
-                                  onSubmit: (text) => GetPlatform.isWeb
-                                      ? _login(authController)
-                                      : null,
-                                  validator: (value) =>
-                                      ValidateCheck.validatePassword(
-                                        value,
-                                        null,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          _LoginOptionsRow(authController: authController),
-                          const SizedBox(height: Dimensions.paddingSizeDefault),
-                          _PrimaryLoginButton(
-                            isLoading: authController.isLoading,
-                            onPressed: () => _login(authController),
-                          ),
-                          if (storeRegistrationEnabled) ...[
-                            const SizedBox(height: Dimensions.paddingSizeLarge),
-                            const _OrDivider(),
-                            const SizedBox(height: Dimensions.paddingSizeSmall),
-                            const _RegistrationEntry(),
-                          ],
-                          const SizedBox(height: Dimensions.paddingSizeDefault),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
   }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    resizeToAvoidBottomInset: true,
+    backgroundColor: Theme.of(context).colorScheme.surface,
+    body: SafeArea(
+      child: GetBuilder<AuthController>(
+        builder: (authController) {
+          final registrationEnabled =
+              Get.find<SplashController>()
+                  .configModel
+                  ?.toggleStoreRegistration ??
+              false;
+          void submit() {
+            if (!authController.isLoading) _login(authController);
+          }
+
+          return MiliAuthLayout(
+            logoAsset: Images.brandMark,
+            children: [
+              MiliAuthIntro(
+                title: 'auth_ui_title'.tr,
+                subtitle: 'auth_ui_vendor_subtitle'.tr,
+              ),
+              Text(
+                'auth_ui_account_type'.tr,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 10),
+              SegmentedButton<int>(
+                segments: [
+                  ButtonSegment(
+                    value: 0,
+                    label: Text('vendor_owner_short'.tr),
+                    icon: const Icon(Icons.person_outline_rounded, size: 18),
+                  ),
+                  ButtonSegment(
+                    value: 1,
+                    label: Text('vendor_employee_short'.tr),
+                    icon: const Icon(Icons.badge_outlined, size: 18),
+                  ),
+                ],
+                selected: {authController.vendorTypeIndex},
+                showSelectedIcon: false,
+                onSelectionChanged: authController.isLoading
+                    ? null
+                    : (selection) =>
+                          authController.changeVendorType(selection.first),
+                style: SegmentedButton.styleFrom(
+                  selectedBackgroundColor: Theme.of(
+                    context,
+                  ).primaryColor.withValues(alpha: .1),
+                  selectedForegroundColor: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.color,
+                  foregroundColor: authMuted(context),
+                  textStyle: TextStyle(
+                    fontFamily: Get.locale?.languageCode == 'ka'
+                        ? 'MiliAuthGeorgian'
+                        : null,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  minimumSize: const Size(0, 50),
+                  side: BorderSide(color: authBorder(context)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 22),
+              Form(
+                key: _formKeyLogin,
+                child: Column(
+                  children: [
+                    MiliAuthField(
+                      label: 'email'.tr,
+                      hint: 'example@email.com',
+                      controller: _emailController,
+                      focusNode: _emailFocus,
+                      nextFocus: _passwordFocus,
+                      inputType: TextInputType.emailAddress,
+                      autofillHints: const [
+                        AutofillHints.username,
+                        AutofillHints.email,
+                      ],
+                      validator: (value) => ValidateCheck.validateEmail(value),
+                    ),
+                    const SizedBox(height: 18),
+                    MiliAuthField(
+                      label: 'password'.tr,
+                      hint: 'enter_password'.tr,
+                      controller: _passwordController,
+                      focusNode: _passwordFocus,
+                      inputAction: TextInputAction.done,
+                      inputType: TextInputType.visiblePassword,
+                      isPassword: true,
+                      onSubmit: (_) => submit(),
+                      validator: (value) =>
+                          ValidateCheck.validatePassword(value, null),
+                    ),
+                  ],
+                ),
+              ),
+              MiliAuthOptions(
+                remember: authController.isActiveRememberMe,
+                onRemember: authController.toggleRememberMe,
+                onForgot: authController.vendorTypeIndex == 1
+                    ? null
+                    : () => Get.toNamed(RouteHelper.getForgotPassRoute()),
+              ),
+              MiliAuthSubmit(
+                loading: authController.isLoading,
+                label: 'sign_in'.tr,
+                onPressed: submit,
+              ),
+              if (registrationEnabled)
+                MiliAuthSecondary(
+                  label: 'vendor_registration_cta_action'.tr,
+                  description: 'vendor_registration_cta_title'.tr,
+                  icon: Icons.storefront_outlined,
+                  onPressed: () =>
+                      Get.toNamed(RouteHelper.getRestaurantRegistrationRoute()),
+                ),
+            ],
+          );
+        },
+      ),
+    ),
+  );
 
   void _login(AuthController authController) async {
     String email = _emailController.text.trim();
@@ -218,400 +236,5 @@ class _SignInScreenState extends State<SignInScreen> {
         });
       }
     }
-  }
-}
-
-class _LoginBackground extends StatelessWidget {
-  const _LoginBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    final Color primaryColor = Theme.of(context).primaryColor;
-    return Positioned.fill(
-      child: IgnorePointer(
-        child: Stack(
-          children: [
-            Positioned(
-              top: -130,
-              left: -110,
-              child: Container(
-                width: 290,
-                height: 290,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: primaryColor.withValues(alpha: 0.06),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 145,
-              right: 58,
-              child: Icon(
-                Icons.cloud_rounded,
-                size: 52,
-                color: primaryColor.withValues(alpha: 0.06),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ThemedAuthLogo extends StatelessWidget {
-  const _ThemedAuthLogo();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 104,
-      child: Center(
-        child: Image.asset(Images.brandMark, height: 94, fit: BoxFit.contain),
-      ),
-    );
-  }
-}
-
-class _RoleSelector extends StatelessWidget {
-  final AuthController authController;
-
-  const _RoleSelector({required this.authController});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(
-          color: Theme.of(context).primaryColor.withValues(alpha: 0.12),
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _RoleSegment(
-              label: 'vendor_owner_short'.tr,
-              icon: Icons.person_outline_rounded,
-              selected: authController.vendorTypeIndex == 0,
-              onTap: () => authController.changeVendorType(0),
-            ),
-          ),
-          Expanded(
-            child: _RoleSegment(
-              label: 'vendor_employee_short'.tr,
-              icon: Icons.badge_outlined,
-              selected: authController.vendorTypeIndex == 1,
-              onTap: () => authController.changeVendorType(1),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _RoleSegment extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _RoleSegment({
-    required this.label,
-    required this.icon,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final Color primaryColor = Theme.of(context).primaryColor;
-    final Color contentColor = selected
-        ? primaryColor
-        : Theme.of(context).hintColor;
-    return InkWell(
-      borderRadius: BorderRadius.circular(28),
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 110),
-        curve: Curves.easeOutCubic,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: selected ? primaryColor.withValues(alpha: 0.12) : null,
-          borderRadius: BorderRadius.circular(28),
-          border: selected
-              ? Border.all(color: primaryColor.withValues(alpha: 0.22))
-              : null,
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: primaryColor.withValues(alpha: 0.06),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ]
-              : null,
-        ),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 18, color: contentColor),
-              const SizedBox(width: Dimensions.paddingSizeSmall),
-              Text(
-                label,
-                maxLines: 1,
-                style: robotoBold.copyWith(
-                  fontSize: Dimensions.fontSizeDefault,
-                  color: contentColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _LoginOptionsRow extends StatelessWidget {
-  final AuthController authController;
-
-  const _LoginOptionsRow({required this.authController});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: InkWell(
-            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-            onTap: authController.toggleRememberMe,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Row(
-                children: [
-                  Checkbox(
-                    activeColor: Theme.of(context).primaryColor,
-                    value: authController.isActiveRememberMe,
-                    onChanged: (bool? isChecked) =>
-                        authController.toggleRememberMe(),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'remember_me'.tr,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: robotoMedium.copyWith(
-                        fontSize: Dimensions.fontSizeDefault,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        if (authController.vendorTypeIndex != 1)
-          TextButton(
-            onPressed: () => Get.toNamed(RouteHelper.getForgotPassRoute()),
-            child: Text(
-              '${'forgot_password'.tr}?',
-              textAlign: TextAlign.end,
-              style: robotoBold.copyWith(
-                color: Theme.of(context).primaryColor,
-                fontSize: Dimensions.fontSizeDefault,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class _PrimaryLoginButton extends StatelessWidget {
-  final bool isLoading;
-  final VoidCallback onPressed;
-
-  const _PrimaryLoginButton({required this.isLoading, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    final Color primaryColor = Theme.of(context).primaryColor;
-    return TextButton(
-      onPressed: isLoading ? null : onPressed,
-      style: TextButton.styleFrom(
-        backgroundColor: isLoading
-            ? Theme.of(context).disabledColor
-            : primaryColor,
-        minimumSize: const Size.fromHeight(50),
-        padding: const EdgeInsets.symmetric(
-          horizontal: Dimensions.paddingSizeLarge,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-        ),
-      ),
-      child: isLoading
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: Dimensions.paddingSizeSmall),
-                Text(
-                  'loading'.tr,
-                  style: robotoBold.copyWith(
-                    color: Colors.white,
-                    fontSize: Dimensions.fontSizeLarge,
-                  ),
-                ),
-              ],
-            )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.lock_outline_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-                const SizedBox(width: Dimensions.paddingSizeSmall),
-                Flexible(
-                  child: Text(
-                    'sign_in'.tr,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: robotoBold.copyWith(
-                      color: Colors.white,
-                      fontSize: Dimensions.fontSizeLarge,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-    );
-  }
-}
-
-class _OrDivider extends StatelessWidget {
-  const _OrDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(child: Divider(color: Theme.of(context).dividerColor)),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Dimensions.paddingSizeDefault,
-          ),
-          child: Text(
-            'or'.tr,
-            style: robotoMedium.copyWith(
-              color: Theme.of(context).hintColor,
-              fontSize: Dimensions.fontSizeDefault,
-            ),
-          ),
-        ),
-        Expanded(child: Divider(color: Theme.of(context).dividerColor)),
-      ],
-    );
-  }
-}
-
-class _RegistrationEntry extends StatelessWidget {
-  const _RegistrationEntry();
-
-  @override
-  Widget build(BuildContext context) {
-    final Color primaryColor = Theme.of(context).primaryColor;
-    return InkWell(
-      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-      onTap: () => Get.toNamed(RouteHelper.getRestaurantRegistrationRoute()),
-      child: Container(
-        padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-        decoration: BoxDecoration(
-          color: primaryColor.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-          border: Border.all(color: primaryColor.withValues(alpha: 0.18)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: primaryColor.withValues(alpha: 0.12),
-              ),
-              child: Icon(
-                Icons.storefront_rounded,
-                color: primaryColor,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: Dimensions.paddingSizeDefault),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'vendor_registration_cta_title'.tr,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: robotoBold.copyWith(
-                      fontSize: Dimensions.fontSizeDefault * 0.7425,
-                    ),
-                  ),
-                  const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                  Text(
-                    'vendor_registration_cta_subtitle'.tr,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: robotoRegular.copyWith(
-                      color: Theme.of(context).hintColor,
-                      fontSize: Dimensions.fontSizeSmall * 0.7425,
-                      height: 1.35,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: Dimensions.paddingSizeSmall),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Row(
-                children: [
-                  Text(
-                    'vendor_registration_cta_action'.tr,
-                    style: robotoBold.copyWith(
-                      color: primaryColor,
-                      fontSize: Dimensions.fontSizeDefault * 0.7425,
-                    ),
-                  ),
-                  const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                  Icon(Icons.chevron_right_rounded, color: primaryColor),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

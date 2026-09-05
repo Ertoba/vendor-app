@@ -2753,5 +2753,18 @@
   "ai_chat_daily_limit_reached": "Вы достигли дневного лимита ИИ-чата.",
   "ai_chat_temporarily_unavailable": "ИИ-чат временно недоступен. Повторите попытку позже.",
   "verified_store": "Проверенный магазин",
-  "technical_model_brand_required": "Укажите бренд в названии каждой модели или используйте узнаваемое название, например iPhone 11 Pro или Samsung A23."
+  "technical_model_brand_required": "Укажите бренд в названии каждой модели или используйте узнаваемое название, например iPhone 11 Pro или Samsung A23.",
+  "auth_ui_title": "С возвращением",
+  "auth_ui_otp_subtitle": "Введите номер телефона — мы отправим код для входа.",
+  "auth_ui_manual_subtitle": "Войдите с помощью почты или телефона и пароля.",
+  "auth_ui_vendor_subtitle": "Ваш магазин, заказы и команда в одном месте.",
+  "auth_ui_courier_subtitle": "Войдите в аккаунт для управления доставками.",
+  "auth_ui_show_password": "Показать пароль",
+  "auth_ui_hide_password": "Скрыть пароль",
+  "auth_ui_account_type": "Тип аккаунта",
+  "auth_ui_use_password": "Войти с паролем",
+  "auth_ui_use_code": "Войти с кодом",
+  "auth_ui_send_code": "Продолжить",
+  "auth_ui_phone_hint": "Номер телефона",
+  "auth_ui_role": "Партнёр"
 }
