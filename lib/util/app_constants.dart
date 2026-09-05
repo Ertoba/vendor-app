@@ -1,3 +1,4 @@
+import 'package:sixam_mart_store/util/typography.dart';
 import 'package:sixam_mart_store/features/language/domain/models/language_model.dart';
 import 'package:sixam_mart_store/util/images.dart';
 
@@ -7,7 +8,7 @@ class AppConstants {
 
   ///Flutter SDK: 3.41.6
 
-  static const String fontFamily = 'Roboto';
+  static const String fontFamily = MiliTypography.bodyFamily;
   static const double limitOfPickedVideoSizeInMB = 10;
   static const double maxSizeOfASingleFile = 10;
 

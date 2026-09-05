@@ -1,3 +1,4 @@
+import 'package:sixam_mart_store/util/typography.dart';
 import 'package:sixam_mart_store/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart_store/features/auth/widgets/store_registartion_success_bottom_sheet.dart';
 import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
@@ -127,9 +128,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   ).textTheme.bodyLarge?.color,
                   foregroundColor: authMuted(context),
                   textStyle: TextStyle(
-                    fontFamily: Get.locale?.languageCode == 'ka'
-                        ? 'MiliAuthGeorgian'
-                        : null,
+                    fontFamily: MiliTypography.bodyFamily,
+                    fontFamilyFallback: MiliTypography.fallback,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
