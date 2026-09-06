@@ -78,11 +78,12 @@ class MyApp extends StatelessWidget {
           initialRoute: RouteHelper.getSplashRoute(body),
           getPages: RouteHelper.routes,
           defaultTransition: Transition.topLevel,
-          transitionDuration: const Duration(milliseconds: 500),
+          transitionDuration: const Duration(milliseconds: 250),
           builder: (BuildContext context, widget) {
-            return MediaQuery(data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1)), child: Material(
+            return Material(
               child: SafeArea(
-                top: false, bottom: GetPlatform.isAndroid,
+                top: false,
+                bottom: true,
                 child: Stack(children: [
                   widget!,
 
@@ -102,7 +103,7 @@ class MyApp extends StatelessWidget {
 
                 ]),
               ),
-            ));
+            );
           },
         );
       });
