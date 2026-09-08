@@ -50,11 +50,11 @@ class CustomButtonWidget extends StatelessWidget {
           : transparent
           ? Colors.transparent
           : color ?? Theme.of(context).primaryColor,
-      minimumSize: Size(
-        width != null ? width! : 1170,
-        height != null ? height! : 50,
+      minimumSize: Size(width ?? 1170, height ?? 50),
+      padding: const EdgeInsets.symmetric(
+        horizontal: Dimensions.paddingSizeDefault,
+        vertical: Dimensions.paddingSizeExtraSmall,
       ),
-      padding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radius),
         side: isBorder
@@ -68,57 +68,37 @@ class CustomButtonWidget extends StatelessWidget {
     );
 
     return Padding(
-      padding: margin == null ? const EdgeInsets.all(0) : margin!,
+      padding: margin ?? EdgeInsets.zero,
       child: TextButton(
         onPressed: isLoading ? null : onPressed as void Function()?,
         style: flatButtonStyle,
-        child: isLoading
-            ? Center(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Keep the label's layout while busy so the action never jumps.
+            ExcludeSemantics(
+              excluding: isLoading,
+              child: Opacity(
+                opacity: isLoading ? 0 : 1,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(
-                      height: 15,
-                      width: 15,
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          textColor ?? Colors.white,
-                        ),
-                        strokeWidth: 2,
+                    if (icon != null) ...[
+                      Icon(
+                        icon,
+                        color: transparent
+                            ? Theme.of(context).primaryColor
+                            : iconColor ?? Theme.of(context).cardColor,
                       ),
-                    ),
-                    const SizedBox(width: Dimensions.paddingSizeSmall),
-
-                    Text(
-                      'loading'.tr,
-                      style: robotoMedium.copyWith(
-                        color: textColor ?? Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  icon != null
-                      ? Icon(
-                          icon,
-                          color: transparent
-                              ? Theme.of(context).primaryColor
-                              : iconColor ?? Theme.of(context).cardColor,
-                        )
-                      : const SizedBox(),
-                  SizedBox(
-                    width: icon != null ? Dimensions.paddingSizeSmall : 0,
-                  ),
-                  Flexible(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
+                      const SizedBox(width: Dimensions.paddingSizeSmall),
+                    ],
+                    Flexible(
                       child: Text(
                         buttonText,
                         textAlign: TextAlign.center,
-                        maxLines: 1,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: robotoBold.copyWith(
                           color:
                               textColor ??
@@ -127,12 +107,47 @@ class CustomButtonWidget extends StatelessWidget {
                                   : Theme.of(context).cardColor),
                           fontSize: fontSize ?? Dimensions.fontSizeLarge,
                           fontWeight: fontWeight,
+                          height: 1.2,
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+            ),
+            if (isLoading)
+              Positioned.fill(
+                child: Semantics(
+                  label: 'loading'.tr,
+                  liveRegion: true,
+                  child: Center(
+                    child: MediaQuery.disableAnimationsOf(context)
+                        ? Icon(
+                            Icons.hourglass_top_rounded,
+                            color:
+                                textColor ??
+                                (transparent
+                                    ? Theme.of(context).primaryColor
+                                    : Colors.white),
+                            size: 20,
+                          )
+                        : SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color:
+                                  textColor ??
+                                  (transparent
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.white),
+                              strokeWidth: 2,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
