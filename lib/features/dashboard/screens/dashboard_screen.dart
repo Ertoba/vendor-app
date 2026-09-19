@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:sixam_mart_store/common/widgets/navigation_safe_area.dart';
 import 'package:flutter/services.dart';
 import 'package:sixam_mart_store/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart_store/features/dashboard/widgets/out_of_stock_warning_bottom_sheet.dart';
@@ -121,6 +122,7 @@ class DashboardScreenState extends State<DashboardScreen> {
       },
       child: SafeArea(
         top: false,
+        bottom: false,
         child: Scaffold(
 
           floatingActionButton: !GetPlatform.isMobile || keyboardVisible ? null : Container(
@@ -144,8 +146,7 @@ class DashboardScreenState extends State<DashboardScreen> {
           ),
           floatingActionButtonLocation: !GetPlatform.isMobile ? null : FloatingActionButtonLocation.centerDocked,
 
-          bottomNavigationBar: !GetPlatform.isMobile ? const SizedBox() : Container(
-            height: 65,
+          bottomNavigationBar: !GetPlatform.isMobile ? const SizedBox() : BottomNavigationSurface(
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(Dimensions.radiusLarge)),
