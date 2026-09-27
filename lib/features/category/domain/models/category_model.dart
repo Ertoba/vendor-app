@@ -1,3 +1,5 @@
+import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
+
 class CategoryModel {
   int? id;
   String? name;
@@ -12,7 +14,9 @@ class CategoryModel {
   String? slug;
   int? featured;
   int? productsCount;
+  int? childesCount;
   String? imageFullUrl;
+  List<Translation>? translations;
 
   CategoryModel({
     this.id,
@@ -28,7 +32,9 @@ class CategoryModel {
     this.slug,
     this.featured,
     this.productsCount,
+    this.childesCount,
     this.imageFullUrl,
+    this.translations,
   });
 
   CategoryModel.fromJson(Map<String, dynamic> json) {
@@ -44,8 +50,15 @@ class CategoryModel {
     moduleId = json['module_id'];
     slug = json['slug'];
     featured = json['featured'];
-    productsCount = json['products_count'];
+    productsCount = json['items_count'];
+    childesCount = json['childes_count'];
     imageFullUrl = json['image_full_url'];
+    if (json['translations'] != null) {
+      translations = <Translation>[];
+      json['translations'].forEach((v) {
+        translations!.add(Translation.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -63,7 +76,11 @@ class CategoryModel {
     data['slug'] = slug;
     data['featured'] = featured;
     data['products_count'] = productsCount;
+    data['childes_count'] = childesCount;
     data['image_full_url'] = imageFullUrl;
+    if (translations != null) {
+      data['translations'] = translations!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }
