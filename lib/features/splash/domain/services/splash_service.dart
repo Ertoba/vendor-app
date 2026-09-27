@@ -31,4 +31,9 @@ class SplashService implements SplashServiceInterface {
     return splashRepositoryInterface.removeSharedData();
   }
 
+  @override
+  bool handleInitialTopicSubscription() {
+    return splashRepositoryInterface.handleInitialTopicSubscription();
+  }
+
 }

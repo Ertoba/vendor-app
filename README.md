@@ -2,7 +2,7 @@
 
 
 ## Getting Started
-## flutter sdk: 3.35.6
+## flutter sdk: 3.44.2
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
 
