@@ -1,4 +1,5 @@
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
+import 'package:sixam_mart_store/helper/type_converter.dart';
 
 class OrderDetailsModel {
   int? id;
@@ -18,6 +19,7 @@ class OrderDetailsModel {
   String? updatedAt;
   int? itemCampaignId;
   double? totalAddOnPrice;
+  bool? isEditable;
 
   OrderDetailsModel({
     this.id,
@@ -37,6 +39,7 @@ class OrderDetailsModel {
     this.updatedAt,
     this.itemCampaignId,
     this.totalAddOnPrice,
+    this.isEditable,
   });
 
   OrderDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -47,17 +50,32 @@ class OrderDetailsModel {
     itemDetails = json['item_details'] != null ? Item.fromJson(json['item_details']) : null;
     variation = [];
     foodVariation = [];
-    if (json['variation'] != null && json['variation'].isNotEmpty) {
-      if(json['variation'][0]['values'] != null) {
-        json['variation'].forEach((v) {
-          foodVariation!.add(FoodVariation.fromJson(v));
-        });
-      }else {
-        json['variation'].forEach((v) {
-          variation!.add(Variation.fromJson(v));
-        });
+    if  ( json [ 'variation' ]  !=   null   &&  json [ 'variation' ]  is   List    &&   ( json [ 'variation' ]  as   List ). isNotEmpty ) {
+      final   List   variationList   =   json [ 'variation' ]  as   List ;
+      final   firstVariation   =   variationList [ 0 ];
+      if  ( firstVariation   !=   null   &&     firstVariation [ 'values' ]  !=   null ) {
+        for  ( var   v   in   variationList ) {
+          if  ( v   !=   null )  foodVariation  ! . add ( FoodVariation . fromJson ( v ));
+        }
+      }  else  {
+        for  ( var   v   in   variationList ) {
+          if  ( v   !=   null )  variation  ! . add ( Variation . fromJson ( v ));
+        }
       }
     }
+    print("---------order model> ${json [ 'variation' ]}");
+    print("---------order model> $variation");
+    // if (json['variation'] != null && json['variation'].isNotEmpty) {
+    //   if(json['variation'][0]['values'] != null) {
+    //     json['variation'].forEach((v) {
+    //       foodVariation!.add(FoodVariation.fromJson(v));
+    //     });
+    //   }else {
+    //     json['variation'].forEach((v) {
+    //       variation!.add(Variation.fromJson(v));
+    //     });
+    //   }
+    // }
     if (json['add_ons'] != null) {
       addOns = [];
       json['add_ons'].forEach((v) {
@@ -73,6 +91,7 @@ class OrderDetailsModel {
     updatedAt = json['updated_at'];
     itemCampaignId = json['item_campaign_id'];
     totalAddOnPrice = json['total_add_on_price']?.toDouble();
+    isEditable = TypeConverter.getBool(json['is_editable']);
   }
 
   Map<String, dynamic> toJson() {
@@ -101,18 +120,21 @@ class OrderDetailsModel {
     data['updated_at'] = updatedAt;
     data['item_campaign_id'] = itemCampaignId;
     data['total_add_on_price'] = totalAddOnPrice;
+    data['is_editable'] = isEditable;
     return data;
   }
 }
 
 class AddOn {
+  int? id;
   String? name;
   double? price;
   int? quantity;
 
-  AddOn({this.name, this.price, this.quantity});
+  AddOn({this.id, this.name, this.price, this.quantity});
 
   AddOn.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
     name = json['name'];
     price = json['price'] != null ? json['price']?.toDouble() : 0.0;
     quantity = int.parse(json['quantity'].toString());
@@ -120,6 +142,7 @@ class AddOn {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
     data['name'] = name;
     data['price'] = price;
     data['quantity'] = quantity;

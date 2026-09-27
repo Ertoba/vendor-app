@@ -1650,5 +1650,8 @@
   "auth_ui_use_code": "ერთჯერადი კოდით შესვლა",
   "auth_ui_send_code": "გაგრძელება",
   "auth_ui_phone_hint": "ტელეფონის ნომერი",
-  "auth_ui_role": "პარტნიორი"
+  "auth_ui_role": "პარტნიორი",
+  "edit_this_order": "შეკვეთის რედაქტირება?",
+  "you_want_to_edit_this_order": "გსურთ ამ შეკვეთის რედაქტირება?",
+  "edit_history_log": "რედაქტირების ისტორია"
 }

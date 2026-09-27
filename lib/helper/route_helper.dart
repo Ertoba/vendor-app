@@ -49,6 +49,8 @@ import 'package:sixam_mart_store/features/html/screens/html_viewer_screen.dart';
 import 'package:sixam_mart_store/features/language/screens/language_screen.dart';
 import 'package:sixam_mart_store/features/notification/screens/notification_screen.dart';
 import 'package:sixam_mart_store/features/order/screens/order_details_screen.dart';
+import 'package:sixam_mart_store/features/order_edit/screens/add_new_items_screen.dart';
+import 'package:sixam_mart_store/features/order_edit/screens/edit_order_screen.dart';
 import 'package:sixam_mart_store/features/profile/screens/profile_screen.dart';
 import 'package:sixam_mart_store/features/profile/screens/update_profile_screen.dart';
 import 'package:sixam_mart_store/features/store/domain/models/review_model.dart';
@@ -79,6 +81,8 @@ class RouteHelper {
   static const String forgotPassword = '/forgot-password';
   static const String resetPassword = '/reset-password';
   static const String orderDetails = '/order-details';
+  static const String editOrder = '/edit-order';
+  static const String addNewItems = '/add-new-items';
   static const String profile = '/profile';
   static const String updateProfile = '/update-profile';
   static const String notification = '/notification';
@@ -164,6 +168,8 @@ class RouteHelper {
   ) => '$resetPassword?phone=${phone ?? ''}&token=$token&page=$page';
   static String getOrderDetailsRoute(int? orderID, {bool? fromNotification}) =>
       '$orderDetails?id=$orderID&from=${fromNotification.toString()}';
+  static String getEditOrderRoute(int orderId) => '$editOrder?id=$orderId';
+  static String getAddNewItemsRoute() => addNewItems;
   static String getProfileRoute() => profile;
   static String getUpdateProfileRoute() => updateProfile;
   static String getNotificationRoute({bool? fromNotification}) =>
@@ -415,6 +421,11 @@ class RouteHelper {
             );
       },
     ),
+    GetPage(
+      name: editOrder,
+      page: () => EditOrderScreen(orderId: int.parse(Get.parameters['id']!)),
+    ),
+    GetPage(name: addNewItems, page: () => const AddNewItemsScreen()),
     GetPage(name: profile, page: () => const ProfileScreen()),
     GetPage(name: updateProfile, page: () => UpdateProfileScreen()),
     GetPage(

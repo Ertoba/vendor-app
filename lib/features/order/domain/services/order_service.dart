@@ -2,6 +2,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart_store/api/api_client.dart';
 import 'package:sixam_mart_store/common/models/response_model.dart';
 import 'package:sixam_mart_store/features/order/domain/models/order_cancellation_body_model.dart';
+import 'package:sixam_mart_store/features/order/domain/models/edit_history_log_model.dart';
 import 'package:sixam_mart_store/features/order/domain/models/order_details_model.dart';
 import 'package:sixam_mart_store/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart_store/features/order/domain/models/update_status_body_model.dart';
@@ -30,6 +31,11 @@ class OrderService implements OrderServiceInterface {
   @override
   Future<List<OrderDetailsModel>?> getOrderDetails(int orderID) async {
     return await orderRepositoryInterface.getOrderDetails(orderID);
+  }
+
+  @override
+  Future<EditHistoryLogModel?> getEditHistoryLog(int orderId, int offset) async {
+    return await orderRepositoryInterface.getEditHistoryLog(orderId, offset);
   }
 
   @override

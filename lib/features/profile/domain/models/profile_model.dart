@@ -1,4 +1,5 @@
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
+import 'package:sixam_mart_store/helper/type_converter.dart';
 
 class ProfileModel {
   int? id;
@@ -252,6 +253,7 @@ class Store {
   double? minimumStockForWarning;
   MetaSeoData? metaData;
   bool? verifiedSeller;
+  bool? canEditOrder;
 
   Store({
     this.id,
@@ -308,6 +310,7 @@ class Store {
     this.isHalalActive,
     this.minimumStockForWarning,
     this.verifiedSeller,
+    this.canEditOrder,
   });
 
   Store.fromJson(Map<String, dynamic> json) {
@@ -371,6 +374,7 @@ class Store {
     minimumStockForWarning = json['minimum_stock_for_warning']?.toDouble();
     metaData = json['meta_data'] != null ? MetaSeoData.fromJson(json['meta_data']) : null;
     verifiedSeller = json['verified_seller'] == true || json['verified_seller'].toString() == '1';
+    canEditOrder = TypeConverter.getBool(json['can_edit_order']);
   }
 
   Map<String, dynamic> toJson() {
@@ -435,6 +439,7 @@ class Store {
     data['halal_tag_status'] = isHalalActive;
     data['minimum_stock_for_warning'] = minimumStockForWarning;
     data['verified_seller'] = verifiedSeller;
+    data['can_edit_order'] = canEditOrder;
     if (metaData != null) {
       data['meta_data'] = metaData!.toJson();
     }

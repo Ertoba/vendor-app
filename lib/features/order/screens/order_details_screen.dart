@@ -35,6 +35,8 @@ import 'package:sixam_mart_store/features/order/widgets/dialogue_image_widget.da
 import 'package:sixam_mart_store/features/order/widgets/order_item_widget.dart';
 import 'package:sixam_mart_store/features/order/widgets/slider_button_widget.dart';
 import 'package:sixam_mart_store/features/order/widgets/verify_delivery_sheet_widget.dart';
+import 'package:sixam_mart_store/features/order/widgets/edit_history_log_bottom_sheet_widget.dart';
+import 'package:sixam_mart_store/features/order_edit/controllers/order_edit_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -325,6 +327,67 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                   children: [
                                     const SizedBox(
                                       height: Dimensions.paddingSizeExtraSmall,
+                                    ),
+
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Wrap(
+                                        spacing: Dimensions.paddingSizeSmall,
+                                        children: [
+                                          if (controllerOrderModel.edited ?? false)
+                                            TextButton(
+                                              onPressed: () =>
+                                                  _showEditHistoryLog(
+                                                controllerOrderModel.id!,
+                                              ),
+                                              child: Text('edit_history_log'.tr),
+                                            ),
+                                          if (controllerOrderModel.orderStatus ==
+                                                  'pending' &&
+                                              (Get.find<ProfileController>()
+                                                          .profileModel
+                                                          ?.stores
+                                                          ?.isNotEmpty ??
+                                                      false) &&
+                                              (Get.find<ProfileController>()
+                                                      .profileModel!
+                                                      .stores!
+                                                      .first
+                                                      .canEditOrder ??
+                                                  false))
+                                            TextButton.icon(
+                                              onPressed: () {
+                                                Get.dialog(
+                                                  ConfirmationDialogWidget(
+                                                    icon: Images.warning,
+                                                    title: 'edit_this_order'.tr,
+                                                    description:
+                                                        'you_want_to_edit_this_order'
+                                                            .tr,
+                                                    onYesPressed: () {
+                                                      Get.back();
+                                                      Get.find<
+                                                              OrderEditController>()
+                                                          .initializeEditOrder(
+                                                        orderController
+                                                            .orderDetailsModel,
+                                                      );
+                                                      Get.toNamed(
+                                                        RouteHelper
+                                                            .getEditOrderRoute(
+                                                          controllerOrderModel
+                                                              .id!,
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                );
+                                              },
+                                              icon: const Icon(Icons.edit_outlined),
+                                              label: Text('edit_this_order'.tr),
+                                            ),
+                                        ],
+                                      ),
                                     ),
 
                                     /// general_info
@@ -3330,6 +3393,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
           ),
         ),
       ),
+    );
+  }
+
+  void _showEditHistoryLog(int orderId) {
+    Get.bottomSheet(
+      EditHistoryLogBottomSheetWidget(orderId: orderId),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
     );
   }
 

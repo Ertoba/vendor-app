@@ -1607,5 +1607,8 @@
   "auth_ui_use_code": "Sign in with a code",
   "auth_ui_send_code": "Continue",
   "auth_ui_phone_hint": "Phone number",
-  "auth_ui_role": "Partner"
+  "auth_ui_role": "Partner",
+  "edit_this_order": "Edit this order?",
+  "you_want_to_edit_this_order": "Do you want to edit this order?",
+  "edit_history_log": "Edit history"
 }

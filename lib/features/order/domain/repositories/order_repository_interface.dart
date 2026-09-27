@@ -6,6 +6,7 @@ abstract class OrderRepositoryInterface implements RepositoryInterface {
   Future<dynamic> getPaginatedOrderList(int offset, String status);
   Future<dynamic> updateOrderStatus(UpdateStatusBodyModel updateStatusBody, List<MultipartBody> proofAttachment);
   Future<dynamic> getOrderDetails(int orderID);
+  Future<dynamic> getEditHistoryLog(int orderId, int offset);
   Future<dynamic> getCancelReasons();
   Future<dynamic> sendDeliveredNotification(int? orderID);
   Future<void> setBluetoothAddress(String? address);
