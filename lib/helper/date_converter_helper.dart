@@ -99,6 +99,12 @@ class DateConverterHelper {
     ).format(DateTime.parse(dateTime));
   }
 
+  static String orderEditLogDateTime(String dateTime) {
+    final DateTime parsed =
+        DateTime.tryParse(dateTime)?.toLocal() ?? dateTimeStringToDate(dateTime);
+    return DateFormat('dd MMM yyyy hh:mm a', _dateLocale()).format(parsed);
+  }
+
   static bool isAvailable(
     String? start,
     String? end, {

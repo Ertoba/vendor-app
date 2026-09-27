@@ -16,4 +16,8 @@ class TypeConverter {
     }
     return result;
   }
+
+  static bool getBool(dynamic value){
+    return value == 'true' || value == true || value == 1 || value == '1';
+  }
 }

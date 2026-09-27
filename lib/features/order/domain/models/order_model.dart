@@ -1,3 +1,5 @@
+import 'package:sixam_mart_store/helper/type_converter.dart';
+
 class PaginatedOrderModel {
   int? totalSize;
   String? limit;
@@ -87,6 +89,13 @@ class OrderModel {
   double? extraPackagingAmount;
   double? referrerBonusAmount;
   double? bringChangeAmount;
+  bool? edited;
+  String? deliveryType;
+  double? deliveryTypeCharge;
+  double? proDiscount;
+  String? benefitType;
+  String? deliveryOfferType;
+  double? deliveryFeeReductionAmount;
 
   OrderModel({
     this.id,
@@ -145,6 +154,13 @@ class OrderModel {
     this.extraPackagingAmount,
     this.referrerBonusAmount,
     this.bringChangeAmount,
+    this.edited,
+    this.deliveryType,
+    this.deliveryTypeCharge,
+    this.proDiscount,
+    this.benefitType,
+    this.deliveryOfferType,
+    this.deliveryFeeReductionAmount,
   });
 
   OrderModel.fromJson(Map<String, dynamic> json) {
@@ -223,6 +239,13 @@ class OrderModel {
     extraPackagingAmount = json['extra_packaging_amount']?.toDouble();
     referrerBonusAmount = json['ref_bonus_amount']?.toDouble();
     bringChangeAmount = json['bring_change_amount']?.toDouble();
+    edited = TypeConverter.getBool(json['edited']);
+    deliveryType = json['delivery_type'];
+    deliveryTypeCharge = json['delivery_type_charge']?.toDouble();
+    proDiscount = json['pro_discount']?.toDouble();
+    benefitType = json['benefit_type'];
+    deliveryOfferType = json['delivery_offer_type'];
+    deliveryFeeReductionAmount = json['delivery_fee_reduction_amount']?.toDouble();
   }
 
   Map<String, dynamic> toJson() {
@@ -288,6 +311,13 @@ class OrderModel {
     data['extra_packaging_amount'] = extraPackagingAmount;
     data['ref_bonus_amount'] = referrerBonusAmount;
     data['bring_change_amount'] = bringChangeAmount;
+    data['edited'] = edited;
+    data['delivery_type'] = deliveryType;
+    data['delivery_type_charge'] = deliveryTypeCharge;
+    data['pro_discount'] = proDiscount;
+    data['benefit_type'] = benefitType;
+    data['delivery_offer_type'] = deliveryOfferType;
+    data['delivery_fee_reduction_amount'] = deliveryFeeReductionAmount;
     return data;
   }
 }

@@ -2766,5 +2766,8 @@
   "auth_ui_use_code": "Войти с кодом",
   "auth_ui_send_code": "Продолжить",
   "auth_ui_phone_hint": "Номер телефона",
-  "auth_ui_role": "Партнёр"
+  "auth_ui_role": "Партнёр",
+  "edit_this_order": "Редактировать заказ?",
+  "you_want_to_edit_this_order": "Вы хотите отредактировать этот заказ?",
+  "edit_history_log": "История изменений"
 }

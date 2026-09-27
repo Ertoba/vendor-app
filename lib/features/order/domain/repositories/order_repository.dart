@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart_store/api/api_client.dart';
 import 'package:sixam_mart_store/common/models/response_model.dart';
 import 'package:sixam_mart_store/features/order/domain/models/order_cancellation_body_model.dart';
+import 'package:sixam_mart_store/features/order/domain/models/edit_history_log_model.dart';
 import 'package:sixam_mart_store/features/order/domain/models/order_details_model.dart';
 import 'package:sixam_mart_store/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart_store/features/order/domain/models/update_status_body_model.dart';
@@ -57,8 +60,19 @@ class OrderRepository implements OrderRepositoryInterface {
     if(response.statusCode == 200) {
       orderDetailsModel = [];
       response.body.forEach((orderDetails) => orderDetailsModel!.add(OrderDetailsModel.fromJson(orderDetails)));
+      log( "Order details: ${orderDetailsModel.first.toJson()}");
     }
     return orderDetailsModel;
+  }
+
+  @override
+  Future<EditHistoryLogModel?> getEditHistoryLog(int orderId, int offset) async {
+    EditHistoryLogModel? editHistoryLogModel;
+    Response response = await apiClient.getData('${AppConstants.orderEditLogUri}$orderId&limit=10&offset=$offset');
+    if (response.statusCode == 200) {
+      editHistoryLogModel = EditHistoryLogModel.fromJson(response.body);
+    }
+    return editHistoryLogModel;
   }
 
   @override

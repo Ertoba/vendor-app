@@ -100,6 +100,9 @@ class AppConstants {
   static const String currentOrderDetailsUri = '/api/v1/vendor/order?order_id=';
   static const String modulesUri = '/api/v1/module';
   static const String updateOrderUri = '/api/v1/vendor/update-order-amount';
+  static const String editOrderUri = '/api/v1/vendor/update-order';
+  static const String orderEditLogUri =
+      '/api/v1/vendor/order-edit-log?order_id=';
   static const String orderCancellationUri =
       '/api/v1/customer/order/cancellation-reasons';
   static const String addCouponUri = '/api/v1/vendor/coupon/store';
