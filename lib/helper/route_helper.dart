@@ -14,6 +14,7 @@ import 'package:sixam_mart_store/features/reports/screens/reports_screen.dart';
 import 'package:sixam_mart_store/features/reports/tax/screens/tax_report_screen.dart';
 import 'package:sixam_mart_store/features/review/screens/customer_review_screen.dart';
 import 'package:sixam_mart_store/features/review/screens/review_reply_screen.dart';
+import 'package:sixam_mart_store/features/reels/screens/add_reel_screen.dart';
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
 import 'package:sixam_mart_store/features/profile/domain/models/profile_model.dart';
 import 'package:sixam_mart_store/features/banner/domain/models/store_banner_list_model.dart';
@@ -86,6 +87,7 @@ class RouteHelper {
   static const String profile = '/profile';
   static const String updateProfile = '/update-profile';
   static const String notification = '/notification';
+  static const String reels = '/reels';
   static const String bankInfo = '/bank-info';
   static const String wallet = '/wallet';
   static const String withdrawHistory = '/withdraw-history';
@@ -174,6 +176,7 @@ class RouteHelper {
   static String getUpdateProfileRoute() => updateProfile;
   static String getNotificationRoute({bool? fromNotification}) =>
       '$notification?from=${fromNotification.toString()}';
+  static String getReelsRoute() => reels;
   static String getBankInfoRoute() => bankInfo;
   static String getWalletRoute() => wallet;
   static String getWithdrawHistoryRoute() => withdrawHistory;
@@ -426,6 +429,7 @@ class RouteHelper {
       page: () => EditOrderScreen(orderId: int.parse(Get.parameters['id']!)),
     ),
     GetPage(name: addNewItems, page: () => const AddNewItemsScreen()),
+    GetPage(name: reels, page: () => const AddReelScreen()),
     GetPage(name: profile, page: () => const ProfileScreen()),
     GetPage(name: updateProfile, page: () => UpdateProfileScreen()),
     GetPage(

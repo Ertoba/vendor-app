@@ -199,6 +199,12 @@ class AppConstants {
       '/api/v1/vendor/advertisement/status';
   static const String copyAddAdvertisementUri =
       '/api/v1/vendor/advertisement/copy-add-post';
+  static const String getReelsUri = '/api/v1/vendor/reel/list';
+  static const String reelDetailsUri = '/api/v1/vendor/reel/details';
+  static const String addReelUri = '/api/v1/vendor/reel/store';
+  static const String updateReelUri = '/api/v1/vendor/reel/update';
+  static const String deleteReelUri = '/api/v1/vendor/reel/delete';
+  static const String changeReelStatusUri = '/api/v1/vendor/reel/status';
 
   ///Ai Product Content Generate
   static const String generateTitleAndDes =

@@ -1,5 +1,9 @@
 class Images {
   static const String logo = 'assets/image/logo.png';
+  static const String reelPreview = 'assets/image/reel_preview.png';
+  static const String reels = 'assets/image/reels.png';
+  static const String view = 'assets/image/view.png';
+  static const String delete = 'assets/image/delete.png';
   static const String splashScreen = 'assets/image/splash.png';
   static const String headerLogo = 'assets/image/header_logo.png';
   static const String authLogo = 'assets/image/auth_logo.png';
