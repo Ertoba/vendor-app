@@ -53,6 +53,10 @@ class ConfigModel {
   String? systemTaxType;
   int? systemTaxIncludeStatus;
   bool? openAiStatus;
+  ReelsModule? reelsModule;
+  ValidationConfig? validationConfig;
+  MaintenanceModeData? maintenanceModeData;
+  bool? storeCategoryStatus;
 
   ConfigModel({
     this.businessName,
@@ -109,6 +113,10 @@ class ConfigModel {
     this.systemTaxType,
     this.systemTaxIncludeStatus,
     this.openAiStatus,
+    this.reelsModule,
+    this.validationConfig,
+    this.maintenanceModeData,
+    this.storeCategoryStatus,
   });
 
   ConfigModel.fromJson(Map<String, dynamic> json) {
@@ -119,12 +127,18 @@ class ConfigModel {
     phone = json['phone'];
     email = json['email'];
     country = json['country'];
-    defaultLocation = json['default_location'] != null ? DefaultLocation.fromJson(json['default_location']) : null;
+    defaultLocation = json['default_location'] != null
+        ? DefaultLocation.fromJson(json['default_location'])
+        : null;
     currencySymbol = json['currency_symbol'];
     currencySymbolDirection = json['currency_symbol_direction'];
-    appMinimumVersionAndroid = json['app_minimum_version_android_store'] != null ? json['app_minimum_version_android_store']?.toDouble() : 0.0;
+    appMinimumVersionAndroid = json['app_minimum_version_android_store'] != null
+        ? json['app_minimum_version_android_store']?.toDouble()
+        : 0.0;
     appUrlAndroid = json['app_url_android_store'];
-    appMinimumVersionIos = json['app_minimum_version_ios_store'] != null ? json['app_minimum_version_ios_store']?.toDouble() : 0.0;
+    appMinimumVersionIos = json['app_minimum_version_ios_store'] != null
+        ? json['app_minimum_version_ios_store']?.toDouble()
+        : 0.0;
     appUrlIos = json['app_url_ios_store'];
     customerVerification = json['customer_verification'];
     scheduleOrder = json['schedule_order'];
@@ -149,12 +163,18 @@ class ConfigModel {
     toggleVegNonVeg = json['toggle_veg_non_veg'];
     toggleDmRegistration = json['toggle_dm_registration'];
     toggleStoreRegistration = json['toggle_store_registration'];
-    scheduleOrderSlotDuration = json['schedule_order_slot_duration'] == 0 ? 30 : json['schedule_order_slot_duration'];
+    scheduleOrderSlotDuration = json['schedule_order_slot_duration'] == 0
+        ? 30
+        : json['schedule_order_slot_duration'];
     digitAfterDecimalPoint = json['digit_after_decimal_point'];
     canceledByStore = json['canceled_by_store'];
-    moduleConfig = json['module_config'] != null ? ModuleConfig.fromJson(json['module_config']) : null;
+    moduleConfig = json['module_config'] != null
+        ? ModuleConfig.fromJson(json['module_config'])
+        : null;
     prescriptionOrderStatus = json['prescription_order_status'];
-    dmPictureUploadStatus = json['dm_picture_upload_status'] == 1 ? true : false;
+    dmPictureUploadStatus = json['dm_picture_upload_status'] == 1
+        ? true
+        : false;
     additionalChargeName = json['additional_charge_name'];
     disbursementType = json['disbursement_type'];
     if (json['active_payment_method_list'] != null) {
@@ -165,17 +185,43 @@ class ConfigModel {
     }
     minAmountToPayStore = json['min_amount_to_pay_store']?.toDouble();
     storeReviewReply = json['store_review_reply'] == 1 ? true : false;
-    adminCommission = json['admin_commission']?.toDouble();
-    subscriptionDeadlineWarningDays = json['subscription_deadline_warning_days'];
-    subscriptionDeadlineWarningMessage = json['subscription_deadline_warning_message'];
+    adminCommission = json['admin_commission'] != null
+        ? double.tryParse(json['admin_commission'].toString())
+        : null;
+    subscriptionDeadlineWarningDays =
+        json['subscription_deadline_warning_days'];
+    subscriptionDeadlineWarningMessage =
+        json['subscription_deadline_warning_message'];
     subscriptionFreeTrialDays = json['subscription_free_trial_days'];
-    subscriptionFreeTrialStatus = json['subscription_free_trial_status'] == 1 ? true : false;
+    subscriptionFreeTrialStatus = json['subscription_free_trial_status'] == 1
+        ? true
+        : false;
     subscriptionBusinessModel = json['subscription_business_model'];
     commissionBusinessModel = json['commission_business_model'];
     subscriptionFreeTrialType = json['subscription_free_trial_type'];
     systemTaxType = json['system_tax_type'];
     systemTaxIncludeStatus = json['system_tax_include_status'];
     openAiStatus = json['open_ai_status'] == 1 ? true : false;
+    reelsModule = json['reels_module'] != null
+        ? ReelsModule.fromJson(json['reels_module'])
+        : null;
+    validationConfig = json['validation_config'] != null
+        ? ValidationConfig.fromJson(json['validation_config'])
+        : ValidationConfig(
+            videoFormat: "mp4,webm,ogg",
+            videoExtension: ".mp4,.webm,.ogg",
+            productVideoMaxFileSize: 20,
+            maxFileSize: 2,
+            maxUploadFileCount: 5,
+          );
+    maintenanceModeData = json['maintenance_mode_data'] != null
+        ? MaintenanceModeData.fromJson(json['maintenance_mode_data'])
+        : null;
+    storeCategoryStatus =
+        json['store_category_status'] == true ||
+            json['store_category_status'] == 1
+        ? true
+        : false;
   }
 
   Map<String, dynamic> toJson() {
@@ -226,12 +272,17 @@ class ConfigModel {
     data['additional_charge_name'] = additionalChargeName;
     data['disbursement_type'] = disbursementType;
     if (activePaymentMethodList != null) {
-      data['active_payment_method_list'] = activePaymentMethodList!.map((v) => v.toJson()).toList();
+      data['active_payment_method_list'] = activePaymentMethodList!
+          .map((v) => v.toJson())
+          .toList();
     }
     data['min_amount_to_pay_store'] = minAmountToPayStore;
     data['store_review_reply'] = storeReviewReply;
-    data['subscription_deadline_warning_days'] = subscriptionDeadlineWarningDays;
-    data['subscription_deadline_warning_message'] = subscriptionDeadlineWarningMessage;
+    data['admin_commission'] = adminCommission;
+    data['subscription_deadline_warning_days'] =
+        subscriptionDeadlineWarningDays;
+    data['subscription_deadline_warning_message'] =
+        subscriptionDeadlineWarningMessage;
     data['subscription_free_trial_days'] = subscriptionFreeTrialDays;
     data['subscription_free_trial_status'] = subscriptionFreeTrialStatus;
     data['subscription_business_model'] = subscriptionBusinessModel;
@@ -240,6 +291,14 @@ class ConfigModel {
     data['system_tax_type'] = systemTaxType;
     data['system_tax_include_status'] = systemTaxIncludeStatus;
     data['open_ai_status'] = openAiStatus;
+    if (reelsModule != null) {
+      data['reels_module'] = reelsModule!.toJson();
+    }
+    data['validation_config'] = validationConfig;
+    if (maintenanceModeData != null) {
+      data['maintenance_mode_data'] = maintenanceModeData!.toJson();
+    }
+    data['store_category_status'] = storeCategoryStatus;
     return data;
   }
 }
@@ -290,7 +349,9 @@ class ModuleConfig {
 
   ModuleConfig.fromJson(Map<String, dynamic> json) {
     moduleType = json['module_type'].cast<String>();
-    module = json[moduleType![0]] != null ? Module.fromJson(json[moduleType![0]]) : null;
+    module = json[moduleType![0]] != null
+        ? Module.fromJson(json[moduleType![0]])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -335,7 +396,9 @@ class Module {
   });
 
   Module.fromJson(Map<String, dynamic> json) {
-    orderStatus = json['order_status'] != null ? OrderStatus.fromJson(json['order_status']) : null;
+    orderStatus = json['order_status'] != null
+        ? OrderStatus.fromJson(json['order_status'])
+        : null;
     orderPlaceToScheduleInterval = json['order_place_to_schedule_interval'];
     addOn = json['add_on'];
     stock = json['stock'];
@@ -413,6 +476,189 @@ class PaymentBody {
     data['gateway_title'] = getWayTitle;
     data['gateway_image_full_url'] = getWayImageFullUrl;
     data['storage'] = storageType;
+    return data;
+  }
+}
+
+class ReelsModule {
+  bool? vendorCanUploadReels;
+  int? reelsMaxUploadSizeMb;
+  int? reelsMaxDuration;
+  String? reelsMaxDurationUnit;
+  bool? reelsUploadLimitUnlimited;
+  int? reelsUploadLimit;
+  String? reelsUploadLimitType;
+
+  ReelsModule({
+    this.vendorCanUploadReels,
+    this.reelsMaxUploadSizeMb,
+    this.reelsMaxDuration,
+    this.reelsMaxDurationUnit,
+    this.reelsUploadLimitUnlimited,
+    this.reelsUploadLimit,
+    this.reelsUploadLimitType,
+  });
+
+  ReelsModule.fromJson(Map<String, dynamic> json) {
+    vendorCanUploadReels = json['vendor_can_upload_reels'] == 1;
+    reelsMaxUploadSizeMb = json['reels_max_upload_size_mb'] != null
+        ? int.parse(json['reels_max_upload_size_mb'].toString())
+        : null;
+    reelsMaxDuration = json['reels_max_duration'] != null
+        ? int.parse(json['reels_max_duration'].toString())
+        : null;
+    reelsMaxDurationUnit = json['reels_max_duration_unit'];
+    reelsUploadLimitUnlimited = json['reels_upload_limit_unlimited'] == 1;
+    reelsUploadLimit = json['reels_upload_limit'] != null
+        ? int.parse(json['reels_upload_limit'].toString())
+        : null;
+    reelsUploadLimitType = json['reels_upload_limit_type'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['vendor_can_upload_reels'] = vendorCanUploadReels == true ? 1 : 0;
+    data['reels_max_upload_size_mb'] = reelsMaxUploadSizeMb;
+    data['reels_max_duration'] = reelsMaxDuration;
+    data['reels_max_duration_unit'] = reelsMaxDurationUnit;
+    data['reels_upload_limit_unlimited'] = reelsUploadLimitUnlimited == true
+        ? 1
+        : 0;
+    data['reels_upload_limit'] = reelsUploadLimit;
+    data['reels_upload_limit_type'] = reelsUploadLimitType;
+    return data;
+  }
+}
+
+class ValidationConfig {
+  String videoFormat;
+  String videoExtension;
+  double productVideoMaxFileSize;
+  double maxFileSize;
+  int maxUploadFileCount;
+
+  ValidationConfig({
+    required this.videoFormat,
+    required this.videoExtension,
+    required this.productVideoMaxFileSize,
+    required this.maxFileSize,
+    // currently static
+    required this.maxUploadFileCount,
+  });
+
+  factory ValidationConfig.fromJson(Map<String, dynamic> json) {
+    return ValidationConfig(
+      videoFormat: json['video_format'] ?? '',
+      videoExtension: json['video_extension'] ?? '',
+      productVideoMaxFileSize:
+          num.tryParse(
+            json['product_video_max_file_size'].toString(),
+          )?.toDouble() ??
+          20,
+      maxFileSize:
+          num.tryParse(json['max_file_size'].toString())?.toDouble() ?? 2,
+      maxUploadFileCount:
+          num.tryParse(json['max_upload_file_count'].toString())?.toInt() ?? 5,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['video_format'] = videoFormat;
+    data['video_extension'] = videoExtension;
+    data['product_video_max_file_size'] = productVideoMaxFileSize;
+    data['max_file_size'] = maxFileSize;
+    data['max_upload_file_count'] = maxUploadFileCount;
+    return data;
+  }
+}
+
+class MaintenanceModeData {
+  List<String>? maintenanceSystemSetup;
+  MaintenanceDurationSetup? maintenanceDurationSetup;
+  MaintenanceMessageSetup? maintenanceMessageSetup;
+
+  MaintenanceModeData({
+    this.maintenanceSystemSetup,
+    this.maintenanceDurationSetup,
+    this.maintenanceMessageSetup,
+  });
+
+  MaintenanceModeData.fromJson(Map<String, dynamic> json) {
+    maintenanceSystemSetup = json['maintenance_system_setup'].cast<String>();
+    maintenanceDurationSetup = json['maintenance_duration_setup'] != null
+        ? MaintenanceDurationSetup.fromJson(json['maintenance_duration_setup'])
+        : null;
+    maintenanceMessageSetup = json['maintenance_message_setup'] != null
+        ? MaintenanceMessageSetup.fromJson(json['maintenance_message_setup'])
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['maintenance_system_setup'] = maintenanceSystemSetup;
+    if (maintenanceDurationSetup != null) {
+      data['maintenance_duration_setup'] = maintenanceDurationSetup!.toJson();
+    }
+    if (maintenanceMessageSetup != null) {
+      data['maintenance_message_setup'] = maintenanceMessageSetup!.toJson();
+    }
+    return data;
+  }
+}
+
+class MaintenanceDurationSetup {
+  String? maintenanceDuration;
+  String? startDate;
+  String? endDate;
+
+  MaintenanceDurationSetup({
+    this.maintenanceDuration,
+    this.startDate,
+    this.endDate,
+  });
+
+  MaintenanceDurationSetup.fromJson(Map<String, dynamic> json) {
+    maintenanceDuration = json['maintenance_duration'];
+    startDate = json['start_date'];
+    endDate = json['end_date'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['maintenance_duration'] = maintenanceDuration;
+    data['start_date'] = startDate;
+    data['end_date'] = endDate;
+    return data;
+  }
+}
+
+class MaintenanceMessageSetup {
+  int? businessNumber;
+  int? businessEmail;
+  String? maintenanceMessage;
+  String? messageBody;
+
+  MaintenanceMessageSetup({
+    this.businessNumber,
+    this.businessEmail,
+    this.maintenanceMessage,
+    this.messageBody,
+  });
+
+  MaintenanceMessageSetup.fromJson(Map<String, dynamic> json) {
+    businessNumber = json['business_number'];
+    businessEmail = json['business_email'];
+    maintenanceMessage = json['maintenance_message'];
+    messageBody = json['message_body'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['business_number'] = businessNumber;
+    data['business_email'] = businessEmail;
+    data['maintenance_message'] = maintenanceMessage;
+    data['message_body'] = messageBody;
     return data;
   }
 }

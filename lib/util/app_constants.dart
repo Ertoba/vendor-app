@@ -39,6 +39,24 @@ class AppConstants {
   static const String withdrawRequestUri = '/api/v1/vendor/request-withdraw';
   static const String categoryUri = '/api/v1/vendor/categories';
   static const String subCategoryUri = '/api/v1/vendor/categories/childes/';
+  static const String storeCategoryListUri =
+      '/api/v1/vendor/store-category/list';
+  static const String storeCategoryCreateUri =
+      '/api/v1/vendor/store-category/store';
+  static const String storeCategoryUpdateUri =
+      '/api/v1/vendor/store-category/update';
+  static const String storeCategoryDeleteUri =
+      '/api/v1/vendor/store-category/delete';
+  static const String storeCategoryStatusUri =
+      '/api/v1/vendor/store-category/status';
+  static const String storeCategoryItemsUri =
+      '/api/v1/vendor/store-category/items';
+  static const String assignFoodToCategoryUri =
+      '/api/v1/vendor/store-category/assignable-items';
+  static const String assignFoodsUri =
+      '/api/v1/vendor/store-category/assign-items';
+  static const String storeCategoryDetailsUri =
+      '/api/v1/vendor/store-category/details';
   static const String addonUri = '/api/v1/vendor/addon';
   static const String addAddonUri = '/api/v1/vendor/addon/store';
   static const String updateAddonUri = '/api/v1/vendor/addon/update';
