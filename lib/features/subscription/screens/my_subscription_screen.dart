@@ -26,12 +26,34 @@ class _MySubscriptionScreenState extends State<MySubscriptionScreen> with Ticker
 
   late final TabController _tabController;
 
+  double _getCommissionPercentage(SubscriptionController subscriptionController) {
+    final stores = subscriptionController.profileModel?.stores;
+    final storeCommission = stores != null && stores.isNotEmpty ? stores.first.comission : null;
+
+    if(storeCommission != null && storeCommission > 0) {
+      return storeCommission;
+    }
+
+    return Get.find<SplashController>().configModel?.adminCommission ?? 0;
+  }
+
+  String _formatCommissionPercentage(double commission) {
+    return commission == commission.roundToDouble() ? commission.toStringAsFixed(0) : commission.toString();
+  }
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
 
+    initCall();
+  }
+
+  Future<void> initCall() async {
     if(Get.find<AuthController>().isLoggedIn()) {
+      if(Get.find<ProfileController>().profileModel == null) {
+       await Get.find<ProfileController>().getProfile();
+      }
       Get.find<SubscriptionController>().getProfile(Get.find<ProfileController>().profileModel);
     } else {
       Get.find<SubscriptionController>().getProfile(Get.find<AuthController>().profileModel);
@@ -62,9 +84,10 @@ class _MySubscriptionScreenState extends State<MySubscriptionScreen> with Ticker
   Widget build(BuildContext context) {
     return GetBuilder<SubscriptionController>(builder: (subscriptionController) {
 
-      bool businessIsCommission = subscriptionController.profileModel!.stores![0].storeBusinessModel == 'commission';
-      bool businessIsNone = subscriptionController.profileModel!.stores![0].storeBusinessModel == 'none';
-      bool businessIsUnsubscribed = subscriptionController.profileModel!.stores![0].storeBusinessModel == 'unsubscribed';
+      bool businessIsCommission = subscriptionController.profileModel != null ? subscriptionController.profileModel!.stores![0].storeBusinessModel == 'commission' : false;
+      bool businessIsNone = subscriptionController.profileModel != null ?  subscriptionController.profileModel!.stores![0].storeBusinessModel == 'none' : false;
+      bool businessIsUnsubscribed = subscriptionController.profileModel != null ?  subscriptionController.profileModel!.stores![0].storeBusinessModel == 'unsubscribed' : false;
+      final String commissionPercentageText = _formatCommissionPercentage(_getCommissionPercentage(subscriptionController));
 
       return PopScope(
         canPop: Navigator.canPop(context),
@@ -123,9 +146,7 @@ class _MySubscriptionScreenState extends State<MySubscriptionScreen> with Ticker
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '${Get.find<ProfileController>().profileModel != null && Get.find<ProfileController>().profileModel!.stores?[0].comission != null && Get.find<ProfileController>().profileModel!.stores![0].comission! > 0
-                                ? Get.find<ProfileController>().profileModel!.stores![0].comission!
-                                :  Get.find<SplashController>().configModel?.adminCommission} %',
+                            '$commissionPercentageText %',
                             style: robotoBold.copyWith(color: Colors.teal, fontSize: 24),
                           ),
                           const SizedBox(width: Dimensions.paddingSizeSmall),
@@ -140,7 +161,7 @@ class _MySubscriptionScreenState extends State<MySubscriptionScreen> with Ticker
                     const SizedBox(height: Dimensions.paddingSizeDefault),
 
                     Text(
-                      "${'vendor_will_pay'.tr} ${Get.find<SplashController>().configModel!.adminCommission}% ${'commission_to'.tr} ${Get.find<SplashController>().configModel!.businessName} ${'from_each_order_You_will_get_access_of_all'.tr}",
+                      "${'vendor_will_pay'.tr} $commissionPercentageText% ${'commission_to'.tr} ${Get.find<SplashController>().configModel?.businessName ?? ''} ${'from_each_order_You_will_get_access_of_all'.tr}",
                       style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7), height: 2), textAlign: TextAlign.start,
                     )
 

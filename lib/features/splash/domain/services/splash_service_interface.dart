@@ -6,4 +6,5 @@ abstract class SplashServiceInterface {
   bool showIntro();
   void setIntro(bool intro);
   Future<bool> removeSharedData();
+  bool handleInitialTopicSubscription();
 }

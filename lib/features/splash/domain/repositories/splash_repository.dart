@@ -1,3 +1,5 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart_store/api/api_client.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
@@ -75,6 +77,21 @@ class SplashRepository implements SplashRepositoryInterface {
   @override
   Future update(Map<String, dynamic> body) {
     throw UnimplementedError();
+  }
+
+  @override
+  bool handleInitialTopicSubscription() {
+    try{
+      if(!GetPlatform.isWeb) {
+        FirebaseMessaging.instance.subscribeToTopic(AppConstants.topic);
+        FirebaseMessaging.instance.subscribeToTopic(AppConstants.maintenanceModeTopic);
+      }
+      print('====Topic Subscription Successful');
+      return true;
+    }catch(e) {
+      debugPrint('Topic Subscription Failed, $e');
+      return false;
+    }
   }
 
 }
