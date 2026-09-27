@@ -100,6 +100,16 @@ class MenuScreen extends StatelessWidget {
       );
     }
 
+    if (Get.find<SplashController>().configModel?.reelsModule?.vendorCanUploadReels == true) {
+      menuList.add(
+        MenuModel(
+          icon: Images.reels,
+          title: 'reels'.tr,
+          route: RouteHelper.getReelsRoute(),
+        ),
+      );
+    }
+
     if (modulePermission.campaign!) {
       menuList.add(
         MenuModel(

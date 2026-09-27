@@ -106,6 +106,11 @@ import 'package:sixam_mart_store/features/profile/domain/repositories/profile_re
 import 'package:sixam_mart_store/features/profile/domain/repositories/profile_repository_interface.dart';
 import 'package:sixam_mart_store/features/profile/domain/services/profile_service.dart';
 import 'package:sixam_mart_store/features/profile/domain/services/profile_service_interface.dart';
+import 'package:sixam_mart_store/features/reels/controllers/reels_controller.dart';
+import 'package:sixam_mart_store/features/reels/domain/repositories/reel_repository.dart';
+import 'package:sixam_mart_store/features/reels/domain/repositories/reel_repository_interface.dart';
+import 'package:sixam_mart_store/features/reels/domain/services/reel_service.dart';
+import 'package:sixam_mart_store/features/reels/domain/services/reel_service_interface.dart';
 import 'package:sixam_mart_store/features/rental_module/reports/controllers/taxi_report_controller.dart';
 import 'package:sixam_mart_store/features/rental_module/reports/domain/repositories/taxi_report_repository.dart';
 import 'package:sixam_mart_store/features/rental_module/reports/domain/repositories/taxi_report_repository_interface.dart';
@@ -252,6 +257,9 @@ Future<Map<String, Map<String, String>>> init() async {
   AdvertisementRepositoryInterface advertisementRepositoryInterface = AdvertisementRepository(apiClient: Get.find());
   Get.lazyPut(() => advertisementRepositoryInterface);
 
+  ReelRepositoryInterface reelRepositoryInterface = ReelRepository(apiClient: Get.find());
+  Get.lazyPut(() => reelRepositoryInterface);
+
   AiRepositoryInterface aiRepositoryInterface = AiRepository(apiClient: Get.find());
   Get.lazyPut(() => aiRepositoryInterface);
 
@@ -353,6 +361,9 @@ Future<Map<String, Map<String, String>>> init() async {
   AdvertisementServiceInterface advertisementServiceInterface = AdvertisementService(advertisementRepositoryInterface: Get.find());
   Get.lazyPut(() => advertisementServiceInterface);
 
+  ReelServiceInterface reelServiceInterface = ReelService(reelRepositoryInterface: Get.find());
+  Get.lazyPut(() => reelServiceInterface);
+
   AiServiceInterface aiServiceInterface = AiService(aiRepositoryInterface: Get.find());
   Get.lazyPut(() => aiServiceInterface);
 
@@ -407,6 +418,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => StoreController(storeServiceInterface: Get.find()));
   Get.lazyPut(() => SubscriptionController(subscriptionServiceInterface: Get.find()));
   Get.lazyPut(() => AdvertisementController(advertisementServiceInterface: Get.find()));
+  Get.lazyPut(() => ReelsController(reelServiceInterface: Get.find()));
   Get.lazyPut(() => AiController(aiServiceInterface: Get.find()));
 
   ///Taxi module Controllers
