@@ -51,147 +51,229 @@ class AiController extends GetxController implements GetxService {
   String _requestType = '';
   String get requestType => _requestType;
 
-  void setRequestType(String type, {bool willUpdate = true}){
+  void setRequestType(String type, {bool willUpdate = true}) {
     _requestType = type;
-    if(willUpdate) {
+    if (willUpdate) {
       update();
     }
   }
 
-  void setKeyWord(String? name, {bool willUpdate = true}){
+  void setKeyWord(String? name, {bool willUpdate = true}) {
     _keyWordList.add(name);
-    if(willUpdate) {
+    if (willUpdate) {
       update();
     }
   }
 
-  void initializeKeyWords(){
+  void initializeKeyWords() {
     _keyWordList = [];
   }
 
-  void removeKeyWord(int index){
+  void removeKeyWord(int index) {
     _keyWordList.removeAt(index);
     update();
   }
 
-  Future<void> generateTitleAndDes({required String title, required String langCode}) async {
+  ({String storeId, String moduleType, int moduleId}) _requestContext() {
+    final profile = Get.find<ProfileController>().profileModel;
+    final store = profile?.stores?.isNotEmpty == true
+        ? profile!.stores!.first
+        : null;
+    final module = store?.module;
+    if (profile?.id == null ||
+        module?.moduleType == null ||
+        module?.id == null) {
+      throw StateError('AI request context is not ready');
+    }
+    return (
+      storeId: profile!.id.toString(),
+      moduleType: module!.moduleType!,
+      moduleId: module.id!,
+    );
+  }
+
+  Future<void> generateTitleAndDes({
+    required String title,
+    required String langCode,
+  }) async {
+    if (_titleLoading) return;
     _titleLoading = true;
+    _titleDesModel = null;
     update();
 
-    TitleDesModel? titleDesModel = await aiServiceInterface.generateTitleAndDes(
-      title: title, langCode: langCode, storeId: Get.find<ProfileController>().profileModel!.id.toString(),
-      moduleType: Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType!, generateFrom: _requestType,
-    );
-    if(titleDesModel != null){
-      _titleDesModel = titleDesModel;
+    try {
+      final context = _requestContext();
+      _titleDesModel = await aiServiceInterface.generateTitleAndDes(
+        title: title,
+        langCode: langCode,
+        storeId: context.storeId,
+        moduleType: context.moduleType,
+        generateFrom: _requestType,
+      );
+    } catch (error) {
+      debugPrint('AI title and description generation failed: $error');
+    } finally {
+      _titleLoading = false;
+      update();
     }
-
-    _titleLoading = false;
-    update();
   }
 
-  Future<void> generateOtherData({required String title, required String description}) async {
+  Future<void> generateOtherData({
+    required String title,
+    required String description,
+  }) async {
+    if (_otherDataLoading) return;
     _otherDataLoading = true;
+    _otherDataModel = null;
     update();
 
-    OtherDataModel? otherDataModel = await aiServiceInterface.generateOtherData(
-      title: title, description: description, storeId: Get.find<ProfileController>().profileModel!.id.toString(),
-      moduleType: Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType!, generateFrom: _requestType,
-      moduleId: Get.find<ProfileController>().profileModel!.stores![0].module!.id!,
-    );
-    if(otherDataModel != null){
-      _otherDataModel = otherDataModel;
+    try {
+      final context = _requestContext();
+      _otherDataModel = await aiServiceInterface.generateOtherData(
+        title: title,
+        description: description,
+        storeId: context.storeId,
+        moduleType: context.moduleType,
+        generateFrom: _requestType,
+        moduleId: context.moduleId,
+      );
+    } catch (error) {
+      debugPrint('AI other data generation failed: $error');
+    } finally {
+      _otherDataLoading = false;
+      update();
     }
-
-    _otherDataLoading = false;
-    update();
   }
 
-  Future<void> generateVariationData({required String title, required String description}) async {
+  Future<void> generateVariationData({
+    required String title,
+    required String description,
+  }) async {
+    if (_variationDataLoading) return;
     _variationDataLoading = true;
+    _variationDataModel = null;
     update();
 
-    VariationDataModel? variationDataModel = await aiServiceInterface.generateVariationData(
-      title: title, description: description, storeId: Get.find<ProfileController>().profileModel!.id.toString(),
-      moduleType: Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType!, generateFrom: _requestType,
-    );
-    if(variationDataModel != null){
-      _variationDataModel = variationDataModel;
+    try {
+      final context = _requestContext();
+      _variationDataModel = await aiServiceInterface.generateVariationData(
+        title: title,
+        description: description,
+        storeId: context.storeId,
+        moduleType: context.moduleType,
+        generateFrom: _requestType,
+      );
+    } catch (error) {
+      debugPrint('AI variation generation failed: $error');
+    } finally {
+      _variationDataLoading = false;
+      update();
     }
-
-    _variationDataLoading = false;
-    update();
   }
 
-  Future<void> generateAttributeData({required String title, required String description}) async {
+  Future<void> generateAttributeData({
+    required String title,
+    required String description,
+  }) async {
+    if (_variationDataLoading) return;
     _variationDataLoading = true;
+    _attributeDataModel = null;
     update();
 
-    AttributeDataModel? attributeDataModel = await aiServiceInterface.generateAttributeData(
-      title: title, description: description, storeId: Get.find<ProfileController>().profileModel!.id.toString(),
-      moduleType: Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType!, generateFrom: _requestType,
-    );
-
-    if(attributeDataModel != null){
-      _attributeDataModel = attributeDataModel;
+    try {
+      final context = _requestContext();
+      _attributeDataModel = await aiServiceInterface.generateAttributeData(
+        title: title,
+        description: description,
+        storeId: context.storeId,
+        moduleType: context.moduleType,
+        generateFrom: _requestType,
+      );
+    } catch (error) {
+      debugPrint('AI attribute generation failed: $error');
+    } finally {
+      _variationDataLoading = false;
+      update();
     }
-
-    _variationDataLoading = false;
-    update();
   }
 
   Future<void> generateTitleSuggestions() async {
+    if (_isLoading) return;
     _isLoading = true;
+    _titleSuggestionModel = null;
     update();
 
-    String keyWord = '';
-    for (var element in _keyWordList) {
-      keyWord = keyWord + (keyWord.isEmpty ? '' : ',') + element!.replaceAll(' ', '');
-    }
+    try {
+      final context = _requestContext();
+      final keyWord = _keyWordList
+          .whereType<String>()
+          .map((element) => element.replaceAll(' ', ''))
+          .where((element) => element.isNotEmpty)
+          .join(',');
 
-    TitleSuggestionModel? titleSuggestionModel = await aiServiceInterface.generateTitleSuggestions(
-      keywords: keyWord, storeId: Get.find<ProfileController>().profileModel!.id.toString(),
-      moduleType: Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType!,
-    );
-    if(titleSuggestionModel != null){
-      _titleSuggestionModel = titleSuggestionModel;
+      _titleSuggestionModel = await aiServiceInterface.generateTitleSuggestions(
+        keywords: keyWord,
+        storeId: context.storeId,
+        moduleType: context.moduleType,
+      );
+    } catch (error) {
+      debugPrint('AI title suggestion generation failed: $error');
+    } finally {
+      _isLoading = false;
+      update();
     }
-
-    _isLoading = false;
-    update();
   }
 
   Future<Response> generateFromImage({required XFile image}) async {
+    if (_imageLoading) {
+      return const Response(
+        statusCode: 409,
+        statusText: 'AI image analysis is already running',
+      );
+    }
     _imageLoading = true;
     update();
 
-    XFile compressedImage = await compressImageFile(imageFile: File(image.path), quality: 10, format: CompressFormat.jpeg);
-
-    Response response = await aiServiceInterface.generateFromImage(image: compressedImage);
-
-    _imageLoading = false;
-    update();
-    return response;
+    try {
+      final compressedImage = await compressImageFile(
+        imageFile: File(image.path),
+        quality: 10,
+        format: CompressFormat.jpeg,
+      );
+      return await aiServiceInterface.generateFromImage(image: compressedImage);
+    } catch (error) {
+      debugPrint('AI image analysis failed: $error');
+      return Response(statusCode: 1, statusText: error.toString());
+    } finally {
+      _imageLoading = false;
+      update();
+    }
   }
 
-  Future<XFile> compressImageFile({required File imageFile, int quality = 80, CompressFormat format = CompressFormat.jpeg}) async {
+  Future<XFile> compressImageFile({
+    required File imageFile,
+    int quality = 80,
+    CompressFormat format = CompressFormat.jpeg,
+  }) async {
+    final time = DateTime.now().microsecondsSinceEpoch;
+    final targetPath = path.join(
+      Directory.systemTemp.path,
+      'imagetemp-${format.name}-$quality-$time.${format.name}',
+    );
 
-    DateTime time = DateTime.now();
-    final String targetPath = path.join(Directory.systemTemp.path, 'imagetemp-${format.name}-$quality-${time.second}.${format.name}');
-
-    final XFile? compressedImageFile = await FlutterImageCompress.compressAndGetFile(
+    final compressedImageFile = await FlutterImageCompress.compressAndGetFile(
       imageFile.path,
       targetPath,
       quality: quality,
       format: format,
-      minHeight: 800, minWidth: 800,
+      minHeight: 800,
+      minWidth: 800,
     );
 
-    if (compressedImageFile == null){
-      throw ("Image compression failed! Please try again.");
+    if (compressedImageFile == null) {
+      throw StateError('Image compression failed');
     }
-    debugPrint("Compressed image saved to: ${compressedImageFile.path}");
+    debugPrint('Compressed image saved to: ${compressedImageFile.path}');
     return compressedImageFile;
   }
-
 }

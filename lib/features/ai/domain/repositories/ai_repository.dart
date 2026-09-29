@@ -16,21 +16,55 @@ class AiRepository implements AiRepositoryInterface {
   final Random _random = Random();
   AiRepository({required this.apiClient});
 
+  String _uriWithQuery(String path, Map<String, String> queryParameters) {
+    return Uri(path: path, queryParameters: queryParameters).toString();
+  }
+
   @override
-  Future<TitleDesModel?> generateTitleAndDes({required String title, required String langCode, required String storeId, required String moduleType, required String generateFrom}) async {
+  Future<TitleDesModel?> generateTitleAndDes({
+    required String title,
+    required String langCode,
+    required String storeId,
+    required String moduleType,
+    required String generateFrom,
+  }) async {
     TitleDesModel? titleDesModel;
-    Response response = await apiClient.getData('${AppConstants.generateTitleAndDes}?name=$title&langCode=$langCode&store_id=$storeId&module_type=$moduleType&requestType=$generateFrom');
-    if(response.statusCode == 200) {
+    Response response = await apiClient.getData(
+      _uriWithQuery(AppConstants.generateTitleAndDes, {
+        'name': title,
+        'langCode': langCode,
+        'store_id': storeId,
+        'module_type': moduleType,
+        'requestType': generateFrom,
+      }),
+    );
+    if (response.statusCode == 200 && response.body is Map) {
       titleDesModel = TitleDesModel.fromJson(response.body);
     }
     return titleDesModel;
   }
 
   @override
-  Future<OtherDataModel?> generateOtherData({required String title, required String description, required String storeId, required String moduleType, required String generateFrom, required int moduleId}) async {
+  Future<OtherDataModel?> generateOtherData({
+    required String title,
+    required String description,
+    required String storeId,
+    required String moduleType,
+    required String generateFrom,
+    required int moduleId,
+  }) async {
     OtherDataModel? otherDataModel;
-    Response response = await apiClient.getData('${AppConstants.generateOtherData}?name=$title&description=$description&store_id=$storeId&module_type=$moduleType&requestType=$generateFrom&module_id=$moduleId');
-    if(response.statusCode == 200) {
+    Response response = await apiClient.getData(
+      _uriWithQuery(AppConstants.generateOtherData, {
+        'name': title,
+        'description': description,
+        'store_id': storeId,
+        'module_type': moduleType,
+        'requestType': generateFrom,
+        'module_id': moduleId.toString(),
+      }),
+    );
+    if (response.statusCode == 200 && response.body is Map) {
       otherDataModel = OtherDataModel.fromJson(response.body);
       otherDataModel.priceData ??= PriceData();
 
@@ -38,36 +72,76 @@ class AiRepository implements AiRepositoryInterface {
 
       priceData.discountType = 'percent';
       priceData.totalStock = _generateTotalStock();
-      priceData.maxOrderQuantity = _generateMaxOrderQuantity(priceData.totalStock!);
+      priceData.maxOrderQuantity = _generateMaxOrderQuantity(
+        priceData.totalStock!,
+      );
     }
     return otherDataModel;
   }
 
   @override
-  Future<VariationDataModel?> generateVariationData({required String title, required String description, required String storeId, required String moduleType, required String generateFrom}) async {
+  Future<VariationDataModel?> generateVariationData({
+    required String title,
+    required String description,
+    required String storeId,
+    required String moduleType,
+    required String generateFrom,
+  }) async {
     VariationDataModel? variationDataModel;
-    Response response = await apiClient.getData('${AppConstants.generateVariationData}?name=$title&description=$description&store_id=$storeId&module_type=$moduleType&requestType=$generateFrom');
-    if(response.statusCode == 200) {
+    Response response = await apiClient.getData(
+      _uriWithQuery(AppConstants.generateVariationData, {
+        'name': title,
+        'description': description,
+        'store_id': storeId,
+        'module_type': moduleType,
+        'requestType': generateFrom,
+      }),
+    );
+    if (response.statusCode == 200 && response.body is Map) {
       variationDataModel = VariationDataModel.fromJson(response.body);
     }
     return variationDataModel;
   }
 
   @override
-  Future<AttributeDataModel?> generateAttributeData({required String title, required String description, required String storeId, required String moduleType, required String generateFrom}) async {
+  Future<AttributeDataModel?> generateAttributeData({
+    required String title,
+    required String description,
+    required String storeId,
+    required String moduleType,
+    required String generateFrom,
+  }) async {
     AttributeDataModel? attributeDataModel;
-    Response response = await apiClient.getData('${AppConstants.generateVariationData}?name=$title&description=$description&store_id=$storeId&module_type=$moduleType&requestType=$generateFrom');
-    if(response.statusCode == 200) {
+    Response response = await apiClient.getData(
+      _uriWithQuery(AppConstants.generateVariationData, {
+        'name': title,
+        'description': description,
+        'store_id': storeId,
+        'module_type': moduleType,
+        'requestType': generateFrom,
+      }),
+    );
+    if (response.statusCode == 200 && response.body is Map) {
       attributeDataModel = AttributeDataModel.fromJson(response.body);
     }
     return attributeDataModel;
   }
 
   @override
-  Future<TitleSuggestionModel?> generateTitleSuggestions({required String keywords, required String storeId, required String moduleType,}) async {
+  Future<TitleSuggestionModel?> generateTitleSuggestions({
+    required String keywords,
+    required String storeId,
+    required String moduleType,
+  }) async {
     TitleSuggestionModel? titleSuggestionModel;
-    Response response = await apiClient.getData('${AppConstants.generateTitleSuggestion}?keywords=$keywords&store_id=$storeId&module_type=$moduleType');
-    if(response.statusCode == 200) {
+    Response response = await apiClient.getData(
+      _uriWithQuery(AppConstants.generateTitleSuggestion, {
+        'keywords': keywords,
+        'store_id': storeId,
+        'module_type': moduleType,
+      }),
+    );
+    if (response.statusCode == 200 && response.body is Map) {
       titleSuggestionModel = TitleSuggestionModel.fromJson(response.body);
     }
     return titleSuggestionModel;
@@ -76,8 +150,17 @@ class AiRepository implements AiRepositoryInterface {
   @override
   Future<Response> generateFromImage({required XFile image}) async {
     Map<String, String> fields = {};
-    Response response = await apiClient.postMultipartData(AppConstants.generateFromImage, fields, [MultipartBody('image', image)]);
-    return response;
+    return apiClient
+        .postMultipartData(AppConstants.generateFromImage, fields, [
+          MultipartBody('image', image),
+        ])
+        .timeout(
+          const Duration(seconds: 45),
+          onTimeout: () => const Response(
+            statusCode: 1,
+            statusText: ApiClient.noInternetMessage,
+          ),
+        );
   }
 
   @override
@@ -112,5 +195,4 @@ class AiRepository implements AiRepositoryInterface {
   int _generateMaxOrderQuantity(int totalStock) {
     return totalStock > 2 ? totalStock - 2 : totalStock;
   }
-
 }

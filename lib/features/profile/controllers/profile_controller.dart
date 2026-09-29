@@ -4,6 +4,7 @@ import 'package:sixam_mart_store/features/auth/controllers/auth_controller.dart'
 import 'package:sixam_mart_store/features/auth/domain/models/module_permission_model.dart';
 import 'package:sixam_mart_store/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_store/features/profile/domain/models/profile_model.dart';
+import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
 import 'package:get/get.dart';
@@ -43,25 +44,53 @@ class ProfileController extends GetxController implements GetxService {
     update();
   }
 
-  void hideLowStockWarning(){
+  void hideLowStockWarning() {
     _showLowStockWarning = !_showLowStockWarning;
   }
 
   Future<void> getProfile() async {
     ProfileModel? profileModel = await profileServiceInterface.getProfileInfo();
+
     if (profileModel != null) {
       _profileModel = profileModel;
-      Get.find<SplashController>().setModule(_profileModel!.stores![0].module!.id, _profileModel!.stores![0].module!.moduleType);
-      profileServiceInterface.updateHeader(_profileModel!.stores![0].module!.id);
+
+      final store = _profileModel?.stores?.isNotEmpty == true
+          ? _profileModel!.stores!.first
+          : null;
+      final module = store?.module;
+
+      if (module?.id != null && module?.moduleType != null) {
+        Get.find<SplashController>().setModule(module!.id, module.moduleType);
+
+        profileServiceInterface.updateHeader(module.id);
+
+        if (module.moduleType == 'ecommerce' &&
+            Get.isRegistered<StoreController>()) {
+          try {
+            await Get.find<StoreController>().getBrandList(null);
+          } catch (error) {
+            debugPrint('Brand list preload failed: $error');
+          }
+        }
+      }
+
       _allowModulePermission(_profileModel?.roles);
     }
+
     update();
   }
 
-  Future<bool> updateUserInfo(ProfileModel updateUserModel, String token) async {
+  Future<bool> updateUserInfo(
+    ProfileModel updateUserModel,
+    String token,
+  ) async {
     _isLoading = true;
     update();
-    bool isSuccess = await profileServiceInterface.updateProfile(updateUserModel, _pickedFile, token);
+    bool isSuccess = await profileServiceInterface.updateProfile(
+      updateUserModel,
+      _pickedFile,
+      token,
+    );
     _isLoading = false;
     if (isSuccess) {
       await getProfile();
@@ -74,7 +103,7 @@ class ProfileController extends GetxController implements GetxService {
 
   void pickImage() async {
     XFile? picked = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if(picked != null) {
+    if (picked != null) {
       _pickedFile = picked;
     }
     update();
@@ -89,7 +118,7 @@ class ProfileController extends GetxController implements GetxService {
       showCustomSnackBar(responseModel.message, isError: false);
       Get.find<AuthController>().clearSharedData();
       Get.offAllNamed(RouteHelper.getSignInRoute());
-    }else{
+    } else {
       Get.back();
       showCustomSnackBar(responseModel.message, isError: true);
     }
@@ -133,10 +162,33 @@ class ProfileController extends GetxController implements GetxService {
       );
     } else {
       _modulePermissionBody = ModulePermissionModel(
-        dashboard: true, profile: true, order: true, pos: true, item: true, addon: true, category: true, campaign: true, coupon: true, banner: true,
-        advertisement: true, advertisementList: true, deliveryman: true, deliverymanList: true, wallet: true, walletMethod: true, role: true,
-        employee: true, expenseReport: true, disbursementReport: true, vatReport: true, storeSetup: true, notificationSetup: true,
-        myShop: true, businessPlan: true, reviews: true, chat: true,
+        dashboard: true,
+        profile: true,
+        order: true,
+        pos: true,
+        item: true,
+        addon: true,
+        category: true,
+        campaign: true,
+        coupon: true,
+        banner: true,
+        advertisement: true,
+        advertisementList: true,
+        deliveryman: true,
+        deliverymanList: true,
+        wallet: true,
+        walletMethod: true,
+        role: true,
+        employee: true,
+        expenseReport: true,
+        disbursementReport: true,
+        vatReport: true,
+        storeSetup: true,
+        notificationSetup: true,
+        myShop: true,
+        businessPlan: true,
+        reviews: true,
+        chat: true,
       );
     }
   }
@@ -147,7 +199,11 @@ class ProfileController extends GetxController implements GetxService {
 
   Future<bool> trialWidgetShow({required String route}) async {
     const Set<String> routesToHideWidget = {
-      RouteHelper.mySubscription, 'show-dialog', RouteHelper.success, RouteHelper.payment, RouteHelper.signIn,
+      RouteHelper.mySubscription,
+      'show-dialog',
+      RouteHelper.success,
+      RouteHelper.payment,
+      RouteHelper.signIn,
     };
     _trialWidgetNotShow = routesToHideWidget.contains(route);
     Future.delayed(const Duration(milliseconds: 500), () {
@@ -156,7 +212,7 @@ class ProfileController extends GetxController implements GetxService {
     return _trialWidgetNotShow;
   }
 
-  void initTrialWidgetNotShow(){
+  void initTrialWidgetNotShow() {
     _trialWidgetNotShow = false;
   }
 
@@ -164,5 +220,4 @@ class ProfileController extends GetxController implements GetxService {
     _backgroundNotification = isActive;
     update();
   }
-
 }
