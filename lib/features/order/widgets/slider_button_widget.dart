@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:vibration/vibration.dart';
 
@@ -28,7 +31,7 @@ class SliderButton extends StatefulWidget {
   final Alignment alignLabel;
   final BoxShadow boxShadow;
   final Widget icon;
-  final Function action;
+  final FutureOr<dynamic> Function() action;
 
   ///Make it false if you want to deactivate the shimmer effect.
   final bool shimmer;
@@ -81,6 +84,9 @@ class SliderButton extends StatefulWidget {
 class SliderButtonState extends State<SliderButton> {
   bool? flag;
   Widget? _child;
+  bool _isSubmitting = false;
+
+  bool get _isDisabled => widget.disable || _isSubmitting;
 
   @override
   void initState() {
@@ -91,14 +97,20 @@ class SliderButtonState extends State<SliderButton> {
 
   @override
   Widget build(BuildContext context) {
-    return flag == true ? _control() : widget.dismissible == true ? Container() : Container(child: _control());
+    return _isSubmitting
+        ? _control()
+        : flag == true
+        ? _control()
+        : widget.dismissible == true
+        ? Container()
+        : Container(child: _control());
   }
 
   Widget _control() => Container(
     height: widget.height,
     width: widget.width,
     decoration: BoxDecoration(
-      color: widget.disable ? Colors.grey.shade700 : widget.backgroundColor,
+      color: _isDisabled ? Colors.grey.shade700 : widget.backgroundColor,
       borderRadius: BorderRadius.circular(widget.radius),
     ),
     alignment: Alignment.centerLeft,
@@ -107,70 +119,146 @@ class SliderButtonState extends State<SliderButton> {
       children: <Widget>[
         Container(
           alignment: widget.alignLabel,
-          child: widget.shimmer && !widget.disable ? Shimmer(
-            color: widget.highlightedColor,
-            child: widget.label!,
-          ) : widget.label,
-        ),
-        widget.disable ? Tooltip(
-          verticalOffset: 50,
-          message: 'Button is disabled',
-          child: Container(
-            width: widget.width - (widget.height), height: widget.height,
-            alignment: widget.isLtr! ? Alignment.centerLeft : Alignment.centerRight,
-            padding: EdgeInsets.only(left: (widget.height - widget.buttonSize) / 2),
-            child: _child ?? Container(
-              height: widget.buttonSize, width: widget.buttonSize,
-              decoration: BoxDecoration(
-                boxShadow: [widget.boxShadow],
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(widget.radius),
-              ),
-              child: Center(child: widget.icon),
-            ),
-          )) : Dismissible(
-            key: const Key("cancel"),
-            direction: DismissDirection.startToEnd,
-            dismissThresholds: {
-              DismissDirection.startToEnd: widget.dismissThresholds
-            },
-            ///gives direction of swipping in argument.
-            onDismissed: (dir) async {
-              setState(() {
-                if (widget.dismissible) {
-                  flag = false;
-                } else {
-                  flag = !flag!;
-                }
-              });
-
-              widget.action();
-              if (widget.vibrationFlag &&
-                  (await Vibration.hasVibrator())) {
-                try {
-                  Vibration.vibrate(duration: 200);
-                } catch (e) {
-                  if (kDebugMode) {
-                    print(e);
-                  }
-                }
-              }
-            },
-            child: Container(
-              width: widget.width - (widget.height), height: widget.height,
-              alignment: widget.isLtr! ? Alignment.centerLeft : Alignment.centerRight,
-              padding: EdgeInsets.only(left: (widget.height - widget.buttonSize) / 2),
-              child: _child ?? Container(
-                height: widget.buttonSize, width: widget.buttonSize,
-                decoration: BoxDecoration(
-                  boxShadow: [widget.boxShadow],
-                  color: widget.buttonColor,
-                  borderRadius: BorderRadius.circular(widget.radius),
-                ),
-                child: Center(child: widget.icon),
-              ),
-            ),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 180),
+            child: _isSubmitting
+                ? Row(
+                    key: const ValueKey('slider_processing'),
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: widget.highlightedColor,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'processing'.tr,
+                        style: TextStyle(color: widget.highlightedColor),
+                      ),
+                    ],
+                  )
+                : FittedBox(
+                    key: const ValueKey('slider_idle'),
+                    fit: BoxFit.scaleDown,
+                    child: widget.shimmer && !_isDisabled
+                        ? Shimmer(
+                            color: widget.highlightedColor,
+                            child: widget.label!,
+                          )
+                        : widget.label,
+                  ),
           ),
+        ),
+        _isDisabled
+            ? Tooltip(
+                verticalOffset: 50,
+                message: 'Button is disabled',
+                child: Container(
+                  width: widget.width - (widget.height),
+                  height: widget.height,
+                  alignment: widget.isLtr!
+                      ? Alignment.centerLeft
+                      : Alignment.centerRight,
+                  padding: EdgeInsets.only(
+                    left: (widget.height - widget.buttonSize) / 2,
+                  ),
+                  child:
+                      _child ??
+                      Container(
+                        height: widget.buttonSize,
+                        width: widget.buttonSize,
+                        decoration: BoxDecoration(
+                          boxShadow: [widget.boxShadow],
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(widget.radius),
+                        ),
+                        child: Center(
+                          child: _isSubmitting
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : widget.icon,
+                        ),
+                      ),
+                ),
+              )
+            : Dismissible(
+                key: const Key("cancel"),
+                direction: DismissDirection.startToEnd,
+                dismissThresholds: {
+                  DismissDirection.startToEnd: widget.dismissThresholds,
+                },
+
+                ///gives direction of swipping in argument.
+                onDismissed: (dir) async {
+                  if (_isSubmitting) {
+                    return;
+                  }
+                  setState(() {
+                    _isSubmitting = true;
+                    if (widget.dismissible) {
+                      flag = false;
+                    } else {
+                      flag = !flag!;
+                    }
+                  });
+
+                  try {
+                    await Future.sync(widget.action);
+                    if (widget.vibrationFlag &&
+                        (await Vibration.hasVibrator())) {
+                      try {
+                        Vibration.vibrate(duration: 200);
+                      } catch (e) {
+                        if (kDebugMode) {
+                          print(e);
+                        }
+                      }
+                    }
+                  } catch (error) {
+                    if (kDebugMode) {
+                      debugPrint('Slider action failed: $error');
+                    }
+                  } finally {
+                    if (mounted) {
+                      setState(() {
+                        _isSubmitting = false;
+                      });
+                    }
+                  }
+                },
+                child: Container(
+                  width: widget.width - (widget.height),
+                  height: widget.height,
+                  alignment: widget.isLtr!
+                      ? Alignment.centerLeft
+                      : Alignment.centerRight,
+                  padding: EdgeInsets.only(
+                    left: (widget.height - widget.buttonSize) / 2,
+                  ),
+                  child:
+                      _child ??
+                      Container(
+                        height: widget.buttonSize,
+                        width: widget.buttonSize,
+                        decoration: BoxDecoration(
+                          boxShadow: [widget.boxShadow],
+                          color: widget.buttonColor,
+                          borderRadius: BorderRadius.circular(widget.radius),
+                        ),
+                        child: Center(child: widget.icon),
+                      ),
+                ),
+              ),
         const SizedBox.expand(),
       ],
     ),
