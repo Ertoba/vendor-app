@@ -19,36 +19,52 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'helper/get_di.dart' as di;
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Map<String, Map<String, String>> languages = await di.init();
 
-  if(GetPlatform.isAndroid) {
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: "AIzaSyCc3OCd5I2xSlnftZ4bFAbuCzMhgQHLivA",
-        appId: "1:491987943015:android:9795ba69e89c684b8f1ec2",
-        messagingSenderId: "491987943015",
-        projectId: "stackmart-500c7",
-      ),
-    );
-  }else {
-    await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp().timeout(const Duration(seconds: 15));
+  } catch (error, stackTrace) {
+    debugPrint('Firebase init failed: $error');
+    debugPrintStack(stackTrace: stackTrace);
   }
 
   NotificationBodyModel? body;
+
   try {
-    if (GetPlatform.isMobile) {
-      final RemoteMessage? remoteMessage = await FirebaseMessaging.instance.getInitialMessage();
+    if (GetPlatform.isMobile && Firebase.apps.isNotEmpty) {
+      final RemoteMessage? remoteMessage = await FirebaseMessaging.instance
+          .getInitialMessage()
+          .timeout(
+            const Duration(seconds: 8),
+            onTimeout: () {
+              debugPrint('Firebase getInitialMessage timeout');
+              return null;
+            },
+          );
+
       if (remoteMessage != null) {
         body = NotificationHelper.convertNotification(remoteMessage.data);
       }
-      await NotificationHelper.initialize(flutterLocalNotificationsPlugin);
+
+      try {
+        await NotificationHelper.initialize(
+          flutterLocalNotificationsPlugin,
+        ).timeout(const Duration(seconds: 8));
+      } catch (error) {
+        debugPrint('Notification init skipped: $error');
+      }
+
       FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
     }
-  }catch(_) {}
+  } catch (error, stackTrace) {
+    debugPrint('Firebase messaging init failed: $error');
+    debugPrintStack(stackTrace: stackTrace);
+  }
 
   runApp(MyApp(languages: languages, body: body));
 }
@@ -60,56 +76,105 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+    );
 
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness: Brightness.dark,
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ));
-
-    return GetBuilder<ThemeController>(builder: (themeController) {
-      return GetBuilder<LocalizationController>(builder: (localizeController) {
-        return GetMaterialApp(
-          title: AppConstants.appName,
-          debugShowCheckedModeBanner: false,
-          navigatorKey: Get.key,
-          theme: themeController.darkTheme ? dark : light,
-          locale: localizeController.locale,
-          translations: Messages(languages: languages),
-          fallbackLocale: Locale(AppConstants.languages[0].languageCode!, AppConstants.languages[0].countryCode),
-          initialRoute: RouteHelper.getSplashRoute(body),
-          getPages: RouteHelper.routes,
-          defaultTransition: Transition.topLevel,
-          transitionDuration: const Duration(milliseconds: 500),
-          builder: (BuildContext context, widget) {
-            return MediaQuery(data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1)), child: Material(
-              child: SafeArea(
-                top: false, bottom: GetPlatform.isAndroid,
-                child: Stack(children: [
-                  widget!,
-
-                  GetBuilder<ProfileController>(builder: (profileController) {
-                    bool canShow = profileController.profileModel != null && profileController.profileModel!.subscription != null
-                        && profileController.profileModel!.subscription!.isTrial == 1 && profileController.profileModel!.subscription!.status == 1
-                        && DateConverterHelper.differenceInDaysIgnoringTime(DateTime.parse(profileController.profileModel!.subscription!.expiryDate!), null) > 0;
-
-                    return canShow && !profileController.trialWidgetNotShow ? Align(
-                      alignment: Alignment.bottomRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 90),
-                        child: TrialWidget(subscription: profileController.profileModel!.subscription!),
-                      ),
-                    ) : const SizedBox();
-                  }),
-
-                ]),
+    return GetBuilder<ThemeController>(
+      builder: (themeController) {
+        return GetBuilder<LocalizationController>(
+          builder: (localizeController) {
+            return GetMaterialApp(
+              title: AppConstants.appName,
+              debugShowCheckedModeBanner: false,
+              navigatorKey: Get.key,
+              theme: themeController.darkTheme ? dark : light,
+              locale: localizeController.locale,
+              translations: Messages(languages: languages),
+              fallbackLocale: Locale(
+                AppConstants.languages[0].languageCode!,
+                AppConstants.languages[0].countryCode,
               ),
-            ));
+              initialRoute: RouteHelper.getSplashRoute(body),
+              getPages: RouteHelper.routes,
+              defaultTransition: Transition.topLevel,
+              transitionDuration: const Duration(milliseconds: 500),
+              builder: (BuildContext context, widget) {
+                return MediaQuery(
+                  data: MediaQuery.of(
+                    context,
+                  ).copyWith(textScaler: const TextScaler.linear(1)),
+                  child: Material(
+                    child: SafeArea(
+                      top: false,
+                      bottom: GetPlatform.isAndroid,
+                      child: Stack(
+                        children: [
+                          widget!,
+
+                          GetBuilder<ProfileController>(
+                            builder: (profileController) {
+                              bool canShow =
+                                  profileController.profileModel != null &&
+                                  profileController
+                                          .profileModel!
+                                          .subscription !=
+                                      null &&
+                                  profileController
+                                          .profileModel!
+                                          .subscription!
+                                          .isTrial ==
+                                      1 &&
+                                  profileController
+                                          .profileModel!
+                                          .subscription!
+                                          .status ==
+                                      1 &&
+                                  DateConverterHelper.differenceInDaysIgnoringTime(
+                                        DateTime.parse(
+                                          profileController
+                                              .profileModel!
+                                              .subscription!
+                                              .expiryDate!,
+                                        ),
+                                        null,
+                                      ) >
+                                      0;
+
+                              return canShow &&
+                                      !profileController.trialWidgetNotShow
+                                  ? Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 90,
+                                        ),
+                                        child: TrialWidget(
+                                          subscription: profileController
+                                              .profileModel!
+                                              .subscription!,
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
           },
         );
-      });
-    });
+      },
+    );
   }
 }
