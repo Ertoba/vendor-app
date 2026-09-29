@@ -1,4 +1,5 @@
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
+import 'package:sixam_mart_store/helper/type_converter.dart';
 
 class ProfileModel {
   int? id;
@@ -220,7 +221,7 @@ class Store {
   bool? itemSection;
   double? avgRating;
   int? ratingCount;
-  int? totalOrder;
+  String? totalOrder;
   int? totalItems;
   bool? active;
   bool? gstStatus;
@@ -249,9 +250,11 @@ class Store {
   bool? extraPackagingStatus;
   double? extraPackagingAmount;
   bool? isHalalActive;
-  double? minimumStockForWarning;
+  bool? showLowStockCount;
+  int? minimumStockForWarning;
   MetaSeoData? metaData;
   bool? verifiedSeller;
+  bool? canEditOrder;
 
   Store({
     this.id,
@@ -306,8 +309,10 @@ class Store {
     this.extraPackagingStatus,
     this.extraPackagingAmount,
     this.isHalalActive,
+    this.showLowStockCount,
     this.minimumStockForWarning,
     this.verifiedSeller,
+    this.canEditOrder,
   });
 
   Store.fromJson(Map<String, dynamic> json) {
@@ -335,7 +340,7 @@ class Store {
     avgRating = json['avg_rating']?.toDouble();
     ratingCount = json['rating_count'];
     totalItems = json['total_items'];
-    totalOrder = json['total_order'];
+    totalOrder = json['total_order'].toString();
     active = json['active'];
     gstStatus = json['gst_status'];
     gstCode = json['gst_code'];
@@ -368,9 +373,11 @@ class Store {
     extraPackagingStatus = json['extra_packaging_status'] ?? false;
     extraPackagingAmount = json['extra_packaging_amount']?.toDouble();
     isHalalActive = json['halal_tag_status'] ?? false;
-    minimumStockForWarning = json['minimum_stock_for_warning']?.toDouble();
+    showLowStockCount = (json['show_low_stock_count'] == 1 || json['show_low_stock_count'] == true) ? true : false;
+    minimumStockForWarning = int.tryParse(json['minimum_stock_for_warning'].toString()) ?? 0;
     metaData = json['meta_data'] != null ? MetaSeoData.fromJson(json['meta_data']) : null;
-    verifiedSeller = json['verified_seller'] == true || json['verified_seller'].toString() == '1';
+    verifiedSeller = (json['verified_seller'] == 1 || json['verified_seller'] == true);
+    canEditOrder = TypeConverter.getBool(json['can_edit_order']);
   }
 
   Map<String, dynamic> toJson() {
@@ -433,11 +440,13 @@ class Store {
     data['extra_packaging_status'] = extraPackagingStatus;
     data['extra_packaging_amount'] = extraPackagingAmount;
     data['halal_tag_status'] = isHalalActive;
+    data['show_low_stock_count'] = showLowStockCount;
     data['minimum_stock_for_warning'] = minimumStockForWarning;
-    data['verified_seller'] = verifiedSeller;
     if (metaData != null) {
       data['meta_data'] = metaData!.toJson();
     }
+    data['verified_seller'] = verifiedSeller;
+    data['can_edit_order'] = canEditOrder;
     return data;
   }
 }
@@ -702,12 +711,12 @@ class Subscription {
   int? review;
   int? selfDelivery;
   int? status;
-  int? isTrial;
+  String? isTrial;
   int? totalPackageRenewed;
   String? createdAt;
   String? updatedAt;
   String? renewedAt;
-  int? isCanceled;
+  String? isCanceled;
   String? canceledBy;
   int? validity;
   Package? package;
@@ -749,12 +758,12 @@ class Subscription {
     review = json['review'] ?? 0;
     selfDelivery = json['self_delivery'];
     status = json['status'];
-    isTrial = json['is_trial'];
+    isTrial = json['is_trial'].toString();
     totalPackageRenewed = json['total_package_renewed'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     renewedAt = json['renewed_at'];
-    isCanceled = json['is_canceled'];
+    isCanceled = json['is_canceled'].toString();
     canceledBy = json['canceled_by'];
     validity = json['validity'];
     package = json['package'] != null ? Package.fromJson(json['package']) : null;

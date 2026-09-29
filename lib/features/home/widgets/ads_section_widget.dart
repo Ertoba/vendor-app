@@ -33,22 +33,20 @@ class AdsSectionWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
                 child: Row(children: [
 
-                  Expanded(
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                      Text('want_to_get_highlighted'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge), maxLines: 2, overflow: TextOverflow.ellipsis),
-                      const SizedBox(height: Dimensions.paddingSizeSmall),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    Text('want_to_get_highlighted'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+                    const SizedBox(height: Dimensions.paddingSizeSmall),
 
-                      Text(
-                        'in_the_customer_app_and_websites'.tr,
-                        style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.7)),
-                        maxLines: 2, overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: Dimensions.paddingSizeSmall),
+                    Text(
+                      'in_the_customer_app_and_websites'.tr,
+                      textAlign: TextAlign.center,
+                      style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.7)),
+                    ),
+                    const SizedBox(height: Dimensions.paddingSizeSmall),
 
-                    ]),
-                  ),
+                  ]),
 
                 ]),
               ),
@@ -69,11 +67,11 @@ class AdsSectionWidget extends StatelessWidget {
 
         Positioned(
           bottom: 15, left: 15,
-          width: 160,
+          width: 120,
           child: CustomButtonWidget(
             buttonText: 'create_ads'.tr,
             fontWeight: FontWeight.w500,
-            fontSize: Dimensions.fontSizeSmall,
+            fontSize: Dimensions.fontSizeDefault,
             onPressed: (){
               Get.toNamed(RouteHelper.getCreateAdvertisementRoute());
             },

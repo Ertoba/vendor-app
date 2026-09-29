@@ -90,6 +90,7 @@ class Item {
   int? itemId;
   int? isPrescriptionRequired;
   int? brandId;
+  String? brandName;
   int? isHalal;
   int? halalTagStatus;
   List<String?>? nutrition;
@@ -107,7 +108,12 @@ class Item {
   String? metaTitle;
   String? metaDescription;
   String? metaImageFullUrl;
+  String? videoFullUrl;
+  String? videoLink;
+  double? videoSize;
   MetaSeoData? metaData;
+  int? storeCategoryId;
+  String? storeCategoryName;
 
   Item({
     this.id,
@@ -149,6 +155,7 @@ class Item {
     this.itemId,
     this.isPrescriptionRequired,
     this.brandId,
+    this.brandName,
     this.isHalal,
     this.halalTagStatus,
     this.nutrition,
@@ -166,7 +173,12 @@ class Item {
     this.metaTitle,
     this.metaDescription,
     this.metaImageFullUrl,
+    this.videoFullUrl,
+    this.videoLink,
+    this.videoSize,
     this.metaData,
+    this.storeCategoryId,
+    this.storeCategoryName,
   });
 
   Item.fromJson(Map<String, dynamic> json) {
@@ -257,6 +269,7 @@ class Item {
     itemId = json['item_id'] != null ? int.parse(json['item_id'].toString()) : null;
     isPrescriptionRequired = json['is_prescription_required'] != null ? int.parse(json['is_prescription_required'].toString()) : 0;
     brandId = json['brand_id'];
+    brandName = json['brand_name'];
     isHalal = json['is_halal'];
     halalTagStatus = json['halal_tag_status'];
     if(json['nutritions_name'] != null) {
@@ -309,10 +322,23 @@ class Item {
       taxData = <TaxData>[];
       json['tax_data'].forEach((v) { taxData!.add(TaxData.fromJson(v)); });
     }
+    if ((taxVatIds == null || taxVatIds!.isEmpty) && taxData != null && taxData!.isNotEmpty) {
+      taxVatIds = [];
+      for (final tax in taxData!) {
+        if (tax.id != null) {
+          taxVatIds!.add(tax.id!);
+        }
+      }
+    }
     metaTitle = json['meta_title'];
     metaDescription = json['meta_description'];
     metaImageFullUrl = json['meta_image'];
+    videoFullUrl = json['video_full_url'];
+    videoLink = json['video_link'];
+    videoSize = double.tryParse(json['video_size'].toString());
     metaData = json['meta_data'] != null ? MetaSeoData.fromJson(json['meta_data']) : null;
+    storeCategoryId = json['store_category_id'];
+    storeCategoryName = json['store_category_name'];
   }
 
   Map<String, dynamic> toJson() {
@@ -369,6 +395,7 @@ class Item {
     data['item_id'] = itemId;
     data['is_prescription_required'] = isPrescriptionRequired;
     data['brand_id'] = brandId;
+    data['brand_name'] = brandName;
     data['is_halal'] = isHalal;
     data['halal_tag_status'] = halalTagStatus;
     if (nutrition != null) {
@@ -402,9 +429,14 @@ class Item {
     data['meta_title'] = metaTitle;
     data['meta_description'] = metaDescription;
     data['meta_image'] = metaImageFullUrl;
+    data['video_full_url'] = videoFullUrl;
+    data['video_link'] = videoLink;
+    data['video_size'] = videoSize;
     if (metaData != null) {
       data['meta_data'] = metaData!.toJson();
     }
+    data['store_category_id'] = storeCategoryId;
+    data['store_category_name'] = storeCategoryName;
     return data;
   }
 }
@@ -702,4 +734,3 @@ class TaxData {
     return data;
   }
 }
-

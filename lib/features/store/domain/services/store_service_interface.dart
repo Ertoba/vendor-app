@@ -21,7 +21,7 @@ abstract class StoreServiceInterface {
   Future<List<AttributeModel>?> getAttributeList(Item? item);
   Future<bool> updateStoreBasicInfo(Store store, XFile? logo, XFile? cover, List<Translation> translation, XFile? metaImage);
   Future<bool> updateStore(Store store, String min, String max, String type);
-  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName);
+  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, XFile? video, String? videoLink, bool isVideoLink, bool removeSavedVideo, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName,);
   Future<bool> deleteItem(int? itemID, bool pendingItem);
   Future<List<ReviewModel>?> getStoreReviewList(int? storeID, String? searchText);
   Future<List<ReviewModel>?> getItemReviewList(int? itemID);
@@ -35,8 +35,8 @@ abstract class StoreServiceInterface {
   Future<XFile?> pickImageFromGallery();
   bool hasAttributeData(List<AttributeModel>? attributeList);
   int setUnitIndex (List<UnitModel>? unitList, Item? item, int unitIndex);
-  List<VariantTypeModel>? variationTypeList(List<AttributeModel>? attributeList, Item? item, {bool enforceBrandModelCompatibility = false});
-  int totalStock(List<AttributeModel>? attributeList, Item? item, {bool enforceBrandModelCompatibility = false});
+  List<VariantTypeModel>? variationTypeList(List<AttributeModel>? attributeList, Item? item);
+  int totalStock(List<AttributeModel>? attributeList, Item? item);
   List<VariationModelBodyModel>? setExistingVariation(List<FoodVariation>? variationList);
   Future<List<BrandModel>?> getBrandList();
   int? setBrandIndex(List<BrandModel>? brands, Item? item);

@@ -21,133 +21,47 @@ class CustomButtonWidget extends StatelessWidget {
   final bool isLoading;
   final bool isBorder;
   final Color? borderColor;
-  const CustomButtonWidget({
-    super.key,
-    this.onPressed,
-    required this.buttonText,
-    this.transparent = false,
-    this.margin,
-    this.iconColor,
-    this.isLoading = false,
-    this.width,
-    this.height,
-    this.fontSize,
-    this.color,
-    this.icon,
-    this.radius = Dimensions.radiusDefault,
-    this.fontWeight,
-    this.isViewReply = false,
-    this.textColor,
-    this.isBorder = false,
-    this.borderColor,
-  });
+  const CustomButtonWidget({super.key, this.onPressed, required this.buttonText, this.transparent = false, this.margin, this.iconColor, this.isLoading = false,
+    this.width, this.height, this.fontSize, this.color, this.icon, this.radius = Dimensions.radiusDefault, this.fontWeight, this.isViewReply = false, this.textColor, this.isBorder = false, this.borderColor});
 
   @override
   Widget build(BuildContext context) {
+
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
-      backgroundColor: onPressed == null
-          ? Theme.of(context).disabledColor
-          : transparent
-          ? Colors.transparent
-          : color ?? Theme.of(context).primaryColor,
-      minimumSize: Size(width ?? 1170, height ?? 50),
-      padding: const EdgeInsets.symmetric(
-        horizontal: Dimensions.paddingSizeDefault,
-        vertical: Dimensions.paddingSizeExtraSmall,
-      ),
+      backgroundColor: onPressed == null ? Theme.of(context).disabledColor : transparent ? Colors.transparent : color ?? Theme.of(context).primaryColor,
+      minimumSize: Size(width != null ? width! : 1170, height != null ? height! : 50),
+      padding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radius),
-        side: isBorder
-            ? BorderSide(
-                color:
-                    borderColor ??
-                    Theme.of(context).disabledColor.withValues(alpha: 0.5),
-              )
-            : BorderSide.none,
+        side: isBorder ? BorderSide(color: borderColor ?? Theme.of(context).disabledColor.withValues(alpha: 0.5)) : BorderSide.none,
       ),
     );
 
     return Padding(
-      padding: margin ?? EdgeInsets.zero,
+      padding: margin == null ? const EdgeInsets.all(0) : margin!,
       child: TextButton(
         onPressed: isLoading ? null : onPressed as void Function()?,
         style: flatButtonStyle,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Keep the label's layout while busy so the action never jumps.
-            ExcludeSemantics(
-              excluding: isLoading,
-              child: Opacity(
-                opacity: isLoading ? 0 : 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (icon != null) ...[
-                      Icon(
-                        icon,
-                        color: transparent
-                            ? Theme.of(context).primaryColor
-                            : iconColor ?? Theme.of(context).cardColor,
-                      ),
-                      const SizedBox(width: Dimensions.paddingSizeSmall),
-                    ],
-                    Flexible(
-                      child: Text(
-                        buttonText,
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: robotoBold.copyWith(
-                          color:
-                              textColor ??
-                              (transparent || isViewReply
-                                  ? Theme.of(context).primaryColor
-                                  : Theme.of(context).cardColor),
-                          fontSize: fontSize ?? Dimensions.fontSizeLarge,
-                          fontWeight: fontWeight,
-                          height: 1.2,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+        child: isLoading ? Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          SizedBox(
+            height: 15, width: 15,
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(textColor ?? Colors.white),
+              strokeWidth: 2,
             ),
-            if (isLoading)
-              Positioned.fill(
-                child: Semantics(
-                  label: 'loading'.tr,
-                  liveRegion: true,
-                  child: Center(
-                    child: MediaQuery.disableAnimationsOf(context)
-                        ? Icon(
-                            Icons.hourglass_top_rounded,
-                            color:
-                                textColor ??
-                                (transparent
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.white),
-                            size: 20,
-                          )
-                        : SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              color:
-                                  textColor ??
-                                  (transparent
-                                      ? Theme.of(context).primaryColor
-                                      : Colors.white),
-                              strokeWidth: 2,
-                            ),
-                          ),
-                  ),
-                ),
-              ),
-          ],
-        ),
+          ),
+          const SizedBox(width: Dimensions.paddingSizeSmall),
+
+          Text('loading'.tr, style: robotoMedium.copyWith(color: textColor ?? Colors.white)),
+        ]),
+        ) : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          icon != null ? Icon(icon, color: transparent ? Theme.of(context).primaryColor : iconColor ?? Theme.of(context).cardColor) : const SizedBox(),
+          SizedBox(width: icon != null ? Dimensions.paddingSizeSmall : 0),
+          Text(buttonText, textAlign: TextAlign.center, style: robotoBold.copyWith(
+            color: textColor ?? (transparent || isViewReply ? Theme.of(context).primaryColor : Theme.of(context).cardColor),
+            fontSize: fontSize ?? Dimensions.fontSizeLarge, fontWeight: fontWeight,
+          )),
+        ]),
       ),
     );
   }

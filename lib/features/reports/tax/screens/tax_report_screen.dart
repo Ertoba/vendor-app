@@ -140,14 +140,14 @@ class _TaxReportScreenState extends State<TaxReportScreen> {
                       const CustomAssetImageWidget(Images.taxReportIcon, height: 50, width: 50),
                       const SizedBox(width: Dimensions.paddingSizeSmall),
 
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
                         Text(PriceConverterHelper.convertPrice(reportController.taxReportModel?.totalTax), style: robotoBlack.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeLarge)),
                         const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-                        Text('total_tax_amount'.tr, style: robotoRegular.copyWith(color: Theme.of(context).hintColor), maxLines: 2, overflow: TextOverflow.ellipsis),
+                        Text('total_tax_amount'.tr, style: robotoRegular.copyWith(color: Theme.of(context).hintColor)),
 
-                      ])),
+                      ]),
 
                     ]),
                     const SizedBox(height: Dimensions.paddingSizeLarge),

@@ -27,12 +27,28 @@ class _SubscriptionDetailsWidgetState extends State<SubscriptionDetailsWidget> {
 
   final JustTheController tooltipController = JustTheController();
 
+  double _getCommissionPercentage() {
+    final stores = widget.subscriptionController.profileModel?.stores;
+    final storeCommission = stores != null && stores.isNotEmpty ? stores.first.comission : null;
+
+    if(storeCommission != null && storeCommission > 0) {
+      return storeCommission;
+    }
+
+    return Get.find<SplashController>().configModel?.adminCommission ?? 0;
+  }
+
+  String _formatCommissionPercentage(double commission) {
+    return commission == commission.roundToDouble() ? commission.toStringAsFixed(0) : commission.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
 
     bool businessIsCommission = widget.subscriptionController.profileModel!.stores![0].storeBusinessModel == 'commission';
     int remainingDays = widget.subscriptionController.profileModel!.subscription != null ? DateConverterHelper.differenceInDaysIgnoringTime(DateTime.parse(widget.subscriptionController.profileModel!.subscription!.expiryDate!), null) : 0;
     bool isRental = Get.find<AuthController>().getModuleType() == 'rental';
+    final String commissionPercentageText = _formatCommissionPercentage(_getCommissionPercentage());
 
     return Column(children: [
 
@@ -75,7 +91,7 @@ class _SubscriptionDetailsWidgetState extends State<SubscriptionDetailsWidget> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '${widget.subscriptionController.profileModel!.stores![0].comission} %',
+                          '$commissionPercentageText %',
                           style: robotoBold.copyWith(color: const Color(0xff006161), fontSize: 24),
                         ),
                         const SizedBox(width: Dimensions.paddingSizeSmall),
@@ -90,7 +106,7 @@ class _SubscriptionDetailsWidgetState extends State<SubscriptionDetailsWidget> {
                   const SizedBox(height: Dimensions.paddingSizeDefault),
 
                   Text(
-                    "${'vendor_will_pay'.tr} ${widget.subscriptionController.profileModel!.stores![0].comission}% ${'commission_to'.tr} ${Get.find<SplashController>().configModel!.businessName} ${'from_each_order_You_will_get_access_of_all'.tr}",
+                    "${'vendor_will_pay'.tr} $commissionPercentageText% ${'commission_to'.tr} ${Get.find<SplashController>().configModel?.businessName ?? ''} ${'from_each_order_You_will_get_access_of_all'.tr}",
                     style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7), height: 2), textAlign: TextAlign.start,
                   )
                   

@@ -1,7 +1,5 @@
 import 'package:sixam_mart_store/common/widgets/custom_bottom_sheet_widget.dart';
 import 'package:sixam_mart_store/features/payment/controllers/payment_controller.dart';
-import 'package:sixam_mart_store/features/disbursement/controllers/disbursement_controller.dart';
-import 'package:sixam_mart_store/features/disbursement/widgets/keepz_settlement_list_widget.dart';
 import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_store/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_store/helper/price_converter_helper.dart';
@@ -31,48 +29,13 @@ class _WalletScreenState extends State<WalletScreen> {
 
   @override
   void initState() {
-    final PaymentController paymentController = Get.find<PaymentController>();
-    final ProfileController profileController = Get.find<ProfileController>();
-    paymentController.setIndex(0);
-    paymentController.getWithdrawList();
-    paymentController.getWithdrawMethodList();
-    paymentController.getWalletPaymentList();
-    if(profileController.modulePermission?.disbursementReport ?? false) {
-      Get.find<DisbursementController>().getDisbursementReport(1);
-    }
-    if(profileController.profileModel == null) {
-      profileController.getProfile();
+    Get.find<PaymentController>().getWithdrawList();
+    Get.find<PaymentController>().getWithdrawMethodList();
+    Get.find<PaymentController>().getWalletPaymentList();
+    if(Get.find<ProfileController>().profileModel == null) {
+      Get.find<ProfileController>().getProfile();
     }
     super.initState();
-  }
-
-  Widget _historySelector({required BuildContext context, required PaymentController controller, required int index, required String title}) {
-    final bool isSelected = controller.selectedIndex == index;
-    return InkWell(
-      onTap: () {
-        if(!isSelected) {
-          controller.setIndex(index);
-        }
-      },
-      hoverColor: Colors.transparent,
-      child: Padding(
-        padding: const EdgeInsets.only(right: Dimensions.paddingSizeDefault),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: robotoMedium.copyWith(
-            color: isSelected ? Colors.blue : Theme.of(context).disabledColor,
-          )),
-          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-          Container(
-            height: 3, width: 120,
-            margin: const EdgeInsets.only(top: Dimensions.paddingSizeExtraSmall),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-              color: isSelected ? Colors.blue : null,
-            ),
-          ),
-        ]),
-      ),
-    );
   }
 
   @override
@@ -87,10 +50,6 @@ class _WalletScreenState extends State<WalletScreen> {
             onRefresh: () async {
               await Get.find<ProfileController>().getProfile();
               await Get.find<PaymentController>().getWithdrawList();
-              await Get.find<PaymentController>().getWalletPaymentList();
-              if(profileController.modulePermission?.disbursementReport ?? false) {
-                await Get.find<DisbursementController>().getDisbursementReport(1);
-              }
             },
             child: Column(children: [
 
@@ -259,65 +218,77 @@ class _WalletScreenState extends State<WalletScreen> {
 
                     WalletWidget(title: 'total_earning'.tr, value: profileController.profileModel!.totalEarning , isAmountAndTextInRow: true),
 
-                    if(profileController.modulePermission!.disbursementReport!) ...[
-                      const SizedBox(height: Dimensions.paddingSizeSmall),
-                      GetBuilder<DisbursementController>(builder: (disbursementController) {
-                        final double keepzCompleted = disbursementController.disbursementReportModel?.keepzCompleted ?? 0;
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge, vertical: Dimensions.paddingSizeExtraLarge),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                            color: Theme.of(context).primaryColor,
-                          ),
-                          child: Row(children: [
-                            Image.asset(Images.disbursementIcon, width: 60, height: 60),
-                            const SizedBox(width: Dimensions.paddingSizeLarge),
-                            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text('keepz_split_completed'.tr, style: robotoRegular.copyWith(
-                                fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).cardColor,
-                              )),
-                              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                              Text(
-                                PriceConverterHelper.convertPrice(keepzCompleted),
-                                style: robotoBold.copyWith(fontSize: 22, color: Theme.of(context).cardColor),
-                                textDirection: TextDirection.ltr,
-                              ),
-                            ])),
-                          ]),
-                        );
-                      }),
-                    ],
-
                     Padding(
                       padding: const EdgeInsets.only(top: Dimensions.paddingSizeExtraLarge),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(children: [
-                          _historySelector(context: context, controller: bankController, index: 0, title: 'withdraw_request'.tr),
-                          _historySelector(context: context, controller: bankController, index: 1, title: 'payment_history'.tr),
-                          if(profileController.modulePermission!.disbursementReport!)
-                            _historySelector(context: context, controller: bankController, index: 2, title: 'automatic_deposits'.tr),
-                        ]),
-                      ),
+                      child: Row(children: [
+
+                        InkWell(
+                          onTap: () {
+                            if(bankController.selectedIndex != 0) {
+                              bankController.setIndex(0);
+                            }
+                          },
+                          hoverColor: Colors.transparent,
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+
+                            Text('withdraw_request'.tr, style: robotoMedium.copyWith(
+                              color: bankController.selectedIndex == 0 ? Colors.blue : Theme.of(context).disabledColor,
+                            )),
+                            const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+
+                            Container(
+                              height: 3, width: 120,
+                              margin: const EdgeInsets.only(top: Dimensions.paddingSizeExtraSmall),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                                color: bankController.selectedIndex == 0 ? Colors.blue : null,
+                              ),
+                            ),
+
+                          ]),
+                        ),
+                        const SizedBox(width: Dimensions.paddingSizeSmall),
+
+                        InkWell(
+                          onTap: () {
+                            if(bankController.selectedIndex != 1) {
+                              bankController.setIndex(1);
+                            }
+                          },
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+
+                            Text('payment_history'.tr, style: robotoMedium.copyWith(
+                              color: bankController.selectedIndex == 1 ? Colors.blue : Theme.of(context).disabledColor,
+                            )),
+                            const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+
+                            Container(
+                              height: 3, width: 120,
+                              margin: const EdgeInsets.only(top: Dimensions.paddingSizeExtraSmall),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                                color: bankController.selectedIndex == 1 ? Colors.blue : null,
+                              ),
+                            ),
+
+                          ]),
+                        ),
+                      ]),
                     ),
                     const SizedBox(height: Dimensions.paddingSizeSmall),
 
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
 
-                      Text(bankController.selectedIndex == 2 ? 'automatic_deposits'.tr : "transaction_history".tr, style: robotoMedium),
+                      Text("transaction_history".tr, style: robotoMedium),
 
                       (bankController.selectedIndex == 0 && (bankController.withdrawList != null && bankController.withdrawList!.isNotEmpty))
-                      || (bankController.selectedIndex == 1 && (bankController.transactions != null && bankController.transactions!.isNotEmpty))
-                      || (bankController.selectedIndex == 2 && (Get.find<DisbursementController>().disbursementReportModel?.keepzSettlements?.isNotEmpty ?? false)) ? InkWell(
+                      || (bankController.selectedIndex == 1 && (bankController.transactions != null && bankController.transactions!.isNotEmpty)) ? InkWell(
                         onTap: () {
                           if(bankController.selectedIndex == 0) {
                             Get.toNamed(RouteHelper.getWithdrawHistoryRoute());
                           }
                           if(bankController.selectedIndex == 1) {
                             Get.toNamed(RouteHelper.getPaymentHistoryRoute());
-                          }
-                          if(bankController.selectedIndex == 2) {
-                            Get.toNamed(RouteHelper.getDisbursementRoute());
                           }
 
                         },
@@ -379,20 +350,6 @@ class _WalletScreenState extends State<WalletScreen> {
                         },
                       ) : Center(child: Padding(padding: const EdgeInsets.only(top: 70, bottom: 100), child: Text('no_transaction_found'.tr)))
                           : const Center(child: Padding(padding: EdgeInsets.only(top: 100), child: CircularProgressIndicator())),
-
-                    if (bankController.selectedIndex == 2)
-                      GetBuilder<DisbursementController>(builder: (disbursementController) {
-                        return disbursementController.disbursementReportModel != null
-                            ? KeepzSettlementListWidget(
-                                settlements: disbursementController.disbursementReportModel!.keepzSettlements,
-                                showTitle: false,
-                                padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeDefault),
-                              )
-                            : const Center(child: Padding(
-                                padding: EdgeInsets.only(top: 100),
-                                child: CircularProgressIndicator(),
-                              ));
-                      }),
 
                   ]),
                 ),

@@ -10,7 +10,7 @@ import 'package:sixam_mart_store/features/advertisement/enums/ads_type.dart';
 import 'package:sixam_mart_store/features/advertisement/screens/create_advertisement_screen.dart';
 import 'package:sixam_mart_store/features/advertisement/widgets/ads_item.dart';
 import 'package:sixam_mart_store/features/advertisement/widgets/confirmation_bottom_sheet.dart';
-import 'package:sixam_mart_store/features/advertisement/widgets/network_video_preview_widget.dart';
+import 'package:sixam_mart_store/common/widgets/network_video_preview_widget.dart';
 import 'package:sixam_mart_store/helper/date_converter_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/helper/string_extensions.dart';

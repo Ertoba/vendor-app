@@ -15,11 +15,8 @@ import 'package:sixam_mart_store/features/store/domain/models/variant_type_model
 import 'package:sixam_mart_store/features/store/domain/models/variation_body_model.dart';
 import 'package:sixam_mart_store/features/store/domain/repositories/store_repository_interface.dart';
 import 'package:sixam_mart_store/features/store/domain/services/store_service_interface.dart';
-import 'package:sixam_mart_store/features/store/domain/utils/variation_key_helper.dart';
 
 class StoreService implements StoreServiceInterface {
-  static const int _maxStoreImageBytes = 5 * 1024 * 1024;
-
   final StoreRepositoryInterface storeRepositoryInterface;
   StoreService({required this.storeRepositoryInterface});
 
@@ -59,8 +56,8 @@ class StoreService implements StoreServiceInterface {
   }
 
   @override
-  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName) async {
-    return await storeRepositoryInterface.addItem(item, metaImage, image, images, savedImages, attributes, isAdd, tags, nutrition, allergicIngredients, genericName);
+  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, XFile? video, String? videoLink, bool isVideoLink, bool removeSavedVideo, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName,) async {
+    return await storeRepositoryInterface.addItem(item, metaImage, image, images, video, videoLink, isVideoLink, removeSavedVideo, savedImages, attributes, isAdd, tags, nutrition, allergicIngredients, genericName,);
   }
 
   @override
@@ -132,11 +129,13 @@ class StoreService implements StoreServiceInterface {
   Future<XFile?> pickImageFromGallery() async {
     XFile? pickImage = await ImagePicker().pickImage(source: ImageSource.gallery);
     if(pickImage != null) {
-      final int fileSize = await pickImage.length();
-      if (fileSize > _maxStoreImageBytes) {
-        showCustomSnackBar('please_upload_image_within_5_mb'.tr);
-        return null;
-      }
+      pickImage.length().then((value) {
+        if (value > 2000000) {
+          showCustomSnackBar('please_upload_lower_size_file'.tr);
+        } else {
+          return pickImage;
+        }
+      });
     }
     return pickImage;
   }
@@ -144,10 +143,7 @@ class StoreService implements StoreServiceInterface {
   @override
   bool hasAttributeData(List<AttributeModel>? attributeList){
     bool hasData = false;
-    if(attributeList == null || attributeList.isEmpty) {
-      return hasData;
-    }
-    for(AttributeModel attribute in attributeList) {
+    for(AttributeModel attribute in attributeList!) {
       if(attribute.active) {
         hasData = true;
         break;
@@ -170,18 +166,33 @@ class StoreService implements StoreServiceInterface {
   }
 
   @override
-  List<VariantTypeModel>? variationTypeList(List<AttributeModel>? attributeList, Item? item, {bool enforceBrandModelCompatibility = false}) {
+  List<VariantTypeModel>? variationTypeList(List<AttributeModel>? attributeList, Item? item) {
+    List<List<String>> mainList = [];
+    int length = 1;
+    bool hasData = false;
+    List<int> indexList = [];
     List<VariantTypeModel>? variantTypeList = [];
-    for (final VariationCombination combination in buildVariationCombinations(attributeList)) {
-      if(enforceBrandModelCompatibility && !combination.isBrandModelCompatible) {
-        continue;
+    for (var attribute in attributeList!) {
+      if(attribute.active) {
+        hasData = true;
+        mainList.add(attribute.variants);
+        length = length * attribute.variants.length;
+        indexList.add(0);
       }
-      final String value = combination.type;
+    }
+    if(!hasData) {
+      length = 0;
+    }
+    for(int i=0; i<length; i++) {
+      String value = '';
+      for(int j=0; j<mainList.length; j++) {
+        value = value + (value.isEmpty ? '' : '-') + mainList[j][indexList[j]].trim();
+      }
       if(item != null && item.variations != null) {
         double? price = 0;
         int? stock = 0;
         for(Variation variation in item.variations!) {
-          if(canonicalVariationType(variation.type ?? '') == canonicalVariationType(value)) {
+          if(variation.type == value) {
             price = variation.price;
             stock = variation.stock;
             break;
@@ -198,27 +209,58 @@ class StoreService implements StoreServiceInterface {
         ));
       }
 
+      for(int j=0; j<mainList.length; j++) {
+        if(indexList[indexList.length-(1+j)] < mainList[mainList.length-(1+j)].length-1) {
+          indexList[indexList.length-(1+j)] = indexList[indexList.length-(1+j)] + 1;
+          break;
+        }else {
+          indexList[indexList.length-(1+j)] = 0;
+        }
+      }
     }
     return variantTypeList;
   }
 
   @override
-  int totalStock(List<AttributeModel>? attributeList, Item? item, {bool enforceBrandModelCompatibility = false}) {
+  int totalStock(List<AttributeModel>? attributeList, Item? item) {
+    List<List<String>> mainList = [];
+    int length = 1;
+    bool hasData = false;
+    List<int> indexList = [];
     int totalStock = 0;
-    for (final VariationCombination combination in buildVariationCombinations(attributeList)) {
-      if(enforceBrandModelCompatibility && !combination.isBrandModelCompatible) {
-        continue;
+    for (var attribute in attributeList!) {
+      if(attribute.active) {
+        hasData = true;
+        mainList.add(attribute.variants);
+        length = length * attribute.variants.length;
+        indexList.add(0);
       }
-      final String value = combination.type;
+    }
+    if(!hasData) {
+      length = 0;
+    }
+    for(int i=0; i<length; i++) {
+      String value = '';
+      for(int j=0; j<mainList.length; j++) {
+        value = value + (value.isEmpty ? '' : '-') + mainList[j][indexList[j]].trim();
+      }
       if(item != null && item.variations != null) {
         int? stock = 0;
         for(Variation variation in item.variations!) {
-          if(canonicalVariationType(variation.type ?? '') == canonicalVariationType(value)) {
+          if(variation.type == value) {
             stock = variation.stock;
             break;
           }
         }
         totalStock = totalStock + stock!;
+      }
+      for(int j=0; j<mainList.length; j++) {
+        if(indexList[indexList.length-(1+j)] < mainList[mainList.length-(1+j)].length-1) {
+          indexList[indexList.length-(1+j)] = indexList[indexList.length-(1+j)] + 1;
+          break;
+        }else {
+          indexList[indexList.length-(1+j)] = 0;
+        }
       }
     }
     return totalStock;
@@ -253,50 +295,28 @@ class StoreService implements StoreServiceInterface {
 
   @override
   int? setBrandIndex(List<BrandModel>? brands, Item? item) {
-    if(brands == null || brands.isEmpty || item == null) {
-      return null;
+    int? brandIndex;
+    for(int index = 0; index < brands!.length; index++) {
+      if(item != null) {
+        if(brands[index].id.toString() == item.brandId.toString()) {
+          brandIndex = index;
+        }
+      }
     }
-
-    final int brandIndex = brands.indexWhere(
-      (brand) => brand.id.toString() == item.brandId.toString(),
-    );
-    if(brandIndex >= 0) {
-      return brandIndex;
-    }
-
-    brands.insert(
-      0,
-      BrandModel(id: item.brandId ?? 0, name: 'brand'.tr),
-    );
-    return 0;
+    return brandIndex;
   }
 
   @override
   int? setSuitableTagIndex(List<SuitableTagModel>? suitableTagList, Item? item) {
-    if(suitableTagList == null || suitableTagList.isEmpty) {
-      return null;
+    int? suitableTagIndex;
+    for(int index = 0; index < suitableTagList!.length; index++) {
+      if(item != null) {
+        if(suitableTagList[index].id.toString() == item.conditionId.toString()) {
+          suitableTagIndex = index;
+        }
+      }
     }
-
-    if(item == null) {
-      suitableTagList.insert(
-        0,
-        SuitableTagModel(id: 0, name: 'suitable_for'.tr),
-      );
-      return 0;
-    }
-
-    final int suitableTagIndex = suitableTagList.indexWhere(
-      (tag) => tag.id.toString() == item.conditionId.toString(),
-    );
-    if(suitableTagIndex >= 0) {
-      return suitableTagIndex;
-    }
-
-    suitableTagList.insert(
-      0,
-      SuitableTagModel(id: item.conditionId ?? 0, name: 'suitable_for'.tr),
-    );
-    return 0;
+    return suitableTagIndex;
   }
 
   @override

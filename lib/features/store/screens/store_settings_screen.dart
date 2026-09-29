@@ -63,6 +63,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
   late String _initialProcessingTime;
   late String _initialExtraPackaging;
   late String _initialMinimumStock;
+  late bool _initialShowLowStockCount;
   late String _initialMinTime;
   late String _initialMaxTime;
   late String? _initialDurationType;
@@ -92,7 +93,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
     _gstController.text = widget.store.gstCode!;
     _processingTimeController.text = widget.store.orderPlaceToScheduleInterval.toString();
     _extraPackagingController.text = widget.store.extraPackagingAmount.toString();
-    _minimumStockController.text = widget.store.minimumStockForWarning.toString();
+    _minimumStockController.text = widget.store.minimumStockForWarning?.toString() ?? '';
     if(widget.store.deliveryTime != null && widget.store.deliveryTime!.isNotEmpty) {
       try {
         _minimumController.text = getDeliveryData(widget.store.deliveryTime!, 'min');
@@ -115,6 +116,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
     _initialProcessingTime = _processingTimeController.text;
     _initialExtraPackaging = _extraPackagingController.text;
     _initialMinimumStock = _minimumStockController.text;
+    _initialShowLowStockCount = storeController.showLowStockCount ?? true;
     _initialMinTime = _minimumController.text;
     _initialMaxTime = _maximumController.text;
     _initialDurationType = storeController.selectedDuration;
@@ -158,8 +160,8 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
     storeController.setTakeAwayEnabled(_initialIsTakeAwayEnabled);
     storeController.setPrescriptionStatusEnable(_initialIsPrescriptionStatusEnable);
     storeController.setHalalEnabled(_initialIsHalalEnabled);
+    storeController.setShowLowStockCount(_initialShowLowStockCount);
     storeController.setSelectedDuration(_initialDurationType);
-    
     showCustomSnackBar('reset_successful'.tr, isError: false);
   }
 
@@ -425,39 +427,46 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                           inputType: TextInputType.number,
                           isAmount: true,
                         ) : const SizedBox(),
-                        SizedBox(height: !_module.showRestaurantText! ? Dimensions.paddingSizeExtraLarge : 0),
-
-                        !_module.showRestaurantText! ? Column(
-                          children: [
-
-                            Row(children: [
-                              Text(
-                                'minimum_stock_for_warning'.tr,
-                                style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
-                              ),
-                              const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-
-                              CustomToolTip(
-                                preferredDirection: AxisDirection.up,
-                                message: 'minimum_stock_for_warning_tooltip'.tr,
-                              ),
-                            ]),
-
-                            CustomTextFieldWidget(
-                              hintText: 'minimum_stock_for_warning'.tr,
-                              // labelText: 'minimum_stock_for_warning'.tr,
-                              controller: _minimumStockController,
-                              focusNode: _minimumStockNode,
-                              inputAction: TextInputAction.done,
-                              inputType: TextInputType.number,
-                              isAmount: true,
-                            ),
-                          ],
-                        ) : const SizedBox(),
 
                       ]),
                     ),
                     const SizedBox(height: Dimensions.paddingSizeDefault),
+
+                    /// Stock Setup
+                    !_module.showRestaurantText! ? Text('stock_setup'.tr, style: robotoBold) : const SizedBox(),
+                    SizedBox(height: !_module.showRestaurantText! ? Dimensions.paddingSizeSmall : 0),
+                    !_module.showRestaurantText! ? CustomCard(
+                      padding: EdgeInsets.all(Dimensions.paddingSizeDefault),
+                      child: Column(children: [
+                        SwitchButtonWidget(
+                          title: 'show_low_stock_count'.tr,
+                          isButtonActive: storeController.showLowStockCount,
+                          onTap: () {
+                            storeController.toggleShowLowStockCount();
+                          },
+                        ),
+                        const SizedBox(height: Dimensions.paddingSizeDefault),
+
+                        CustomTextFieldWidget(
+                          hintText: 'minimum_stock_for_warning'.tr,
+                          labelText: 'minimum_stock_for_warning'.tr,
+                          controller: _minimumStockController,
+                          focusNode: _minimumStockNode,
+                          inputAction: TextInputAction.done,
+                          inputType: TextInputType.number,
+                          isNumber: true,
+                          suffixChild: Padding(
+                            padding: const EdgeInsetsDirectional.only(end: Dimensions.paddingSizeSmall),
+                            child: CustomToolTip(
+                              preferredDirection: AxisDirection.up,
+                              message: 'minimum_stock_for_warning_tooltip'.tr,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ]),
+                    ) : const SizedBox(),
+                    SizedBox(height: !_module.showRestaurantText! ? Dimensions.paddingSizeDefault : 0),
 
                     CustomCard(
                       child: Column(children: [
@@ -599,7 +608,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                     Expanded(
                       child: CustomButtonWidget(
                         isLoading: storeController.isLoading,
-                        onPressed: () {
+                        onPressed: () async {
 
                       String minimumOrder = _orderAmountController.text.trim();
                       String deliveryFee = _minimumDeliveryFeeController.text.trim();
@@ -662,10 +671,11 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                         _store.freeDelivery = storeController.isFreeDeliveryEnabled;
                         _store.takeAway = storeController.isTakeAwayEnabled;
                         _store.prescriptionStatus = storeController.isPrescriptionStatusEnable;
-                        _store.minimumStockForWarning = minimumStockForWarning.isNotEmpty ? double.parse(minimumStockForWarning) : 0;
+                        _store.showLowStockCount = storeController.showLowStockCount;
+                        _store.minimumStockForWarning = int.tryParse(minimumStockForWarning) ?? 0;
 
                         print('Halal Tag: ${_store.isHalalActive}');
-                        storeController.updateStore(_store, minimum, maximum);
+                        await storeController.updateStore(_store, minimum, maximum);
                       }
                     },
                         buttonText: 'update'.tr,

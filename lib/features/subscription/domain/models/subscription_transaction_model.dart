@@ -40,7 +40,7 @@ class Transactions {
   int? packageId;
   int? storeId;
   int? storeSubscriptionId;
-  double? price;
+  num? price;
   int? validity;
   String? paymentMethod;
   String? paymentStatus;

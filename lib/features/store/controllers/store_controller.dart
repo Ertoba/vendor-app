@@ -24,6 +24,7 @@ import 'package:sixam_mart_store/features/profile/domain/models/profile_model.da
 import 'package:sixam_mart_store/features/store/domain/models/review_model.dart';
 import 'package:sixam_mart_store/features/store/domain/models/unit_model.dart';
 import 'package:sixam_mart_store/features/rental_module/profile/controllers/taxi_profile_controller.dart';
+import 'package:sixam_mart_store/helper/image_size_checker.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
@@ -31,7 +32,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart_store/features/store/domain/services/store_service_interface.dart';
-import 'package:sixam_mart_store/features/store/domain/utils/variation_key_helper.dart';
 
 class StoreController extends GetxController implements GetxService {
   final StoreServiceInterface storeServiceInterface;
@@ -87,16 +87,6 @@ class StoreController extends GetxController implements GetxService {
   List<VariantTypeModel>? _variantTypeList;
   List<VariantTypeModel>? get variantTypeList => _variantTypeList;
 
-  List<String> _unresolvedTechnicalModels = <String>[];
-  List<String> get unresolvedTechnicalModels => _unresolvedTechnicalModels;
-
-  bool get _isTechnicalStore {
-    final stores = Get.find<ProfileController>().profileModel?.stores;
-    return stores != null &&
-        stores.isNotEmpty &&
-        stores.first.module?.moduleType == 'ecommerce';
-  }
-
   bool _isAvailable = true;
   bool get isAvailable => _isAvailable;
 
@@ -135,9 +125,32 @@ class StoreController extends GetxController implements GetxService {
 
   List<XFile> _rawImages = [];
   List<XFile> get rawImages => _rawImages;
+  List<bool> _rawImageValidList = [];
+
+  XFile? _rawVideo;
+  XFile? get rawVideo => _rawVideo;
+
+  bool _isVideoValid = true;
+  bool get isVideoValid => _isVideoValid;
+
+  String? _videoLink;
+  String? get videoLink => _videoLink;
+
+  bool _toggleVideo = true;
+  bool get toggleVideo => _toggleVideo;
+
+  bool _removeSavedVideo = false;
+  bool get removeSavedVideo => _removeSavedVideo;
 
   List<String> _savedImages = [];
   List<String> get savedImages => _savedImages;
+
+  bool _isItemThumbnailValid = true;
+  bool get isItemThumbnailValid => _isItemThumbnailValid;
+
+  bool _isMetaImageValid = true;
+  bool get isMetaImageValid => _isMetaImageValid;
+  bool get hasInvalidAdditionalImages => _rawImageValidList.contains(false);
 
   int _imageIndex = 0;
   int get imageIndex => _imageIndex;
@@ -216,6 +229,9 @@ class StoreController extends GetxController implements GetxService {
 
   bool? _isPrescriptionStatusEnable = false;
   bool? get isPrescriptionStatusEnable => _isPrescriptionStatusEnable;
+
+  bool? _showLowStockCount = true;
+  bool? get showLowStockCount => _showLowStockCount;
 
   List<String?>? _nutritionSuggestionList;
   List<String?>? get nutritionSuggestionList => _nutritionSuggestionList;
@@ -621,33 +637,40 @@ class StoreController extends GetxController implements GetxService {
     _offset = offset;
   }
 
-  void getAttributeList(Item? item) async {
-    _attributeList = [];
+  Future<void> getAttributeList(Item? item, {bool resetThumbnail = true, bool resetMedia = true}) async {
+    _attributeList = null;
     _discountTypeIndex = 0;
-    _rawLogo = null;
+    if(resetThumbnail) {
+      _rawLogo = null;
+      _isItemThumbnailValid = true;
+    }
     _selectedAddons = [];
     _variantTypeList = [];
     _totalStock = 0;
-    _rawImages = [];
-    _savedImages = [];
-    if(item != null) {
-      for (var e in item.imagesFullUrl!) {
-        if(e != null) {
-          _savedImages.add(e);
+    if(resetMedia) {
+      _rawImages = [];
+      _rawImageValidList = [];
+      _rawVideo = null;
+      _videoLink = null;
+      _toggleVideo = true;
+      _removeSavedVideo = false;
+      _isVideoValid = true;
+      _savedImages = [];
+      _removeImageList = [];
+      _imageIndex = 0;
+      if(item != null) {
+        for (var e in item.imagesFullUrl ?? <String?>[]) {
+          if(e != null) {
+            _savedImages.add(e);
+          }
         }
       }
     }
-    generateVariantTypes(item);
-    update();
-
     List<AttributeModel>? attributeList = await storeServiceInterface.getAttributeList(item);
-    _attributeList = [];
     if(attributeList != null) {
+      _attributeList = [];
       _attributeList!.addAll(attributeList);
     }
-    generateVariantTypes(item);
-    update();
-
     if(Get.find<SplashController>().configModel!.moduleConfig!.module!.addOn!) {
       List<int?> addonsIds = await Get.find<AddonController>().getAddonList();
       if(item != null && item.addOns != null) {
@@ -660,7 +683,6 @@ class StoreController extends GetxController implements GetxService {
       await getUnitList(item);
     }
     generateVariantTypes(item);
-    update();
   }
 
   void setDiscountTypeIndex(int index, bool notify) {
@@ -677,7 +699,7 @@ class StoreController extends GetxController implements GetxService {
   }
 
   void addVariant(int index, String variant, Item? product) {
-    _attributeList![index].variants.add(variant.trim());
+    _attributeList![index].variants.add(variant);
     generateVariantTypes(product);
     update();
   }
@@ -723,10 +745,22 @@ class StoreController extends GetxController implements GetxService {
     if(isRemove) {
       _rawLogo = null;
       _rawCover = null;
+      _isItemThumbnailValid = true;
     }else {
-      isLogo ? _rawLogo = await storeServiceInterface.pickImageFromGallery() : _rawCover = await storeServiceInterface.pickImageFromGallery();
-      update();
+      if(isLogo) {
+        XFile? xFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+        if(xFile != null) {
+          _rawLogo = xFile;
+          _isItemThumbnailValid = await _isImageValid(xFile);
+          if(!_isItemThumbnailValid) {
+            _showImageSizeError();
+          }
+        }
+      } else {
+        _rawCover = await storeServiceInterface.pickImageFromGallery();
+      }
     }
+    update();
   }
 
   void setSelectedAddonIndex(int index, bool notify) {
@@ -744,14 +778,12 @@ class StoreController extends GetxController implements GetxService {
   }
 
   Future<void> addItem(Item item, bool isAdd, {String? genericNameData}) async {
-    _isLoading = true;
-    update();
-    if(_isTechnicalStore && _unresolvedTechnicalModels.isNotEmpty) {
-      _isLoading = false;
-      update();
-      showCustomSnackBar('technical_model_brand_required'.tr);
+    if(!_isItemThumbnailValid || !_isMetaImageValid || _rawImageValidList.contains(false)) {
+      _showImageSizeError();
       return;
     }
+    _isLoading = true;
+    update();
     Map<String, String> fields = {};
     if(!Get.find<SplashController>().getStoreModuleConfig().newVariation! && _variantTypeList!.isNotEmpty) {
       List<int?> idList = [];
@@ -760,9 +792,10 @@ class StoreController extends GetxController implements GetxService {
         if(attributeModel.active) {
           idList.add(attributeModel.attribute.id);
           nameList.add(attributeModel.attribute.name);
-          final String variantString = attributeModel.variants
-              .map((variant) => variant.trim())
-              .join(',');
+          String variantString = '';
+          for (var variant in attributeModel.variants) {
+            variantString = variantString + (variantString.isEmpty ? '' : ',') + variant.replaceAll(' ', '');
+          }
           fields.addAll(<String, String>{'choice_options_${attributeModel.attribute.id}': jsonEncode([variantString])});
         }
       }
@@ -770,24 +803,9 @@ class StoreController extends GetxController implements GetxService {
         'attribute_id': jsonEncode(idList), 'choice_no': jsonEncode(idList), 'choice': jsonEncode(nameList)
       });
       for(int index=0; index<_variantTypeList!.length; index++) {
-        final String requestKey = variationRequestKey(_variantTypeList![index].variantType);
-        fields.addAll(<String, String> {
-          'price_$requestKey': _variantTypeList![index].priceController.text.trim(),
-          'stock_$requestKey': _variantTypeList![index].stockController.text.trim().isEmpty ? '0'
-              : _variantTypeList![index].stockController.text.trim(),
-        });
-      }
-      if(_isTechnicalStore) {
-        final String fallbackPrice = _variantTypeList!.first.priceController.text.trim().isNotEmpty
-            ? _variantTypeList!.first.priceController.text.trim()
-            : (item.price?.toString() ?? '0');
-        for(final VariationCombination combination in buildVariationCombinations(_attributeList)) {
-          if(!combination.isBrandModelCompatible) {
-            final String requestKey = variationRequestKey(combination.type);
-            fields.putIfAbsent('price_$requestKey', () => fallbackPrice);
-            fields.putIfAbsent('stock_$requestKey', () => '0');
-          }
-        }
+        fields.addAll(<String, String> {'price_${_variantTypeList![index].variantType.replaceAll(' ', '_')}': _variantTypeList![index].priceController.text.trim(),
+          'stock_${_variantTypeList![index].variantType.replaceAll(' ', '_')}': _variantTypeList![index].stockController.text.trim().isEmpty ? '0'
+              : _variantTypeList![index].stockController.text.trim()});
       }
     }
     String tags = '';
@@ -812,7 +830,7 @@ class StoreController extends GetxController implements GetxService {
       genericName = genericNameData ?? '';
     }
 
-    Response response = await storeServiceInterface.addItem(item, _pickedMetaImage, _rawLogo, _rawImages, _savedImages, fields, isAdd, tags, nutrition, allergicIngredients, genericName);
+    Response response = await storeServiceInterface.addItem(item, _pickedMetaImage, _rawLogo, _rawImages, _rawVideo, _videoLink?.trim(), !_toggleVideo, _removeSavedVideo, _savedImages, fields, isAdd, tags, nutrition, allergicIngredients, genericName,);
     if(response.statusCode == 200) {
       Get.offAll(() => const DashboardScreen(pageIndex: 2));
       showCustomSnackBar(response.body['message'], isError: false);
@@ -843,20 +861,8 @@ class StoreController extends GetxController implements GetxService {
   }
 
   void generateVariantTypes(Item? item) {
-    final bool enforceCompatibility = _isTechnicalStore;
-    _unresolvedTechnicalModels = enforceCompatibility
-        ? findUnresolvedTechnicalModels(_attributeList)
-        : <String>[];
-    _variantTypeList = storeServiceInterface.variationTypeList(
-      _attributeList,
-      item,
-      enforceBrandModelCompatibility: enforceCompatibility,
-    );
-    _totalStock = storeServiceInterface.totalStock(
-      _attributeList,
-      item,
-      enforceBrandModelCompatibility: enforceCompatibility,
-    );
+    _variantTypeList = storeServiceInterface.variationTypeList(_attributeList, item);
+    _totalStock = storeServiceInterface.totalStock(_attributeList, item);
   }
 
   bool hasAttribute() {
@@ -952,6 +958,8 @@ class StoreController extends GetxController implements GetxService {
     _rawLogo = null;
     _rawCover = null;
     _pickedMetaImage = null;
+    _isItemThumbnailValid = true;
+    _isMetaImageValid = true;
   }
 
   void initStoreData(Store store) {
@@ -968,6 +976,7 @@ class StoreController extends GetxController implements GetxService {
     _isTakeAwayEnabled = store.takeAway;
     _isPrescriptionStatusEnable = store.prescriptionStatus;
     _isHalalEnabled = store.isHalalActive;
+    _showLowStockCount = store.showLowStockCount ?? true;
   }
 
   void toggleGst() {
@@ -1111,6 +1120,11 @@ class StoreController extends GetxController implements GetxService {
     update();
   }
 
+  void setShowLowStockCount(bool value) {
+    _showLowStockCount = value;
+    update();
+  }
+
   void setHalalEnabled(bool value) {
     _isHalalEnabled = value;
     update();
@@ -1119,8 +1133,8 @@ class StoreController extends GetxController implements GetxService {
   Future<void> getUnitList(Item? item) async {
     _unitIndex = 0;
     List<UnitModel>? unitList = await storeServiceInterface.getUnitList();
-    _unitList = [];
     if(unitList != null) {
+      _unitList = [];
       _unitList!.addAll(unitList);
       _unitIndex = storeServiceInterface.setUnitIndex(_unitList, item, _unitIndex!);
     }
@@ -1135,17 +1149,86 @@ class StoreController extends GetxController implements GetxService {
     update();
   }
 
+  double get _maxFileSize => Get.find<SplashController>().configModel!.validationConfig!.maxFileSize;
+
+  String _maxFileSizeText() {
+    if(_maxFileSize % 1 == 0) {
+      return _maxFileSize.toInt().toString();
+    }
+    return _maxFileSize.toString();
+  }
+
+  Future<bool> _isImageValid(XFile file) async {
+    final double imageSize = await ImageSize.getImageSizeFromXFile(file);
+    return imageSize <= _maxFileSize;
+  }
+
+  void _showImageSizeError() {
+    showCustomSnackBar('image_size_exceeds'.trParams({'size' : _maxFileSizeText()}));
+  }
+
   void pickImages() async {
+    if((_savedImages.length + _rawImages.length) >= (Get.find<SplashController>().configModel!.validationConfig!.maxUploadFileCount)){
+      showCustomSnackBar('maximum_image_limit_is'.trParams({'count' : Get.find<SplashController>().configModel!.validationConfig!.maxUploadFileCount.toString()}));
+      return;
+    }
     XFile? xFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if(xFile != null) {
       _rawImages.add(xFile);
+      bool isValid = await _isImageValid(xFile);
+      _rawImageValidList.add(isValid);
+      if(!isValid) {
+        _showImageSizeError();
+      }
+    }
+    update();
+  }
+
+  void pickVideo() async {
+    if(toggleVideo){
+      XFile? xFile = await ImagePicker().pickVideo(source: ImageSource.gallery);
+      if (xFile != null) {
+        final double videoSize = await ImageSize.getImageSizeFromXFile(xFile);
+        final SplashController splashController = Get.find<SplashController>();
+        _rawVideo = xFile;
+        _removeSavedVideo = false;
+        _isVideoValid = videoSize <= splashController.configModel!.validationConfig!.productVideoMaxFileSize;
+        if (!_isVideoValid) {
+          showCustomSnackBar("video_size_should_be_reduce".tr);
+        }
+      }
     }
     update();
   }
 
   void removeImage(int index) {
     _rawImages.removeAt(index);
+    if(index < _rawImageValidList.length) {
+      _rawImageValidList.removeAt(index);
+    }
     update();
+  }
+
+  void removeVideo() {
+    _rawVideo = null;
+    _isVideoValid = true;
+    update();
+  }
+
+  void setToggleVideo(bool? value) {
+    _toggleVideo =value?? !_toggleVideo;
+    update();
+  }
+
+  void setVideoLink(String? value) {
+    _videoLink = value;
+  }
+
+  void setRemoveSavedVideo(bool value, {bool notify = true}) {
+    _removeSavedVideo = value;
+    if(notify) {
+      update();
+    }
   }
 
   List<String> _removeImageList = [];
@@ -1164,6 +1247,37 @@ class StoreController extends GetxController implements GetxService {
 
   void removeImageFromList() {
     _removeImageList = [];
+  }
+
+  void resetItemThumbnail({bool willUpdate = true}) {
+    _rawLogo = null;
+    _isItemThumbnailValid = true;
+    if(willUpdate) {
+      update();
+    }
+  }
+
+  void resetItemMedia(Item? item, {bool willUpdate = true}) {
+    _rawImages = [];
+    _rawImageValidList = [];
+    _rawVideo = null;
+    _videoLink = null;
+    _toggleVideo = true;
+    _removeSavedVideo = false;
+    _isVideoValid = true;
+    _savedImages = [];
+    _removeImageList = [];
+    _imageIndex = 0;
+    if(item != null) {
+      for (var e in item.imagesFullUrl ?? <String?>[]) {
+        if(e != null) {
+          _savedImages.add(e);
+        }
+      }
+    }
+    if(willUpdate) {
+      update();
+    }
   }
 
   void setImageIndex(int index, bool notify) {
@@ -1297,6 +1411,11 @@ class StoreController extends GetxController implements GetxService {
 
   void togglePrescription() {
     _isPrescriptionStatusEnable = !_isPrescriptionStatusEnable!;
+    update();
+  }
+
+  void toggleShowLowStockCount() {
+    _showLowStockCount = !_showLowStockCount!;
     update();
   }
 
@@ -1503,8 +1622,19 @@ class StoreController extends GetxController implements GetxService {
   }
 
   void pickMetaImage() async {
-    _pickedMetaImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    XFile? xFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if(xFile != null) {
+      _pickedMetaImage = xFile;
+      _isMetaImageValid = await _isImageValid(xFile);
+      if(!_isMetaImageValid) {
+        _showImageSizeError();
+      }
+    }
     update();
+  }
+
+  bool isAdditionalImageValid(int index) {
+    return index < _rawImageValidList.length ? _rawImageValidList[index] : true;
   }
 
   void toggleHalalTag() {
@@ -1516,171 +1646,189 @@ class StoreController extends GetxController implements GetxService {
     _selectedDuration = duration;
   }
 
-  void generateAndSetOtherData({required String title, required String description, TextEditingController? priceController, TextEditingController? discountController, TextEditingController? maxOrderQuantityController}) {
+  Future<void> generateAndSetOtherData({
+    required String title,
+    required String description,
+    TextEditingController? priceController,
+    TextEditingController? discountController,
+    TextEditingController? stockController,
+    TextEditingController? maxOrderQuantityController,
+  }) async {
     AiController aiController = Get.find<AiController>();
 
-    aiController.generateOtherData(title: title, description: description).then((value) async {
+    await aiController.generateOtherData(title: title, description: description);
 
-      OtherDataModel? otherData = aiController.otherDataModel;
+    OtherDataModel? otherData = aiController.otherDataModel;
 
-      if(otherData != null){
-        if(otherData.generalData?.data?.isHalal ?? false) {
-          toggleHalal();
+    if(otherData != null){
+      if(otherData.generalData?.data?.isHalal ?? false) {
+        toggleHalal();
+      }
+
+      await Get.find<CategoryController>().setCategoryAndSubCategoryForAiData(
+        categoryId: otherData.generalData!.data!.categoryId.toString(),
+        subCategoryId: otherData.generalData!.data!.subCategoryId?.toString(),
+      );
+
+      if(otherData.generalData?.data?.nutrition != null && otherData.generalData!.data!.nutrition!.isNotEmpty) {
+        await _getNutritionSuggestionList();
+        _selectedNutritionList = [];
+        _selectedNutritionList?.addAll(otherData.generalData!.data!.nutrition!);
+      }
+
+      if(otherData.generalData?.data?.allergy != null && otherData.generalData!.data!.allergy!.isNotEmpty) {
+        await _getAllergicIngredientsSuggestionList();
+        _selectedAllergicIngredientsList = [];
+        _selectedAllergicIngredientsList?.addAll(otherData.generalData!.data!.allergy!);
+      }
+
+      setVeg(otherData.generalData?.data?.productType == 'veg', true);
+
+      if(Get.find<SplashController>().configModel!.systemTaxType == 'product_wise'){
+        if(_vatTaxList != null && _vatTaxList!.isNotEmpty) {
+          int randomIndex = Random().nextInt(_vatTaxList!.length);
+          VatTaxModel randomVatTax = _vatTaxList![randomIndex];
+          setSelectedVatTax(randomVatTax.name, randomVatTax.id, randomVatTax.taxRate);
+        }
+      }
+
+      if(otherData.generalData?.data?.addonsIds != null && otherData.generalData!.data!.addonsIds!.isNotEmpty) {
+        _selectedAddons = [];
+        List<int?> addonsIds = await Get.find<AddonController>().getAddonList();
+
+        for(int index = 0; index < otherData.generalData!.data!.addonsIds!.length; index++) {
+          setSelectedAddonIndex(addonsIds.indexOf(otherData.generalData!.data!.addonsIds![index]), false);
+        }
+        update();
+      }
+
+      setAvailableTimeStarts(startTime: otherData.generalData?.data?.availableTimeStarts);
+      setAvailableTimeEnds(endTime: otherData.generalData?.data?.availableTimeEnds);
+
+      ///Price & Discount
+      final PriceData? priceData = otherData.priceData;
+      priceController?.text = priceData?.unitPrice.toString() ?? '0';
+      setDiscountTypeIndex(priceData?.discountType == 'amount' ? 1 : 0, true);
+      discountController?.text = priceData?.discountAmount.toString() ?? '0';
+      stockController?.text = priceData?.totalStock.toString() ?? '0';
+      maxOrderQuantityController?.text = (priceData?.maxOrderQuantity ?? priceData?.minimumOrderQuantity ?? 0).toString();
+
+      ///Tags
+      if(otherData.generalData?.data?.searchTags != null && otherData.generalData!.data!.searchTags!.isNotEmpty){
+        _tagList = [];
+        _tagList.addAll(otherData.generalData!.data!.searchTags!);
+      }
+    }
+
+    update();
+  }
+
+  Future<void> generateAndSetVariationData({required String title, required String description}) async {
+    AiController aiController = Get.find<AiController>();
+
+    await aiController.generateVariationData(title: title, description: description);
+
+    VariationDataModel? variationData = aiController.variationDataModel;
+
+    if(variationData != null && variationData.data != null && variationData.data!.isNotEmpty) {
+      _variationList = [];
+      for (var variation in variationData.data!) {
+        List<Option> options = [];
+
+        for (var option in variation.options!) {
+          options.add(Option(
+            optionNameController: TextEditingController(text: option.optionName),
+            optionPriceController: TextEditingController(text: option.optionPrice.toString()),
+          ),
+          );
         }
 
-        Get.find<CategoryController>().setCategoryAndSubCategoryForAiData(
-          categoryId: otherData.generalData!.data!.categoryId.toString(),
-          subCategoryId: otherData.generalData!.data!.subCategoryId?.toString(),
+        _variationList!.add(VariationModelBodyModel(
+          nameController: TextEditingController(text: variation.variationName),
+          isSingle: variation.selectionType == 'single' ? true : false,
+          minController: TextEditingController(text: variation.min != null ? variation.min.toString() : ''),
+          maxController: TextEditingController(text: variation.max != null ? variation.max.toString() : ''),
+          required: variation.required == true,
+          options: options,
+        ));
+      }
+      update();
+    }
+  }
+
+  Future<void> generateAndSetAttributeData({required String title, required String description}) async {
+    AiController aiController = Get.find<AiController>();
+
+    await aiController.generateAttributeData(title: title, description: description);
+
+    AttributeDataModel? attributeData = aiController.attributeDataModel;
+
+    if(attributeData != null && attributeData.data != null && attributeData.data?.choiceAttributes != null && attributeData.data!.choiceAttributes!.isNotEmpty) {
+      _attributeList = [];
+      for (var attribute in attributeData.data!.choiceAttributes!) {
+        _attributeList!.add(AttributeModel(
+          attribute: Attr(id: attribute.id, name: attribute.name),
+          active: attribute.options != null && attribute.options!.isNotEmpty,
+          controller: TextEditingController(),
+          variants: attribute.options != null ? attribute.options!.map((e) => e).toList() : [],
+        ));
+      }
+      update();
+    }
+  }
+
+  Future<bool> generateAndSetDataFromImage({List<Language>? languageList, TabController? tabController, List<TextEditingController>? nameControllerList, List<TextEditingController>? descriptionControllerList, TextEditingController? priceController,
+    TextEditingController? discountController, TextEditingController? stockController, TextEditingController? maxOrderQuantityController}) async {
+    AiController aiController = Get.find<AiController>();
+
+    Response response = await aiController.generateFromImage(image: _rawLogo!);
+    if(response.statusCode == 200){
+
+      aiController.setRequestType('image');
+
+      String title = response.body['title'] ?? '';
+
+      if (Get.isBottomSheetOpen ?? false) {
+        Get.back();
+      }
+
+      if (Get.isBottomSheetOpen ?? false) {
+        Get.back();
+      }
+
+      await aiController.generateTitleAndDes(title: title, langCode: languageList![tabController!.index].key!);
+      if(aiController.titleDesModel != null){
+        nameControllerList?[tabController.index].text = aiController.titleDesModel!.title ?? '';
+        descriptionControllerList?[tabController.index].text = aiController.titleDesModel!.description ?? '';
+      }
+
+      await generateAndSetOtherData(
+        title: aiController.titleDesModel?.title ?? '',
+        description: aiController.titleDesModel?.description ?? '',
+        priceController: priceController,
+        discountController: discountController,
+        stockController: stockController,
+        maxOrderQuantityController: maxOrderQuantityController,
+      );
+
+      if(Get.find<SplashController>().getStoreModuleConfig().newVariation!){
+        await generateAndSetVariationData(
+          title: aiController.titleDesModel?.title ?? '',
+          description: aiController.titleDesModel?.description ?? '',
         );
-
-        if(otherData.generalData?.data?.nutrition != null && otherData.generalData!.data!.nutrition!.isNotEmpty) {
-          _getNutritionSuggestionList();
-          _selectedNutritionList = [];
-          _selectedNutritionList?.addAll(otherData.generalData!.data!.nutrition!);
-        }
-
-        if(otherData.generalData?.data?.allergy != null && otherData.generalData!.data!.allergy!.isNotEmpty) {
-          _getAllergicIngredientsSuggestionList();
-          _selectedAllergicIngredientsList = [];
-          _selectedAllergicIngredientsList?.addAll(otherData.generalData!.data!.allergy!);
-        }
-
-        setVeg(otherData.generalData?.data?.productType == 'veg', true);
-
-        if(Get.find<SplashController>().configModel!.systemTaxType == 'product_wise'){
-          if(_vatTaxList != null && _vatTaxList!.isNotEmpty) {
-            int randomIndex = Random().nextInt(_vatTaxList!.length);
-            VatTaxModel randomVatTax = _vatTaxList![randomIndex];
-            setSelectedVatTax(randomVatTax.name, randomVatTax.id, randomVatTax.taxRate);
-          }
-        }
-
-        if(otherData.generalData?.data?.addonsIds != null && otherData.generalData!.data!.addonsIds!.isNotEmpty) {
-          _selectedAddons = [];
-          List<int?> addonsIds = await Get.find<AddonController>().getAddonList();
-
-          for(int index = 0; index < otherData.generalData!.data!.addonsIds!.length; index++) {
-            setSelectedAddonIndex(addonsIds.indexOf(otherData.generalData!.data!.addonsIds![index]), false);
-          }
-          update();
-        }
-
-        setAvailableTimeStarts(startTime: otherData.generalData?.data?.availableTimeStarts);
-        setAvailableTimeEnds(endTime: otherData.generalData?.data?.availableTimeEnds);
-
-        ///Price & Discount
-        priceController?.text = otherData.priceData?.unitPrice.toString() ?? '0';
-        setDiscountTypeIndex(1, true);
-        discountController?.text = otherData.priceData?.discountAmount.toString() ?? '0';
-        maxOrderQuantityController?.text = otherData.priceData?.minimumOrderQuantity.toString() ?? '0';
-
-        ///Tags
-        if(otherData.generalData?.data?.searchTags != null && otherData.generalData!.data!.searchTags!.isNotEmpty){
-          _tagList = [];
-          _tagList.addAll(otherData.generalData!.data!.searchTags!);
-        }
+      }else{
+        await generateAndSetAttributeData(
+          title: aiController.titleDesModel?.title ?? '',
+          description: aiController.titleDesModel?.description ?? '',
+        );
       }
 
       update();
-    });
-  }
+      return true;
+    }
 
-  void generateAndSetVariationData({required String title, required String description}){
-    AiController aiController = Get.find<AiController>();
-
-    aiController.generateVariationData(title: title, description: description).then((value) {
-
-      VariationDataModel? variationData = aiController.variationDataModel;
-
-      if(variationData != null && variationData.data != null && variationData.data!.isNotEmpty) {
-        _variationList = [];
-        for (var variation in variationData.data!) {
-          List<Option> options = [];
-
-          for (var option in variation.options!) {
-            options.add(Option(
-              optionNameController: TextEditingController(text: option.optionName),
-              optionPriceController: TextEditingController(text: option.optionPrice.toString()),
-            ),
-            );
-          }
-
-          _variationList!.add(VariationModelBodyModel(
-            nameController: TextEditingController(text: variation.variationName),
-            isSingle: variation.selectionType == 'single' ? true : false,
-            minController: TextEditingController(text: variation.min != null ? variation.min.toString() : ''),
-            maxController: TextEditingController(text: variation.max != null ? variation.max.toString() : ''),
-            required: variation.required == true,
-            options: options,
-          ));
-        }
-        update();
-      }
-    });
-  }
-
-  void generateAndSetAttributeData({required String title, required String description}){
-    AiController aiController = Get.find<AiController>();
-
-    aiController.generateAttributeData(title: title, description: description).then((value) {
-
-      AttributeDataModel? attributeData = aiController.attributeDataModel;
-
-      if(attributeData != null && attributeData.data != null && attributeData.data?.choiceAttributes != null && attributeData.data!.choiceAttributes!.isNotEmpty) {
-        _attributeList = [];
-        for (var attribute in attributeData.data!.choiceAttributes!) {
-          _attributeList!.add(AttributeModel(
-            attribute: Attr(id: attribute.id, name: attribute.name),
-            active: attribute.options != null && attribute.options!.isNotEmpty,
-            controller: TextEditingController(),
-            variants: attribute.options != null ? attribute.options!.map((e) => e).toList() : [],
-          ));
-        }
-        update();
-      }
-    });
-  }
-
-  Future<void> generateAndSetDataFromImage({List<Language>? languageList, TabController? tabController, List<TextEditingController>? nameControllerList, List<TextEditingController>? descriptionControllerList, TextEditingController? priceController,
-    TextEditingController? discountController, TextEditingController? maxOrderQuantityController}) async {
-    AiController aiController = Get.find<AiController>();
-
-    await aiController.generateFromImage(image: _rawLogo!).then((response) async {
-      if(response.statusCode == 200){
-
-        aiController.setRequestType('image');
-
-        String title = response.body['title'] ?? '';
-
-        if (Get.isBottomSheetOpen ?? false) {
-          Get.back();
-        }
-
-        if (Get.isBottomSheetOpen ?? false) {
-          Get.back();
-        }
-
-        await aiController.generateTitleAndDes(title: title, langCode: languageList![tabController!.index].key!).then((value) {
-          if(aiController.titleDesModel != null){
-            nameControllerList?[tabController.index].text = aiController.titleDesModel!.title ?? '';
-            descriptionControllerList?[tabController.index].text = aiController.titleDesModel!.description ?? '';
-          }
-        }).then((value) {
-          if(Get.find<SplashController>().getStoreModuleConfig().newVariation!){
-            generateAndSetVariationData(
-              title: aiController.titleDesModel?.title ?? '',
-              description: aiController.titleDesModel?.description ?? '',
-            );
-          }else{
-            generateAndSetAttributeData(
-              title: aiController.titleDesModel?.title ?? '',
-              description: aiController.titleDesModel?.description ?? '',
-            );
-          }
-        });
-      }
-    });
     update();
+    return false;
   }
 
   void setMetaIndex(String? index) {
@@ -1729,6 +1877,17 @@ class StoreController extends GetxController implements GetxService {
   }
 
   void initializeMetaData(MetaSeoData? metaData) {
+    _pickedMetaImage = null;
+    _isMetaImageValid = true;
+    _metaIndex = 'index';
+    _noFollow = null;
+    _noImageIndex = null;
+    _noArchive = null;
+    _noSnippet = null;
+    _maxSnippet = null;
+    _maxVideoPreview = null;
+    _maxImagePreview = null;
+    _imagePreviewSelectedType = 'large';
     if (metaData != null) {
       _metaIndex = metaData.metaIndex.toString();
       _noFollow = metaData.metaNoFollow;

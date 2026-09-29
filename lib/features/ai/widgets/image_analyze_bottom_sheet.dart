@@ -18,13 +18,17 @@ class ImageAnalyzeBottomSheet extends StatefulWidget {
   final List<TextEditingController>? descriptionControllerList;
   final TextEditingController? priceController;
   final TextEditingController? discountController;
+  final TextEditingController? stockController;
   final TextEditingController? maxOrderQuantityController;
   final TextEditingController? metaTitleController;
   final TextEditingController? metaDescriptionController;
   final TextEditingController? maxSnippetController;
   final TextEditingController? maxVideoPreviewController;
-  const ImageAnalyzeBottomSheet({super.key, this.nameControllerList, this.descriptionControllerList, this.priceController, this.discountController, this.maxOrderQuantityController,
-    this.metaTitleController, this.metaDescriptionController, this.maxSnippetController, this.maxVideoPreviewController, this.languageList, this.tabController});
+  final VoidCallback? onGeneratedDiscountTypeSelected;
+  final VoidCallback? onImageDataApplied;
+  const ImageAnalyzeBottomSheet({super.key, this.nameControllerList, this.descriptionControllerList, this.priceController, this.discountController, this.stockController,
+    this.maxOrderQuantityController, this.metaTitleController, this.metaDescriptionController, this.maxSnippetController, this.maxVideoPreviewController,
+    this.languageList, this.tabController, this.onGeneratedDiscountTypeSelected, this.onImageDataApplied});
 
   @override
   State<ImageAnalyzeBottomSheet> createState() => _ImageAnalyzeBottomSheetState();
@@ -166,19 +170,24 @@ class _ImageAnalyzeBottomSheetState extends State<ImageAnalyzeBottomSheet> {
                   icon: Icons.auto_awesome,
                   isLoading: aiController.imageLoading,
                   color: Colors.blue,
-                  onPressed: () {
+                  onPressed: () async {
                     if(storeController.rawLogo == null) {
                       showCustomSnackBar('please_upload_an_image'.tr);
                     }else {
-                      storeController.generateAndSetDataFromImage(
+                      widget.onGeneratedDiscountTypeSelected?.call();
+                      final bool isGenerated = await storeController.generateAndSetDataFromImage(
                         languageList: widget.languageList,
                         tabController: widget.tabController,
                         nameControllerList: widget.nameControllerList,
                         descriptionControllerList: widget.descriptionControllerList,
                         priceController: widget.priceController,
                         discountController: widget.discountController,
+                        stockController: widget.stockController,
                         maxOrderQuantityController: widget.maxOrderQuantityController,
                       );
+                      if(isGenerated) {
+                        widget.onImageDataApplied?.call();
+                      }
                     }
                   },
                   buttonText: 'analyze_and_generate_content'.tr,

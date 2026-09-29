@@ -92,7 +92,7 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
           padding: EdgeInsets.only(right: 8),
         ),
         iconStyleData: IconStyleData(
-          icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).disabledColor, size: 30),
+          icon: Icon(Icons.arrow_drop_down, color: Theme.of(context).disabledColor, size: 30),
         ),
         dropdownStyleData: DropdownStyleData(
           maxHeight: 300,

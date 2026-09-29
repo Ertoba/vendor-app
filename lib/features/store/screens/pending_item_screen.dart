@@ -148,7 +148,7 @@ class _PendingItemScreenState extends State<PendingItemScreen> with SingleTicker
 
                                     Row(children: [
                                       Text('${'category'.tr} : ', style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeSmall)),
-                                      Text(storeController.pendingItem![index].categoryIds![index].name.toString(), style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall)),
+                                      Flexible(child: Text(storeController.pendingItem![index].categoryIds![index].name.toString(), style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall), overflow: TextOverflow.ellipsis, maxLines: 1,)),
                                     ]),
 
                                     const SizedBox(height: Dimensions.paddingSizeExtraSmall),

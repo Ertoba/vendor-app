@@ -42,6 +42,7 @@ class AuthRepository implements AuthRepositoryInterface {
     if(!GetPlatform.isWeb) {
       FirebaseMessaging.instance.subscribeToTopic(AppConstants.topic);
       FirebaseMessaging.instance.subscribeToTopic(sharedPreferences.getString(AppConstants.zoneTopic)!);
+      FirebaseMessaging.instance.subscribeToTopic(AppConstants.maintenanceModeTopic);
     }
     return await apiClient.postData(AppConstants.tokenUri, {"_method": "put", "token": getUserToken(), "fcm_token": deviceToken}, handleError: false);
   }

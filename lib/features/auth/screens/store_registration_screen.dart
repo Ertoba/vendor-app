@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart_store/common/widgets/confirmation_dialog_widget.dart';
 import 'package:sixam_mart_store/common/widgets/custom_asset_image_widget.dart';
 import 'package:sixam_mart_store/common/widgets/custom_tool_tip_widget.dart';
 import 'package:sixam_mart_store/features/auth/controllers/auth_controller.dart';
@@ -19,7 +20,6 @@ import 'package:sixam_mart_store/features/splash/controllers/splash_controller.d
 import 'package:sixam_mart_store/features/store/domain/models/store_body_model.dart';
 import 'package:sixam_mart_store/common/models/config_model.dart';
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
-import 'package:sixam_mart_store/helper/input_language_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/helper/validate_check.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
@@ -61,8 +61,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
   final FocusNode _confirmPasswordFocus = FocusNode();
-  final List<Language> _languageList = buildInputLanguageList(Get.find<SplashController>().configModel!.language);
-  int get _defaultLanguageIndex => englishLanguageIndex(_languageList);
+  final List<Language>? _languageList = Get.find<SplashController>().configModel!.language;
 
   final ScrollController _scrollController = ScrollController();
   String? _countryDialCode;
@@ -76,7 +75,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _languageList.length, initialIndex: 0, vsync: this);
+    _tabController = TabController(length: _languageList!.length, initialIndex: 0, vsync: this);
     _countryDialCode = CountryCode.fromCountryCode(Get.find<SplashController>().configModel!.country!).dialCode;
     for (var language in _languageList) {
       if (kDebugMode) {
@@ -110,8 +109,8 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
     return GetBuilder<AuthController>(builder: (authController) {
       return GetBuilder<AddressController>(builder: (addressController) {
 
-        if(addressController.storeAddress != null && _languageList.isNotEmpty){
-          _addressController[_defaultLanguageIndex].text = addressController.storeAddress.toString();
+        if(addressController.storeAddress != null && _languageList!.isNotEmpty){
+          _addressController[0].text = addressController.storeAddress.toString();
         }
 
         return PopScope(
@@ -123,7 +122,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
             }else if(authController.storeStatus == 0.9){
               authController.storeStatusChange(0.6);
             }else {
-              await _showBackPressedDialogue();
+              await _showBackPressedDialogue('your_registration_not_setup_yet'.tr);
             }
           },
           child: Scaffold(
@@ -135,7 +134,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
               }else if(authController.storeStatus == 0.9){
                 authController.storeStatusChange(0.6);
               }else {
-                await _showBackPressedDialogue();
+                await _showBackPressedDialogue('your_registration_not_setup_yet'.tr);
               }
             }),
 
@@ -217,7 +216,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                 labelText: 'vendor_name'.tr,
                                 controller: _nameController[_tabController!.index],
                                 focusNode: _nameFocus[_tabController!.index],
-                                nextFocus: _tabController!.index != _languageList.length-1 ? _addressFocus[_tabController!.index] : _addressFocus[0],
+                                nextFocus: _tabController!.index != _languageList!.length-1 ? _addressFocus[_tabController!.index] : _addressFocus[0],
                                 inputType: TextInputType.name,
                                 prefixImage: Images.shopIcon,
                                 capitalization: TextCapitalization.words,
@@ -231,15 +230,11 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                 Expanded(flex: 4,
                                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-                                    Text.rich(
-                                      TextSpan(children: [
-                                        TextSpan(text: 'vendor_logo'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7))),
-                                        TextSpan(text: ' (1:1)', style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall)),
-                                        TextSpan(text: ' *'.tr, style: robotoRegular.copyWith(color: Colors.red, fontSize: Dimensions.fontSizeDefault)),
-                                      ]),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                    Row(children: [
+                                      Text('vendor_logo'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7))),
+                                      Text(' (${'1:1'})', style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall)),
+                                      Text(' *'.tr, style: robotoRegular.copyWith(color: Colors.red, fontSize: Dimensions.fontSizeDefault)),
+                                    ]),
                                     const SizedBox(height: Dimensions.paddingSizeDefault),
 
                                     Align(alignment: Alignment.center, child: Stack(children: [
@@ -267,7 +262,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                               Padding(
                                                 padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
                                                 child: Text(
-                                                  'registration_image_format_maximum_10_mb'.tr,
+                                                  'thumbnail_image_format'.tr,
                                                   style: robotoRegular.copyWith(color: Theme.of(context).disabledColor.withValues(alpha: 0.6), fontSize: Dimensions.fontSizeSmall),
                                                   textAlign: TextAlign.center,
                                                 ),
@@ -290,7 +285,19 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                               padding: const EdgeInsets.all(0),
                                               radius: const Radius.circular(Dimensions.radiusDefault),
                                             ),
-                                            child: const SizedBox.expand(),
+                                            child: Center(
+                                              child: Visibility(
+                                                visible: authController.pickedLogo != null,
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(25),
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(width: 2, color: Colors.white),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: const Icon(CupertinoIcons.photo_camera_solid, color: Colors.white),
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -302,15 +309,11 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                 Expanded(flex: 6,
                                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-                                    Text.rich(
-                                      TextSpan(children: [
-                                        TextSpan(text: 'vendor_cover'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7))),
-                                        TextSpan(text: ' (3:1)', style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall)),
-                                        TextSpan(text: ' *'.tr, style: robotoRegular.copyWith(color: Colors.red, fontSize: Dimensions.fontSizeDefault)),
-                                      ]),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                    Row(children: [
+                                      Text('vendor_cover'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7))),
+                                      Text(' (${'3:1'})', style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall)),
+                                      Text(' *'.tr, style: robotoRegular.copyWith(color: Colors.red, fontSize: Dimensions.fontSizeDefault)),
+                                    ]),
                                     const SizedBox(height: Dimensions.paddingSizeDefault),
 
                                     Stack(children: [
@@ -360,7 +363,14 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                               padding: const EdgeInsets.all(0),
                                               radius: const Radius.circular(Dimensions.radiusDefault),
                                             ),
-                                            child: const SizedBox.expand(),
+                                            child: Center(child: Visibility(
+                                              visible: authController.pickedCover != null,
+                                              child: Container(
+                                                padding: const EdgeInsets.all(25),
+                                                decoration: BoxDecoration(border: Border.all(width: 3, color: Colors.white), shape: BoxShape.circle),
+                                                child: const Icon(CupertinoIcons.photo_camera_solid, color: Colors.white, size: 50),
+                                              ),
+                                            )),
                                           ),
                                         ),
                                       ),
@@ -377,7 +387,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                           const SizedBox(height: Dimensions.paddingSizeDefault),
 
                           addressController.zoneList != null ? SelectLocationAndModuleViewWidget(
-                            fromView: true,  addressController: _addressController[_defaultLanguageIndex], addressFocus: _addressFocus[_defaultLanguageIndex],
+                            fromView: true,  addressController: _addressController[0], addressFocus: _addressFocus[0],
                           ) : const Center(child: CircularProgressIndicator()),
 
                           const SizedBox(height: Dimensions.paddingSizeLarge),
@@ -835,7 +845,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                               const SizedBox(height: Dimensions.paddingSizeExtremeLarge),
 
                               CustomTextFieldWidget(
-                                hintText: 'XXX-XXXXXX',
+                                hintText: 'enter_phone_number'.tr,
                                 controller: _phoneController,
                                 focusNode: _phoneFocus,
                                 nextFocus: _emailFocus,
@@ -1014,10 +1024,14 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                     margin: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                     onPressed: () {
                       bool defaultNameNull = false;
+                      bool defaultAddressNull = false;
                       for(int index=0; index<_languageList.length; index++) {
                         if(_languageList[index].key == 'en') {
                           if (_nameController[index].text.trim().isEmpty) {
                             defaultNameNull = true;
+                          }
+                          if(_addressController[index].text.trim().isEmpty){
+                            defaultAddressNull = true;
                           }
                           break;
                         }
@@ -1030,6 +1044,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                       String phone = _phoneController.text.trim();
                       String email = _emailController.text.trim();
                       String password = _passwordController.text.trim();
+                      String confirmPassword = _confirmPasswordController.text.trim();
                       String phoneWithCountryCode = _countryDialCode! + phone;
                       bool valid = false;
                       bool isRentalModule = addressController.moduleList != null && addressController.selectedModuleIndex != -1 &&
@@ -1135,220 +1150,12 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
     });
   }
 
-  Future<void> _showBackPressedDialogue() async {
-    await Get.dialog<void>(
-      _VendorRegistrationExitDialog(
-        onExit: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
-      ),
-      barrierDismissible: false,
-      useSafeArea: false,
-    );
+  Future<void> _showBackPressedDialogue(String title) async {
+    Get.dialog(ConfirmationDialogWidget(icon: Images.support,
+      title: title,
+      description: 'are_you_sure_to_go_back'.tr, isLogOut: true,
+      onYesPressed: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
+    ), useSafeArea: false);
   }
 
-}
-
-class _VendorRegistrationExitDialog extends StatelessWidget {
-  final VoidCallback onExit;
-
-  const _VendorRegistrationExitDialog({required this.onExit});
-
-  @override
-  Widget build(BuildContext context) {
-    final Color primaryColor = Theme.of(context).primaryColor;
-    const Color warningColor = Color(0xFFF37021);
-    final Color titleColor = Theme.of(context).textTheme.bodyLarge!.color!;
-
-    return PopScope(
-      canPop: false,
-      child: Dialog(
-        insetPadding: const EdgeInsets.symmetric(
-          horizontal: Dimensions.paddingSizeLarge,
-          vertical: Dimensions.paddingSizeLarge,
-        ),
-        backgroundColor: Colors.transparent,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 500),
-          child: Container(
-            padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              SizedBox(
-                width: 112,
-                height: 86,
-                child: Stack(alignment: Alignment.center, children: [
-                  Positioned(
-                    top: 5,
-                    child: Container(
-                      width: 74,
-                      height: 74,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: warningColor.withValues(alpha: 0.12),
-                        border: Border.all(
-                          color: warningColor.withValues(alpha: 0.16),
-                          width: 8,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
-                      boxShadow: [
-                        BoxShadow(
-                          color: warningColor.withValues(alpha: 0.18),
-                          blurRadius: 18,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(Icons.shield_outlined, color: warningColor, size: 32),
-                  ),
-                  const Positioned(
-                    child: Icon(Icons.question_mark_rounded, color: warningColor, size: 24),
-                  ),
-                  Positioned(
-                    left: 10,
-                    top: 42,
-                    child: Icon(Icons.close_rounded, color: warningColor.withValues(alpha: 0.42), size: 20),
-                  ),
-                  Positioned(
-                    right: 8,
-                    bottom: 20,
-                    child: Icon(Icons.close_rounded, color: warningColor.withValues(alpha: 0.35), size: 18),
-                  ),
-                  Positioned(left: 32, top: 16, child: _ExitDialogDot(color: warningColor, size: 8)),
-                  Positioned(right: 28, top: 16, child: _ExitDialogDot(color: warningColor, size: 8)),
-                  Positioned(right: 20, top: 44, child: _ExitDialogDot(color: warningColor, size: 10)),
-                ]),
-              ),
-              const SizedBox(height: Dimensions.paddingSizeDefault),
-              RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  style: robotoBold.copyWith(color: titleColor, fontSize: Dimensions.fontSizeLarge, height: 1.35),
-                  children: [
-                    TextSpan(text: 'vendor_registration_exit_title_start'.tr),
-                    TextSpan(
-                      text: 'vendor_registration_exit_title_emphasis'.tr,
-                      style: robotoBold.copyWith(color: warningColor),
-                    ),
-                    TextSpan(text: 'vendor_registration_exit_title_end'.tr),
-                  ],
-                ),
-              ),
-              const SizedBox(height: Dimensions.paddingSizeSmall),
-              Text(
-                'vendor_registration_exit_body'.tr,
-                textAlign: TextAlign.center,
-                style: robotoRegular.copyWith(
-                  color: Theme.of(context).hintColor,
-                  fontSize: Dimensions.fontSizeDefault,
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: Dimensions.paddingSizeDefault),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: Dimensions.paddingSizeSmall,
-                  vertical: Dimensions.paddingSizeSmall,
-                ),
-                decoration: BoxDecoration(
-                  color: warningColor.withValues(alpha: 0.06),
-                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                  border: Border.all(color: warningColor.withValues(alpha: 0.35)),
-                ),
-                child: Row(children: [
-                  const Icon(Icons.health_and_safety_outlined, color: warningColor, size: 24),
-                  const SizedBox(width: Dimensions.paddingSizeSmall),
-                  Expanded(
-                    child: Text(
-                      'vendor_registration_exit_note'.tr,
-                      textAlign: TextAlign.center,
-                      style: robotoMedium.copyWith(color: titleColor, fontSize: Dimensions.fontSizeDefault, height: 1.3),
-                    ),
-                  ),
-                ]),
-              ),
-              const SizedBox(height: Dimensions.paddingSizeLarge),
-              Row(children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => Get.back(),
-                    icon: Icon(Icons.close_rounded, color: Theme.of(context).hintColor, size: 20),
-                    label: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'vendor_registration_exit_close'.tr,
-                        style: robotoBold.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeDefault),
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(50),
-                      side: BorderSide(color: Theme.of(context).hintColor.withValues(alpha: 0.35)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.radiusDefault)),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: Dimensions.paddingSizeDefault),
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: onExit,
-                    icon: const Icon(Icons.logout_rounded, color: Colors.white, size: 20),
-                    label: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'vendor_registration_exit_confirm'.tr,
-                        style: robotoBold.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeDefault),
-                      ),
-                    ),
-                    style: TextButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.radiusDefault)),
-                    ),
-                  ),
-                ),
-              ]),
-            ]),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ExitDialogDot extends StatelessWidget {
-  final Color color;
-  final double size;
-
-  const _ExitDialogDot({
-    required this.color,
-    this.size = 12,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color.withValues(alpha: 0.20),
-      ),
-    );
-  }
 }

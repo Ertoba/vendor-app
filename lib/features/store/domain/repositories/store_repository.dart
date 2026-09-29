@@ -18,6 +18,7 @@ import 'package:sixam_mart_store/features/store/domain/models/suitable_tag_model
 import 'package:sixam_mart_store/features/store/domain/models/unit_model.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart_store/features/category/controllers/category_controller.dart';
 import 'package:sixam_mart_store/features/store/domain/repositories/store_repository_interface.dart';
 
 class StoreRepository implements StoreRepositoryInterface {
@@ -138,11 +139,12 @@ class StoreRepository implements StoreRepositoryInterface {
       'minimum_delivery_charge': store.minimumShippingCharge.toString(), 'per_km_delivery_charge': store.perKmShippingCharge.toString(),
       'veg': store.veg.toString(), 'non_veg': store.nonVeg.toString(),
       'halal_tag_status': store.isHalalActive! ? '1' : '0',
+      'show_low_stock_count': store.showLowStockCount == true ? '1' : '0',
       'order_place_to_schedule_interval': store.orderPlaceToScheduleInterval.toString(), 'minimum_delivery_time': min,
       'maximum_delivery_time': max, 'delivery_time_type': type, 'prescription_order': store.prescriptionStatus! ? '1' : '0',
       'cutlery': store.cutlery! ? '1' : '0', 'free_delivery': store.freeDelivery! ? '1' : '0',
       'extra_packaging_status': store.extraPackagingStatus! ? '1' : '0', 'extra_packaging_amount': store.extraPackagingAmount!.toString(),
-      'minimum_stock_for_warning': store.minimumStockForWarning.toString(),
+      'minimum_stock_for_warning': store.minimumStockForWarning?.toString() ?? '0',
     });
     if(store.maximumShippingCharge != null){
       fields.addAll({'maximum_delivery_charge':  store.maximumShippingCharge.toString()});
@@ -159,7 +161,7 @@ class StoreRepository implements StoreRepositoryInterface {
   }
 
   @override
-  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName) async {
+  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, XFile? video, String? videoLink, bool isVideoLink, bool removeSavedVideo, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName,) async {
     Map<String, String> fields = {};
     fields.addAll(<String, String>{
       'price': item.price.toString(), 'discount': item.discount.toString(), 'veg': item.veg.toString(),
@@ -220,6 +222,10 @@ class StoreRepository implements StoreRepositoryInterface {
     if(item.categoryIds!.length > 1) {
       fields.addAll(<String, String> {'sub_category_id': item.categoryIds![1].id!});
     }
+    final CategoryController categoryController = Get.find<CategoryController>();
+    if(categoryController.isMyCategoryFeatureEnabled && (categoryController.myCategories?.isNotEmpty ?? false) && item.storeCategoryId != null) {
+      fields.addAll(<String, String> {'store_category_id': item.storeCategoryId.toString()});
+    }
     if(!isAdd) {
       fields.addAll(<String, String> {'_method': 'put', 'id': item.itemId != null ? item.itemId.toString() : item.id.toString(), 'images': jsonEncode(savedImages)});
     }
@@ -242,6 +248,25 @@ class StoreRepository implements StoreRepositoryInterface {
     for(int index=0; index<images.length; index++) {
       images0.add(MultipartBody('item_images[]', images[index]));
     }
+    if(!isVideoLink && video != null) {
+      images0.add(MultipartBody('video', video));
+      fields.addAll({'video_upload_type': 'file'});
+    }
+
+    final String trimmedVideoLink = videoLink?.trim() ?? '';
+    if(!isAdd) {
+      final bool hasReplacementVideo = video != null || (isVideoLink && trimmedVideoLink.isNotEmpty);
+      if(removeSavedVideo && !hasReplacementVideo) {
+        fields.addAll({'remove_video' : "1",});
+      }
+    }
+
+    if(isVideoLink) {
+      fields.addAll(<String, String>{
+        'video_link': trimmedVideoLink,
+        'video_upload_type': 'link',
+      });
+    }
 
     fields.addAll({'removedImageKeys': jsonEncode(Get.find<StoreController>().removeImageList)});
     if(!isAdd){
@@ -252,7 +277,6 @@ class StoreRepository implements StoreRepositoryInterface {
         isAdd ? AppConstants.addItemUri : AppConstants.updateItemUri,
         fields,
         images0,
-        handleError: false
     );
     return response;
   }
@@ -357,7 +381,12 @@ class StoreRepository implements StoreRepositoryInterface {
   @override
   Future<List<BrandModel>?> getBrandList() async {
     List<BrandModel>? brands;
-    Response response = await apiClient.getData(AppConstants.getBrandsUri);
+    // moduleId is already sent in _mainHeaders automatically; also append as query param for explicitness
+    final int? moduleId = Get.find<ProfileController>().profileModel?.stores?[0].module?.id;
+    final String uri = moduleId != null
+        ? '${AppConstants.getBrandsUri}?module_id=$moduleId'
+        : AppConstants.getBrandsUri;
+    Response response = await apiClient.getData(uri);
     if(response.statusCode == 200) {
       brands = [];
       response.body!.forEach((brand) {

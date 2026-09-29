@@ -85,14 +85,4 @@ class ProfileRepository implements ProfileRepositoryInterface {
     throw UnimplementedError();
   }
 
-  // @override
-  // Future<bool> saveLowStockStatus(bool status) async {
-  //   return await sharedPreferences.setBool(AppConstants.lowStockStatus, status);
-  // }
-  //
-  // @override
-  // bool getLowStockStatus() {
-  //   return sharedPreferences.getBool(AppConstants.lowStockStatus) ?? false;
-  // }
-
 }

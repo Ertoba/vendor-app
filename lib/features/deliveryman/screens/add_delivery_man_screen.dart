@@ -172,7 +172,7 @@ class _AddDeliveryManScreenState extends State<AddDeliveryManScreen> {
 
                     TextFieldWidget(
                       // hintText: 'xxx-xxxx-xxxx',
-                      hintText: 'XXX-XXXXXX',
+                      hintText: 'phone'.tr,
                       controller: _phoneController,
                       focusNode: _phoneNode,
                       nextFocus: _passwordNode,

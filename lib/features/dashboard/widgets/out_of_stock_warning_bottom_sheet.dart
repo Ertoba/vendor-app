@@ -73,7 +73,7 @@ class OutOfStockWarningBottomSheet extends StatelessWidget {
                 onPressed: () {
                   Get.find<ProfileController>().hideLowStockWarning();
                   Get.back();
-                  return Get.toNamed(RouteHelper.getLowStockRoute());
+                  Get.toNamed(RouteHelper.getLowStockRoute());
                 },
               ),
               const SizedBox(height: Dimensions.paddingSizeExtraLarge),

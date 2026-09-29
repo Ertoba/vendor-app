@@ -52,9 +52,8 @@ class EmptyAdsView extends StatelessWidget {
         const SizedBox(height: Dimensions.paddingSizeExtremeLarge),
 
         CustomButtonWidget(
-          margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+          margin: EdgeInsets.symmetric(horizontal: context.width*0.2),
           buttonText: 'create_ads'.tr,
-          fontSize: Dimensions.fontSizeDefault,
           onPressed: (){
             Get.toNamed(RouteHelper.getCreateAdvertisementRoute());
           },

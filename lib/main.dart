@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'package:sixam_mart_store/common/widgets/navigation_safe_area.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:sixam_mart_store/features/home/widgets/trial_widget.dart';
 import 'package:sixam_mart_store/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart_store/common/controllers/theme_controller.dart';
@@ -25,17 +23,20 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterL
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (!GetPlatform.isWeb) {
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  }
-  await initializeDateFormatting();
   Map<String, Map<String, String>> languages = await di.init();
 
-  try {
-    if(!GetPlatform.isWeb) {
-      await Firebase.initializeApp();
-    }
-  } catch (_) {}
+  if(GetPlatform.isAndroid) {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AIzaSyCc3OCd5I2xSlnftZ4bFAbuCzMhgQHLivA",
+        appId: "1:491987943015:android:9795ba69e89c684b8f1ec2",
+        messagingSenderId: "491987943015",
+        projectId: "stackmart-500c7",
+      ),
+    );
+  }else {
+    await Firebase.initializeApp();
+  }
 
   NotificationBodyModel? body;
   try {
@@ -59,12 +60,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reduceMotion = WidgetsBinding.instance.platformDispatcher
-        .accessibilityFeatures.disableAnimations;
 
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.transparent,
       systemNavigationBarIconBrightness: Brightness.dark,
     ));
 
@@ -80,11 +81,12 @@ class MyApp extends StatelessWidget {
           fallbackLocale: Locale(AppConstants.languages[0].languageCode!, AppConstants.languages[0].countryCode),
           initialRoute: RouteHelper.getSplashRoute(body),
           getPages: RouteHelper.routes,
-          defaultTransition: reduceMotion ? Transition.noTransition : Transition.topLevel,
-          transitionDuration: reduceMotion ? Duration.zero : const Duration(milliseconds: 250),
+          defaultTransition: Transition.topLevel,
+          transitionDuration: const Duration(milliseconds: 500),
           builder: (BuildContext context, widget) {
-            return Material(
-              child: AppSafeArea(
+            return MediaQuery(data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1)), child: Material(
+              child: SafeArea(
+                top: false, bottom: GetPlatform.isAndroid,
                 child: Stack(children: [
                   widget!,
 
@@ -104,7 +106,7 @@ class MyApp extends StatelessWidget {
 
                 ]),
               ),
-            );
+            ));
           },
         );
       });

@@ -1,11 +1,14 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:marquee/marquee.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:sixam_mart_store/common/widgets/custom_app_bar_widget.dart';
-import 'package:sixam_mart_store/common/widgets/verified_seller_badge.dart';
-import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
+import 'package:sixam_mart_store/common/widgets/custom_image_widget.dart';
+import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
+import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart_store/features/store/widgets/announcement_bottom_sheet_widget.dart';
 import 'package:sixam_mart_store/helper/date_converter_helper.dart';
 import 'package:sixam_mart_store/helper/price_converter_helper.dart';
@@ -13,10 +16,6 @@ import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
 import 'package:sixam_mart_store/util/styles.dart';
-import 'package:sixam_mart_store/common/widgets/custom_image_widget.dart';
-import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import '../../../common/widgets/item_shimmer_widget.dart';
 import '../widgets/filter_popup_widget.dart';
@@ -221,13 +220,12 @@ class _StoreScreenState extends State<StoreScreen> with TickerProviderStateMixin
                           SizedBox(width: 75),
                           // Store Details
                           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Row(children: [
+                            Row(mainAxisSize: MainAxisSize.min, children: [
                               Flexible(child: Text(store.name ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,
                                 style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraLarge))),
-                              if (store.verifiedSeller == true) ...[
-                                const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                                const VerifiedSellerBadge(verified: true),
-                              ],
+                              SizedBox(width: Dimensions.paddingSizeExtraSmall),
+
+                              if(store.verifiedSeller ?? false) Image.asset(Images.verifyedBadge, width: Dimensions.fontSizeExtraLarge, height: Dimensions.fontSizeExtraLarge)
                             ]),
                             Text(store.address ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,
                               style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
@@ -293,7 +291,9 @@ class _StoreScreenState extends State<StoreScreen> with TickerProviderStateMixin
                               ),
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                  Flexible(child: Text('items'.tr, overflow: TextOverflow.ellipsis)), Image.asset(Images.itemsIcon, width: 20, height: 20),
+                                  Flexible(child: FittedBox(child: Text('items'.tr))),
+                                  SizedBox(width: Dimensions.paddingSizeSmall,),
+                                  Image.asset(Images.itemsIcon, width: 20, height: 20),
                                 ]),
                                 SizedBox(height: Dimensions.paddingSizeDefault),
 
@@ -312,10 +312,12 @@ class _StoreScreenState extends State<StoreScreen> with TickerProviderStateMixin
                             ),
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                Flexible(child: Text('orders'.tr, overflow: TextOverflow.ellipsis)), Image.asset(Images.ordersIcon, width: 20, height: 20),
+                                Flexible(child: FittedBox(child: Text('orders'.tr))),
+                                SizedBox(width: Dimensions.paddingSizeSmall,),
+                                Image.asset(Images.ordersIcon, width: 20, height: 20),
                               ]),
                               SizedBox(height: Dimensions.paddingSizeDefault),
-                              Text(store.totalOrder.toString(), style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Colors.indigo)),
+                              Text(store.totalOrder .toString(), style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Colors.indigo)),
                             ]),
                           )),
                         SizedBox(width: Dimensions.paddingSizeSmall),
@@ -332,11 +334,13 @@ class _StoreScreenState extends State<StoreScreen> with TickerProviderStateMixin
                               ),
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                  Flexible(child: Text('ratings'.tr, overflow: TextOverflow.ellipsis)), Image.asset(Images.ratingsIcon, width: 20, height: 20),
+                                  Flexible(child: FittedBox(child: Text('ratings'.tr))),
+                                  SizedBox(width: Dimensions.paddingSizeSmall,),
+                                  Image.asset(Images.ratingsIcon, width: 20, height: 20),
                                 ]),
                                 SizedBox(height: Dimensions.paddingSizeDefault),
                                 Row(children: [
-                                  Flexible(child: Text('${store.avgRating} ', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Colors.orange), overflow: TextOverflow.ellipsis)),
+                                  Text('${store.avgRating} ', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Colors.orange)),
                                   Text(
                                     '(${store.ratingCount})', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall,
                                     color: Theme.of(context).hintColor, decoration: TextDecoration.underline, decorationColor: Theme.of(context).disabledColor)),
@@ -402,7 +406,7 @@ class _StoreScreenState extends State<StoreScreen> with TickerProviderStateMixin
                         SizedBox(width: Dimensions.paddingSizeDefault),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text('make_announcement'.tr, style: robotoBold),
-                          Text('announcement_shown_in_app'.tr, style: robotoRegular.copyWith(color: Theme.of(context).hintColor)),
+                          Text('This Will be Shown in the user app/web.'.tr, style: robotoRegular.copyWith(color: Theme.of(context).hintColor)),
                         ])),
                         ElevatedButton(onPressed: ()=> showAnnouncementBottomSheet(announcementStatus: store.isAnnouncementActive!, announcementMessage: store.announcementMessage ?? '', context: context),
                           style: ElevatedButton.styleFrom(

@@ -1,3 +1,4 @@
+import 'package:sixam_mart_store/features/reports/domain/models/earning_report_model.dart';
 import 'package:sixam_mart_store/features/reports/domain/models/expense_model.dart';
 import 'package:sixam_mart_store/features/reports/domain/models/tax_report_model.dart';
 import 'package:sixam_mart_store/features/reports/domain/repositories/report_repository_interface.dart';
@@ -15,6 +16,11 @@ class ReportService implements ReportServiceInterface {
   @override
   Future<TaxReportModel?> getTaxReport({required int offset, required String? from, required String? to}) async {
     return await reportRepositoryInterface.getTaxReport(offset: offset, from: from, to: to);
+  }
+
+  @override
+  Future<EarningReportModel?> getEarningReport({required int offset, required int restaurantId, required String? from, required String? to, required String type}) async {
+    return await reportRepositoryInterface.getEarningReport(offset: offset, restaurantId: restaurantId, from: from, to: to, type: type);
   }
 
 }

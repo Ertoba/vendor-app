@@ -21,6 +21,16 @@ class ReportsScreen extends StatelessWidget {
           return Column(children: [
 
             profileController.modulePermission!.expenseReport! ? ReportCardWidget(
+              title: 'earning_report'.tr,
+              subtitle: 'revenue_overview'.tr,
+              image: Images.expense,
+              onTap: () {
+                Get.toNamed(RouteHelper.getEarningRoute());
+              },
+            ) : const SizedBox(),
+            SizedBox(height: profileController.modulePermission!.expenseReport! ? Dimensions.paddingSizeDefault : 0),
+
+            profileController.modulePermission!.expenseReport! ? ReportCardWidget(
               title: 'expense_report'.tr,
               subtitle: 'view_and_track_your_business_expenses_in_detail'.tr,
               image: Images.expense,

@@ -24,7 +24,7 @@ class _CategoryProductScreenState extends State<CategoryProductScreen> {
   void initState() {
     super.initState();
 
-    Get.find<CategoryController>().getSubCategoryList(widget.categoryId);
+    Get.find<CategoryController>().getSubCategoryList(widget.categoryId, isRestaurantWise: true);
     Get.find<CategoryController>().clearSelectedSubCategoryId();
     Get.find<CategoryController>().setSelectedSubCategoryIndex(0, false);
     Get.find<CategoryController>().setOffset(1);

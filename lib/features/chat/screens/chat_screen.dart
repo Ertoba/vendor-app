@@ -24,13 +24,7 @@ class ChatScreen extends StatefulWidget {
   final User? user;
   final int? conversationId;
   final bool fromNotification;
-  const ChatScreen({
-    super.key,
-    required this.notificationBody,
-    required this.user,
-    this.conversationId,
-    this.fromNotification = false,
-  });
+  const ChatScreen({super.key, required this.notificationBody, required this.user, this.conversationId, this.fromNotification = false});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -46,563 +40,256 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
 
     _isLoggedIn = Get.find<AuthController>().isLoggedIn();
-    if (widget.notificationBody != null) {
-      Get.find<ChatController>().getMessages(
-        1,
-        widget.notificationBody!,
-        widget.user,
-        widget.conversationId,
-        firstLoad: true,
-      );
-    }
+    Get.find<ChatController>().getMessages(1, widget.notificationBody!, widget.user, widget.conversationId, firstLoad: true);
+
   }
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ChatController>(
-      builder: (chatController) {
-        final User? receiver =
-            chatController.messageModel?.conversation?.receiver ?? widget.user;
-        // String? baseUrl = '';
-        // if(widget.notificationBody!.customerId != null || (widget.notificationBody!.conversationId != null && widget.notificationBody!.type == 'customer')) {
-        //   baseUrl = ImageType.customer_image_url.name;
-        // }else {
-        //   baseUrl = ImageType.delivery_man_image_url.name;
-        // }
+    return GetBuilder<ChatController>(builder: (chatController) {
+      // String? baseUrl = '';
+      // if(widget.notificationBody!.customerId != null || (widget.notificationBody!.conversationId != null && widget.notificationBody!.type == 'customer')) {
+      //   baseUrl = ImageType.customer_image_url.name;
+      // }else {
+      //   baseUrl = ImageType.delivery_man_image_url.name;
+      // }
 
-        return PopScope(
-          canPop: Navigator.canPop(context),
-          onPopInvokedWithResult: (didPop, result) async {
-            if (widget.fromNotification && !didPop) {
-              Get.offAllNamed(RouteHelper.getInitialRoute());
-            } else {
-              return;
-            }
-          },
-          child: Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                onPressed: () {
-                  if (widget.fromNotification) {
-                    Get.offAllNamed(RouteHelper.getInitialRoute());
-                  } else {
-                    Get.back();
-                  }
-                },
-                icon: const Icon(Icons.arrow_back_ios_rounded),
-              ),
-              title: Row(
-                children: [
-                  ClipOval(
-                    child: receiver?.imageFullUrl != null
-                        ? CustomImageWidget(
-                            image: receiver?.imageFullUrl ?? '',
-                            fit: BoxFit.cover,
-                            height: 40,
-                            width: 40,
-                          )
-                        : const SizedBox(),
+
+      return PopScope(
+        canPop: Navigator.canPop(context),
+        onPopInvokedWithResult: (didPop, result) async{
+          if(widget.fromNotification && !didPop) {
+            Get.offAllNamed(RouteHelper.getInitialRoute());
+          } else {
+            return;
+          }
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(onPressed: () {
+              if(widget.fromNotification){
+                Get.offAllNamed(RouteHelper.getInitialRoute());
+              }else{
+                Get.back();
+              }
+            },
+            icon: const Icon(Icons.arrow_back_ios_rounded)),
+            title: Row(
+              children: [
+                ClipOval(child: chatController.messageModel?.conversation!.receiver!.imageFullUrl != null ? CustomImageWidget(
+                  image: chatController.messageModel!.conversation!.receiver!.imageFullUrl ?? '',
+                  fit: BoxFit.cover, height: 40, width: 40,
+                ) : const SizedBox()),
+                SizedBox(width: 6),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(
+                    chatController.messageModel != null ? '${chatController.messageModel?.conversation!.receiver!.fName}'
+                    ' ${chatController.messageModel!.conversation!.receiver!.lName}' : 'receiver_name'.tr,
+                      style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge)
                   ),
-                  SizedBox(width: 6),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        receiver != null
-                            ? '${receiver.fName ?? ''} ${receiver.lName ?? ''}'
-                                  .trim()
-                            : 'receiver_name'.tr,
-                        style: robotoMedium.copyWith(
-                          fontSize: Dimensions.fontSizeLarge,
-                        ),
-                      ),
-                      receiver?.phone != null
-                          ? Text(
-                              ' ${receiver?.phone}',
-                              style: robotoRegular.copyWith(
-                                fontSize: Dimensions.fontSizeSmall,
-                              ),
-                            )
-                          : SizedBox.shrink(),
-                    ],
-                  ),
-                ],
-              ),
-              backgroundColor: Theme.of(context).cardColor,
-              scrolledUnderElevation: 0,
-              elevation: 0,
+                  chatController.messageModel?.conversation!.receiver!.phone != null ?  Text(
+                    ' ${chatController.messageModel!.conversation!.receiver!.phone}',
+                    style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
+                  ) : SizedBox.shrink(),
+                ]),
+              ],
             ),
-
-            body: _isLoggedIn
-                ? SafeArea(
-                    child: Center(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        child: Column(
-                          children: [
-                            GetBuilder<ChatController>(
-                              builder: (chatController) {
-                                return Expanded(
-                                  child: chatController.hasMessageLoadError
-                                      ? _buildRetryView(chatController)
-                                      : chatController.messageModel != null
-                                      ? chatController
-                                                .messageModel!
-                                                .messages!
-                                                .isNotEmpty
-                                            ? SingleChildScrollView(
-                                                controller: _scrollController,
-                                                reverse: true,
-                                                child: PaginatedListWidget(
-                                                  scrollController:
-                                                      _scrollController,
-                                                  totalSize: chatController
-                                                      .messageModel!
-                                                      .totalSize,
-                                                  offset: chatController
-                                                      .messageModel!
-                                                      .offset,
-                                                  onPaginate: (int? offset) async =>
-                                                      await chatController
-                                                          .getMessages(
-                                                            offset!,
-                                                            widget
-                                                                .notificationBody!,
-                                                            widget.user,
-                                                            widget
-                                                                .conversationId,
-                                                          ),
-                                                  productView: ListView.builder(
-                                                    physics:
-                                                        const NeverScrollableScrollPhysics(),
-                                                    shrinkWrap: true,
-                                                    reverse: true,
-                                                    itemCount: chatController
-                                                        .messageModel!
-                                                        .messages!
-                                                        .length,
-                                                    itemBuilder: (context, index) {
-                                                      Message? previousMessage =
-                                                          index <
-                                                              chatController
-                                                                      .messageModel!
-                                                                      .messages!
-                                                                      .length -
-                                                                  1
-                                                          ? chatController
-                                                                .messageModel!
-                                                                .messages![index +
-                                                                1]
-                                                          : null;
-                                                      Message? nextMessage =
-                                                          index > 0
-                                                          ? chatController
-                                                                .messageModel!
-                                                                .messages![index -
-                                                                1]
-                                                          : null;
-
-                                                      return MessageBubbleWidget(
-                                                        message: chatController
-                                                            .messageModel!
-                                                            .messages![index],
-                                                        previousMessage:
-                                                            previousMessage,
-                                                        nextMessage:
-                                                            nextMessage,
-                                                        user: chatController
-                                                            .messageModel!
-                                                            .conversation!
-                                                            .receiver,
-                                                        sender: chatController
-                                                            .messageModel!
-                                                            .conversation!
-                                                            .sender,
-                                                        userType:
-                                                            widget
-                                                                        .notificationBody!
-                                                                        .customerId !=
-                                                                    null ||
-                                                                (widget.notificationBody!.conversationId !=
-                                                                        null &&
-                                                                    widget
-                                                                            .notificationBody!
-                                                                            .type ==
-                                                                        'customer')
-                                                            ? AppConstants
-                                                                  .customer
-                                                            : AppConstants
-                                                                  .deliveryMan,
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                              )
-                                            : const SizedBox()
-                                      : const Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                );
-                              },
-                            ),
-
-                            (chatController.messageModel?.conversation !=
-                                        null &&
-                                    ((chatController.messageModel?.status ??
-                                            false) ||
-                                        (chatController
-                                                .messageModel
-                                                ?.messages
-                                                ?.isEmpty ??
-                                            true)))
-                                ? Container(
-                                    color: Theme.of(context).cardColor,
-                                    child: Column(
-                                      children: [
-                                        GetBuilder<ChatController>(
-                                          builder: (chatController) {
-                                            return chatController
-                                                    .chatImage!
-                                                    .isNotEmpty
-                                                ? SizedBox(
-                                                    height: 100,
-                                                    child: ListView.builder(
-                                                      scrollDirection:
-                                                          Axis.horizontal,
-                                                      shrinkWrap: true,
-                                                      itemCount: chatController
-                                                          .chatImage!
-                                                          .length,
-                                                      itemBuilder:
-                                                          (
-                                                            BuildContext
-                                                            context,
-                                                            index,
-                                                          ) {
-                                                            return chatController
-                                                                    .chatImage!
-                                                                    .isNotEmpty
-                                                                ? Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                          8.0,
-                                                                        ),
-                                                                    child: Stack(
-                                                                      children: [
-                                                                        Container(
-                                                                          width:
-                                                                              100,
-                                                                          height:
-                                                                              100,
-                                                                          decoration: const BoxDecoration(
-                                                                            color:
-                                                                                Colors.white,
-                                                                            borderRadius: BorderRadius.all(
-                                                                              Radius.circular(
-                                                                                20,
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          child: ClipRRect(
-                                                                            borderRadius: const BorderRadius.all(
-                                                                              Radius.circular(
-                                                                                Dimensions.paddingSizeDefault,
-                                                                              ),
-                                                                            ),
-                                                                            child:
-                                                                                ResponsiveHelper.isWeb()
-                                                                                ? Image.network(
-                                                                                    chatController.chatImage![index].path,
-                                                                                    width: 100,
-                                                                                    height: 100,
-                                                                                    fit: BoxFit.cover,
-                                                                                  )
-                                                                                : Image.file(
-                                                                                    File(
-                                                                                      chatController.chatImage![index].path,
-                                                                                    ),
-                                                                                    width: 100,
-                                                                                    height: 100,
-                                                                                    fit: BoxFit.cover,
-                                                                                  ),
-                                                                          ),
-                                                                        ),
-
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          right:
-                                                                              0,
-                                                                          child: InkWell(
-                                                                            onTap: () => chatController.removeImage(
-                                                                              index,
-                                                                            ),
-                                                                            child: Container(
-                                                                              decoration: const BoxDecoration(
-                                                                                color: Colors.white,
-                                                                                borderRadius: BorderRadius.all(
-                                                                                  Radius.circular(
-                                                                                    Dimensions.paddingSizeDefault,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                              child: const Padding(
-                                                                                padding: EdgeInsets.all(
-                                                                                  4.0,
-                                                                                ),
-                                                                                child: Icon(
-                                                                                  Icons.clear,
-                                                                                  color: Colors.red,
-                                                                                  size: 15,
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  )
-                                                                : const SizedBox();
-                                                          },
-                                                    ),
-                                                  )
-                                                : const SizedBox();
-                                          },
-                                        ),
-
-                                        Row(
-                                          children: [
-                                            InkWell(
-                                              onTap: () async {
-                                                Get.find<ChatController>()
-                                                    .pickImage(false);
-                                              },
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: Dimensions
-                                                          .paddingSizeDefault,
-                                                    ),
-                                                child: Image.asset(
-                                                  Images.image,
-                                                  width: 25,
-                                                  height: 25,
-                                                  color: Theme.of(
-                                                    context,
-                                                  ).hintColor,
-                                                ),
-                                              ),
-                                            ),
-
-                                            SizedBox(
-                                              height: 25,
-                                              child: VerticalDivider(
-                                                width: 0,
-                                                thickness: 1,
-                                                color: Theme.of(
-                                                  context,
-                                                ).hintColor,
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width:
-                                                  Dimensions.paddingSizeDefault,
-                                            ),
-
-                                            Expanded(
-                                              child: TextField(
-                                                inputFormatters: [
-                                                  LengthLimitingTextInputFormatter(
-                                                    Dimensions
-                                                        .messageInputLength,
-                                                  ),
-                                                ],
-                                                controller:
-                                                    _inputMessageController,
-                                                textCapitalization:
-                                                    TextCapitalization
-                                                        .sentences,
-                                                style: robotoRegular,
-                                                keyboardType:
-                                                    TextInputType.multiline,
-                                                maxLines: null,
-                                                decoration: InputDecoration(
-                                                  border: InputBorder.none,
-                                                  hintText: 'type_a_message'.tr,
-                                                  hintStyle: robotoRegular
-                                                      .copyWith(
-                                                        color: Theme.of(
-                                                          context,
-                                                        ).hintColor,
-                                                        fontSize: Dimensions
-                                                            .fontSizeLarge,
-                                                      ),
-                                                ),
-                                                onSubmitted: (String newText) {
-                                                  if (newText
-                                                          .trim()
-                                                          .isNotEmpty &&
-                                                      !Get.find<
-                                                            ChatController
-                                                          >()
-                                                          .isSendButtonActive) {
-                                                    Get.find<ChatController>()
-                                                        .toggleSendButtonActivity();
-                                                  } else if (newText.isEmpty &&
-                                                      Get.find<ChatController>()
-                                                          .isSendButtonActive) {
-                                                    Get.find<ChatController>()
-                                                        .toggleSendButtonActivity();
-                                                  }
-                                                },
-                                                onChanged: (String newText) {
-                                                  if (newText
-                                                          .trim()
-                                                          .isNotEmpty &&
-                                                      !Get.find<
-                                                            ChatController
-                                                          >()
-                                                          .isSendButtonActive) {
-                                                    Get.find<ChatController>()
-                                                        .toggleSendButtonActivity();
-                                                  } else if (newText.isEmpty &&
-                                                      Get.find<ChatController>()
-                                                          .isSendButtonActive) {
-                                                    Get.find<ChatController>()
-                                                        .toggleSendButtonActivity();
-                                                  }
-                                                },
-                                              ),
-                                            ),
-
-                                            GetBuilder<ChatController>(
-                                              builder: (chatController) {
-                                                return !chatController.isLoading
-                                                    ? InkWell(
-                                                        onTap: () async {
-                                                          if (chatController
-                                                              .isSendButtonActive) {
-                                                            if (chatController
-                                                                    .chatImage!
-                                                                    .length >
-                                                                3) {
-                                                              showCustomSnackBar(
-                                                                'you_do_not_send_more_then_3_photos'
-                                                                    .tr,
-                                                              );
-                                                            } else {
-                                                              chatController
-                                                                  .sendMessage(
-                                                                    message:
-                                                                        _inputMessageController
-                                                                            .text,
-                                                                    notificationBody:
-                                                                        widget
-                                                                            .notificationBody,
-                                                                    conversationId:
-                                                                        widget
-                                                                            .conversationId,
-                                                                  )
-                                                                  .then((
-                                                                    success,
-                                                                  ) {
-                                                                    _inputMessageController
-                                                                        .clear();
-                                                                    if (success) {
-                                                                      Future.delayed(
-                                                                        const Duration(
-                                                                          seconds:
-                                                                              2,
-                                                                        ),
-                                                                        () {
-                                                                          chatController.getMessages(
-                                                                            1,
-                                                                            widget.notificationBody!,
-                                                                            widget.user,
-                                                                            widget.conversationId,
-                                                                          );
-                                                                        },
-                                                                      );
-                                                                    }
-                                                                  });
-                                                            }
-                                                          } else {
-                                                            showCustomSnackBar(
-                                                              'write_somethings'
-                                                                  .tr,
-                                                            );
-                                                          }
-                                                        },
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.symmetric(
-                                                            horizontal: Dimensions
-                                                                .paddingSizeDefault,
-                                                          ),
-                                                          child: Image.asset(
-                                                            Images.send,
-                                                            width: 25,
-                                                            height: 25,
-                                                            color:
-                                                                chatController
-                                                                    .isSendButtonActive
-                                                                ? Theme.of(
-                                                                    context,
-                                                                  ).primaryColor
-                                                                : Theme.of(
-                                                                    context,
-                                                                  ).hintColor,
-                                                          ),
-                                                        ),
-                                                      )
-                                                    : const Padding(
-                                                        padding: EdgeInsets.symmetric(
-                                                          horizontal: Dimensions
-                                                              .paddingSizeDefault,
-                                                        ),
-                                                        child: SizedBox(
-                                                          width: 25,
-                                                          height: 25,
-                                                          child:
-                                                              CircularProgressIndicator(),
-                                                        ),
-                                                      );
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : const SizedBox(),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                : const Center(child: Text('Not Login')),
+            backgroundColor: Theme.of(context).cardColor,
+            scrolledUnderElevation: 0,
+            elevation: 0,
           ),
-        );
-      },
-    );
-  }
 
-  Widget _buildRetryView(ChatController chatController) {
-    return Center(
-      child: TextButton.icon(
-        onPressed: widget.notificationBody == null
-            ? null
-            : () {
-                chatController.getMessages(
-                  1,
-                  widget.notificationBody!,
-                  widget.user,
-                  widget.conversationId,
-                  firstLoad: true,
-                );
-              },
-        icon: const Icon(Icons.refresh),
-        label: Text('try_again'.tr),
-      ),
+          body: _isLoggedIn ? SafeArea(
+            child: Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Column(children: [
+
+                  GetBuilder<ChatController>(builder: (chatController) {
+                      return Expanded(child: chatController.messageModel != null ? chatController.messageModel!.messages!.isNotEmpty ? SingleChildScrollView(
+                        controller: _scrollController,
+                        reverse: true,
+                        child: PaginatedListWidget(
+                          scrollController: _scrollController,
+                          totalSize: chatController.messageModel!.totalSize,
+                          offset: chatController.messageModel!.offset,
+                          onPaginate: (int? offset) async => await chatController.getMessages(
+                            offset!, widget.notificationBody!, widget.user, widget.conversationId,
+                          ),
+                          productView: ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            reverse: true,
+                            itemCount: chatController.messageModel!.messages!.length,
+                            itemBuilder: (context, index) {
+                              Message? previousMessage = index < chatController.messageModel!.messages!.length - 1
+                                  ? chatController.messageModel!.messages![index + 1]
+                                  : null;
+                              Message? nextMessage = index > 0
+                                  ? chatController.messageModel!.messages![index - 1]
+                                  : null;
+                                  
+                              return MessageBubbleWidget(
+                                message: chatController.messageModel!.messages![index],
+                                previousMessage: previousMessage,
+                                nextMessage: nextMessage,
+                                user: chatController.messageModel!.conversation!.receiver,
+                                sender: chatController.messageModel!.conversation!.sender,
+                                userType: widget.notificationBody!.customerId != null || (widget.notificationBody!.conversationId != null && widget.notificationBody!.type == 'customer')
+                                    ? AppConstants.customer : AppConstants.deliveryMan,
+                              );
+                            },
+                          ),
+                        ),
+                      ) : const SizedBox() : const Center(child: CircularProgressIndicator()));
+                    }
+                  ),
+
+                  (chatController.messageModel != null && (chatController.messageModel!.status! || chatController.messageModel!.messages!.isEmpty)) ?  Container(
+                    color: Theme.of(context).cardColor,
+                    child: Column(children: [
+
+                      GetBuilder<ChatController>(builder: (chatController) {
+                        return chatController.chatImage!.isNotEmpty ? SizedBox(height: 100,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            itemCount: chatController.chatImage!.length,
+                            itemBuilder: (BuildContext context, index){
+                              return  chatController.chatImage!.isNotEmpty ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Stack(children: [
+
+                                  Container(width: 100, height: 100,
+                                    decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(20))),
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingSizeDefault)),
+                                      child: ResponsiveHelper.isWeb() ? Image.network(
+                                        chatController.chatImage![index].path, width: 100, height: 100, fit: BoxFit.cover,
+                                      ) : Image.file(
+                                        File(chatController.chatImage![index].path), width: 100, height: 100, fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+
+                                  Positioned(top:0, right:0,
+                                    child: InkWell(
+                                      onTap : () => chatController.removeImage(index),
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.all(Radius.circular(Dimensions.paddingSizeDefault))
+                                        ),
+                                        child: const Padding(
+                                          padding: EdgeInsets.all(4.0),
+                                          child: Icon(Icons.clear, color: Colors.red, size: 15),
+                                        ),
+                                      ),
+                                    ),
+                                  )],
+                                ),
+                              ) : const SizedBox();
+                            }
+                          ),
+                        ) : const SizedBox();
+                      }),
+
+                      Row(children: [
+                        InkWell(
+                          onTap: () async {
+                            Get.find<ChatController>().pickImage(false);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                            child: Image.asset(Images.image, width: 25, height: 25, color: Theme.of(context).hintColor),
+                          ),
+                        ),
+
+                        SizedBox(
+                          height: 25,
+                          child: VerticalDivider(width: 0, thickness: 1, color: Theme.of(context).hintColor),
+                        ),
+                        const SizedBox(width: Dimensions.paddingSizeDefault),
+
+                        Expanded(
+                          child: TextField(
+                            inputFormatters: [LengthLimitingTextInputFormatter(Dimensions.messageInputLength)],
+                            controller: _inputMessageController,
+                            textCapitalization: TextCapitalization.sentences,
+                            style: robotoRegular,
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'type_a_message'.tr,
+                              hintStyle: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeLarge),
+                            ),
+                            onSubmitted: (String newText) {
+                              if(newText.trim().isNotEmpty && !Get.find<ChatController>().isSendButtonActive) {
+                                Get.find<ChatController>().toggleSendButtonActivity();
+                              }else if(newText.isEmpty && Get.find<ChatController>().isSendButtonActive) {
+                                Get.find<ChatController>().toggleSendButtonActivity();
+                              }
+                            },
+                            onChanged: (String newText) {
+                              if(newText.trim().isNotEmpty && !Get.find<ChatController>().isSendButtonActive) {
+                                Get.find<ChatController>().toggleSendButtonActivity();
+                              }else if(newText.isEmpty && Get.find<ChatController>().isSendButtonActive) {
+                                Get.find<ChatController>().toggleSendButtonActivity();
+                              }
+                            },
+                          ),
+                        ),
+
+                        GetBuilder<ChatController>(builder: (chatController) {
+                            return !chatController.isLoading ? InkWell(
+                              onTap: () async {
+                                if(chatController.isSendButtonActive) {
+                                  if(chatController.chatImage!.length > 3){
+                                    showCustomSnackBar('you_do_not_send_more_then_3_photos'.tr);
+                                  }else{
+                                    chatController.sendMessage(
+                                      message: _inputMessageController.text, notificationBody: widget.notificationBody, conversationId: widget.conversationId,
+                                    ).then((success) {
+                                      _inputMessageController.clear();
+                                      if(success){
+                                        Future.delayed(const Duration(seconds: 2),() {
+                                          chatController.getMessages(1, widget.notificationBody!, widget.user, widget.conversationId);
+                                        });
+                                      }
+                                    });
+                                  }
+
+                                }else{
+                                  showCustomSnackBar('write_somethings'.tr);
+                                }
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                                child: Image.asset(
+                                  Images.send, width: 25, height: 25,
+                                  color: chatController.isSendButtonActive ? Theme.of(context).primaryColor : Theme.of(context).hintColor,
+                                ),
+                              ),
+                            ) : const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                              child: SizedBox(
+                                width: 25, height: 25,
+                                child: CircularProgressIndicator(),
+                              ),
+                            ) ;
+                        }),
+
+                      ]),
+                    ]),
+                  ) : const SizedBox(),
+                ]),
+              ),
+            ),
+          ) : const Center(child: Text('Not Login')),
+        ),
+      );
+    }
     );
   }
 }

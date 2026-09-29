@@ -80,7 +80,7 @@ class Data {
     categoryName = json['category_name'];
     subCategoryName = json['sub_category_name'];
     nutrition = json['nutrition'].cast<String>();
-    allergy = json['allergy'].cast<String>();
+    allergy = json['allergy']?.cast<String>();
     productType = json['product_type'];
     searchTags = json['search_tags'].cast<String>();
     isHalal = json['is_halal'];
@@ -121,13 +121,26 @@ class PriceData {
   double? unitPrice;
   int? minimumOrderQuantity;
   double? discountAmount;
+  String? discountType;
+  int? totalStock;
+  int? maxOrderQuantity;
 
-  PriceData({this.unitPrice, this.minimumOrderQuantity, this.discountAmount});
+  PriceData({
+    this.unitPrice,
+    this.minimumOrderQuantity,
+    this.discountAmount,
+    this.discountType,
+    this.totalStock,
+    this.maxOrderQuantity,
+  });
 
   PriceData.fromJson(Map<String, dynamic> json) {
-    unitPrice = json['unit_price']?.toDouble();
-    minimumOrderQuantity = json['minimum_order_quantity'];
-    discountAmount = json['discount_amount']?.toDouble();
+    unitPrice = _toDouble(json['unit_price']);
+    minimumOrderQuantity = _toInt(json['minimum_order_quantity']);
+    discountAmount = _toDouble(json['discount_amount']);
+    discountType = json['discount_type']?.toString();
+    totalStock = _toInt(json['total_stock'] ?? json['current_stock'] ?? json['stock']);
+    maxOrderQuantity = _toInt(json['max_order_quantity']);
   }
 
   Map<String, dynamic> toJson() {
@@ -135,6 +148,33 @@ class PriceData {
     data['unit_price'] = unitPrice;
     data['minimum_order_quantity'] = minimumOrderQuantity;
     data['discount_amount'] = discountAmount;
+    data['discount_type'] = discountType;
+    data['total_stock'] = totalStock;
+    data['max_order_quantity'] = maxOrderQuantity;
     return data;
   }
+}
+
+int? _toInt(dynamic value) {
+  if (value == null) {
+    return null;
+  } else if (value is int) {
+    return value;
+  } else if (value is num) {
+    return value.toInt();
+  }
+
+  return int.tryParse(value.toString());
+}
+
+double? _toDouble(dynamic value) {
+  if (value == null) {
+    return null;
+  } else if (value is double) {
+    return value;
+  } else if (value is num) {
+    return value.toDouble();
+  }
+
+  return double.tryParse(value.toString());
 }

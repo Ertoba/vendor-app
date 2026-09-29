@@ -7,8 +7,6 @@ import 'package:sixam_mart_store/features/deliveryman/domain/models/delivery_man
 import 'package:sixam_mart_store/features/store/domain/models/review_model.dart';
 
 class DeliverymanService implements DeliverymanServiceInterface {
-  static const int _maxRegistrationUploadBytes = 10 * 1024 * 1024;
-
   final DeliverymanRepositoryInterface deliverymanRepositoryInterface;
   DeliverymanService({required this.deliverymanRepositoryInterface});
 
@@ -53,11 +51,13 @@ class DeliverymanService implements DeliverymanServiceInterface {
   Future<XFile?> pickImageFromGallery() async {
     XFile? pickImage = await ImagePicker().pickImage(source: ImageSource.gallery);
     if(pickImage != null) {
-      final int fileSize = await pickImage.length();
-      if (fileSize > _maxRegistrationUploadBytes) {
-        showCustomSnackBar('please_upload_lower_size_file'.tr);
-        return null;
-      }
+      pickImage.length().then((value) {
+        if (value > 2000000) {
+          showCustomSnackBar('please_upload_lower_size_file'.tr);
+        } else {
+          return pickImage;
+        }
+      });
     }
     return pickImage;
   }

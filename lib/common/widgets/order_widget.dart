@@ -43,11 +43,12 @@ class OrderWidget extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Flexible(child: Row(children: [
+                    Row(children: [
                       Text('order'.tr, style: robotoRegular.copyWith(color: Theme.of(context).hintColor)),
                       Text(' # ${orderModel.id}', style: robotoBold),
-                      Flexible(child: Text(' (${orderModel.detailsCount} ${orderModel.detailsCount! < 2 ? 'item'.tr : 'items'.tr})', style: robotoRegular.copyWith(color: Theme.of(context).hintColor), overflow: TextOverflow.ellipsis)),
-                    ])),
+                      Text(' (${orderModel.detailsCount} ${orderModel.detailsCount! < 2 ? 'item'.tr : 'items'.tr})', style: robotoRegular.copyWith(color: Theme.of(context).hintColor)),
+                      if(orderModel.edited ?? false) Text(' ${'edited'.tr}', style: robotoMedium.copyWith(color: Colors.blueAccent, fontSize: Dimensions.fontSizeSmall)),
+                    ]),
 
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeExtraSmall),

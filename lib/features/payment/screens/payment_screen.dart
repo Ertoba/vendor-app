@@ -8,6 +8,7 @@ import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:sixam_mart_store/common/widgets/custom_app_bar_widget.dart';
 import 'package:sixam_mart_store/features/payment/widgets/fund_payment_dialog_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PaymentScreen extends StatefulWidget {
   final String paymentMethod;
@@ -171,6 +172,11 @@ class MyInAppBrowser extends InAppBrowser {
   Future<NavigationActionPolicy> shouldOverrideUrlLoading(navigationAction) async {
     if (kDebugMode) {
       print("\n\nOverride ${navigationAction.request.url}\n\n");
+    }
+    Uri uri = navigationAction.request.url!;
+    if (!["http", "https", "file", "chrome", "data", "javascript", "about"].contains(uri.scheme)) {
+      launchUrl(uri, mode: LaunchMode.externalApplication);
+      return NavigationActionPolicy.CANCEL;
     }
     return NavigationActionPolicy.ALLOW;
   }

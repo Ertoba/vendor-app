@@ -1,4 +1,3 @@
-import 'package:sixam_mart_store/util/typography.dart';
 import 'package:sixam_mart_store/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart_store/features/auth/widgets/store_registartion_success_bottom_sheet.dart';
 import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
@@ -6,9 +5,12 @@ import 'package:sixam_mart_store/features/splash/controllers/splash_controller.d
 import 'package:sixam_mart_store/features/rental_module/profile/controllers/taxi_profile_controller.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/helper/validate_check.dart';
+import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
+import 'package:sixam_mart_store/util/styles.dart';
+import 'package:sixam_mart_store/common/widgets/custom_button_widget.dart';
 import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
-import 'package:sixam_mart_store/features/auth/widgets/mili_auth_ui.dart';
+import 'package:sixam_mart_store/common/widgets/custom_text_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -20,6 +22,7 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
   final TextEditingController _emailController = TextEditingController();
@@ -32,9 +35,9 @@ class _SignInScreenState extends State<SignInScreen> {
     _formKeyLogin = GlobalKey<FormState>();
     _emailController.text = Get.find<AuthController>().getUserNumber();
     _passwordController.text = Get.find<AuthController>().getUserPassword();
-    if (Get.find<AuthController>().getUserType() == 'employee') {
+    if(Get.find<AuthController>().getUserType() == 'employee'){
       Get.find<AuthController>().changeVendorType(1, isUpdate: false);
-    } else {
+    }else{
       Get.find<AuthController>().changeVendorType(0, isUpdate: false);
     }
 
@@ -42,194 +45,204 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   void _showRegistrationSuccessBottomSheet() {
-    bool canShowBottomSheet = Get.find<AuthController>()
-        .getIsStoreRegistrationSharedPref();
-    if (canShowBottomSheet) {
+    bool canShowBottomSheet = Get.find<AuthController>().getIsStoreRegistrationSharedPref();
+    if(canShowBottomSheet){
       Future.delayed(const Duration(seconds: 1), () {
-        if (!mounted) return;
         showModalBottomSheet(
-          context: Get.context!,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
+          context: Get.context!, isScrollControlled: true, backgroundColor: Colors.transparent,
           builder: (con) => const StoreRegistrationSuccessBottomSheet(),
         ).then((value) {
           Get.find<AuthController>().saveIsStoreRegistrationSharedPref(false);
-          if (mounted) setState(() {});
+          setState(() {});
         });
       });
     }
   }
 
   @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _emailFocus.dispose();
-    _passwordFocus.dispose();
-    super.dispose();
-  }
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+          child: GetBuilder<AuthController>(builder: (authController) {
+            return Column(children: [
+              Image.asset(Images.logo, width: 200),
+              const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    resizeToAvoidBottomInset: true,
-    backgroundColor: Theme.of(context).colorScheme.surface,
-    body: SafeArea(
-      child: GetBuilder<AuthController>(
-        builder: (authController) {
-          final registrationEnabled =
-              Get.find<SplashController>()
-                  .configModel
-                  ?.toggleStoreRegistration ??
-              false;
-          void submit() {
-            if (!authController.isLoading) _login(authController);
-          }
+              Text('sign_in'.tr.toUpperCase(), style: robotoBold.copyWith(fontSize: Dimensions.fontSizeOverLarge)),
+              const SizedBox(height: 50),
 
-          return MiliAuthLayout(
-            logoAsset: Images.brandMark,
-            children: [
-              MiliAuthIntro(
-                title: 'auth_ui_title'.tr,
-                subtitle: 'auth_ui_vendor_subtitle'.tr,
+              Container(
+                height: 50,
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                child: Row(children: [
+
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => authController.changeVendorType(0),
+                      child: Column(children: [
+
+                        Expanded(
+                          child: Center(child: Text(
+                            'vendor_owner'.tr,
+                            style: robotoMedium.copyWith(color: authController.vendorTypeIndex == 0
+                                ? Theme.of(context).textTheme.bodyLarge!.color : Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.3)),
+                          )),
+                        ),
+
+                        Container(
+                          height: 2,
+                          color: authController.vendorTypeIndex == 0 ? Theme.of(context).primaryColor : Colors.transparent,
+                        ),
+
+                      ]),
+                    ),
+                  ),
+
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => authController.changeVendorType(1),
+                      child: Column(children: [
+
+                        Expanded(
+                          child: Center(child: Text(
+                            'vendor_employee'.tr,
+                            style: robotoMedium.copyWith(color: authController.vendorTypeIndex == 1
+                                ? Theme.of(context).textTheme.bodyLarge!.color : Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.3)),
+                          )),
+                        ),
+
+                        Container(
+                          height: 2,
+                          color: authController.vendorTypeIndex == 1 ? Theme.of(context).primaryColor : Colors.transparent,
+                        ),
+
+                      ]),
+                    ),
+                  ),
+
+                ]),
               ),
-              Text(
-                'auth_ui_account_type'.tr,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 10),
-              SegmentedButton<int>(
-                segments: [
-                  ButtonSegment(
-                    value: 0,
-                    label: Text('vendor_owner_short'.tr),
-                    icon: const Icon(Icons.person_outline_rounded, size: 18),
-                  ),
-                  ButtonSegment(
-                    value: 1,
-                    label: Text('vendor_employee_short'.tr),
-                    icon: const Icon(Icons.badge_outlined, size: 18),
-                  ),
-                ],
-                selected: {authController.vendorTypeIndex},
-                showSelectedIcon: false,
-                onSelectionChanged: authController.isLoading
-                    ? null
-                    : (selection) =>
-                          authController.changeVendorType(selection.first),
-                style: SegmentedButton.styleFrom(
-                  selectedBackgroundColor: Theme.of(
-                    context,
-                  ).primaryColor.withValues(alpha: .1),
-                  selectedForegroundColor: Theme.of(
-                    context,
-                  ).textTheme.bodyLarge?.color,
-                  foregroundColor: authMuted(context),
-                  textStyle: TextStyle(
-                    fontFamily: MiliTypography.bodyFamily,
-                    fontFamilyFallback: MiliTypography.fallback,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  minimumSize: const Size(0, 50),
-                  side: BorderSide(color: authBorder(context)),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 22),
+              const SizedBox(height: 50),
+
               Form(
                 key: _formKeyLogin,
-                child: Column(
-                  children: [
-                    MiliAuthField(
-                      label: 'email'.tr,
-                      hint: 'example@email.com',
-                      controller: _emailController,
-                      focusNode: _emailFocus,
-                      nextFocus: _passwordFocus,
-                      inputType: TextInputType.emailAddress,
-                      autofillHints: const [
-                        AutofillHints.username,
-                        AutofillHints.email,
-                      ],
-                      validator: (value) => ValidateCheck.validateEmail(value),
+                child: Column(children: [
+
+                  CustomTextFieldWidget(
+                    labelText: 'email'.tr,
+                    hintText: 'enter_email'.tr,
+                    controller: _emailController,
+                    focusNode: _emailFocus,
+                    nextFocus: _passwordFocus,
+                    inputType: TextInputType.emailAddress,
+                    prefixImage: Images.mail,
+                    required: true,
+                    validator: (value) => ValidateCheck.validateEmail(value),
+                  ),
+                  const SizedBox(height: 20),
+
+                  CustomTextFieldWidget(
+                    labelText: 'password'.tr,
+                    hintText: 'minimum_8_characters'.tr,
+                    controller: _passwordController,
+                    focusNode: _passwordFocus,
+                    inputAction: TextInputAction.done,
+                    inputType: TextInputType.visiblePassword,
+                    prefixIcon: Icons.lock_outline_rounded,
+                    iconSize: 24,
+                    isPassword: true,
+                    required: true,
+                    onSubmit: (text) => GetPlatform.isWeb ? _login(authController) : null,
+                    validator: (value) => ValidateCheck.validatePassword(value, null),
+                  ),
+
+                ]),
+              ),
+              const SizedBox(height: 10),
+
+              Row(children: [
+
+                Expanded(
+                  child: ListTile(
+                    onTap: () => authController.toggleRememberMe(),
+                    leading: Checkbox(
+                      activeColor: Theme.of(context).primaryColor,
+                      value: authController.isActiveRememberMe,
+                      onChanged: (bool? isChecked) => authController.toggleRememberMe(),
                     ),
-                    const SizedBox(height: 18),
-                    MiliAuthField(
-                      label: 'password'.tr,
-                      hint: 'enter_password'.tr,
-                      controller: _passwordController,
-                      focusNode: _passwordFocus,
-                      inputAction: TextInputAction.done,
-                      inputType: TextInputType.visiblePassword,
-                      isPassword: true,
-                      onSubmit: (_) => submit(),
-                      validator: (value) =>
-                          ValidateCheck.validatePassword(value, null),
-                    ),
-                  ],
+                    title: Text('remember_me'.tr),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    horizontalTitleGap: 0,
+                  ),
                 ),
-              ),
-              MiliAuthOptions(
-                remember: authController.isActiveRememberMe,
-                onRemember: authController.toggleRememberMe,
-                onForgot: authController.vendorTypeIndex == 1
-                    ? null
-                    : () => Get.toNamed(RouteHelper.getForgotPassRoute()),
-              ),
-              MiliAuthSubmit(
-                loading: authController.isLoading,
-                label: 'sign_in'.tr,
-                onPressed: submit,
-              ),
-              if (registrationEnabled)
-                MiliAuthSecondary(
-                  label: 'vendor_registration_cta_action'.tr,
-                  description: 'vendor_registration_cta_title'.tr,
-                  icon: Icons.storefront_outlined,
-                  onPressed: () =>
-                      Get.toNamed(RouteHelper.getRestaurantRegistrationRoute()),
+
+                authController.vendorTypeIndex == 1 ? const SizedBox() : TextButton(
+                  onPressed: () => Get.toNamed(RouteHelper.getForgotPassRoute()),
+                  child: Text('${'forgot_password'.tr}?'),
                 ),
-            ],
-          );
-        },
-      ),
-    ),
-  );
+
+              ]),
+              const SizedBox(height: Dimensions.paddingSizeExtraLarge),
+
+              CustomButtonWidget(
+                isLoading: authController.isLoading,
+                buttonText: 'sign_in'.tr,
+                onPressed: () => _login(authController),
+              ),
+              SizedBox(height: Get.find<SplashController>().configModel != null && Get.find<SplashController>().configModel!.toggleStoreRegistration! ? Dimensions.paddingSizeSmall : 0),
+
+              Get.find<SplashController>().configModel != null && Get.find<SplashController>().configModel!.toggleStoreRegistration! ? TextButton(
+                style: TextButton.styleFrom(
+                  minimumSize: const Size(1, 40),
+                ),
+                onPressed: () async {
+                  Get.toNamed(RouteHelper.getRestaurantRegistrationRoute());
+                },
+                child: RichText(text: TextSpan(children: [
+                  TextSpan(text: '${'join_as'.tr} ', style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
+                  TextSpan(
+                    text: 'vendor'.tr,
+                    style: robotoMedium.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color),
+                  ),
+                ])),
+              ) : const SizedBox(),
+            ]);
+          }),
+        ),
+      )),
+    );
+  }
 
   void _login(AuthController authController) async {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
     String type = authController.vendorTypeIndex == 0 ? 'owner' : 'employee';
 
-    if (_formKeyLogin!.currentState!.validate()) {
+    if(_formKeyLogin!.currentState!.validate()) {
       if (email.isEmpty) {
         showCustomSnackBar('enter_email_address'.tr);
-      } else if (!GetUtils.isEmail(email)) {
+      }else if (!GetUtils.isEmail(email)) {
         showCustomSnackBar('enter_a_valid_email_address'.tr);
-      } else if (password.isEmpty) {
+      }else if (password.isEmpty) {
         showCustomSnackBar('enter_password'.tr);
-      } else if (password.length < 6) {
+      }else if (password.length < 6) {
         showCustomSnackBar('password_should_be'.tr);
-      } else {
+      }else {
         authController.login(email, password, type).then((status) async {
-          if (status != null) {
+          if(status != null){
             if (status.isSuccess) {
               if (authController.isActiveRememberMe) {
                 authController.saveUserNumberAndPassword(email, password, type);
               } else {
                 authController.clearUserNumberAndPassword();
               }
-              authController.getModuleType() == 'rental'
-                  ? await Get.find<TaxiProfileController>().getProfile()
-                  : await Get.find<ProfileController>().getProfile();
+              authController.getModuleType() == 'rental' ? await Get.find<TaxiProfileController>().getProfile() : await Get.find<ProfileController>().getProfile();
               Get.find<ProfileController>().initTrialWidgetNotShow();
               Get.offAllNamed(RouteHelper.getInitialRoute());
-            } else {
+            }else {
               showCustomSnackBar(status.message);
             }
           }

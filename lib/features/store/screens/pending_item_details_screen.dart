@@ -18,6 +18,8 @@ import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/styles.dart';
 import 'package:sixam_mart_store/common/widgets/custom_button_widget.dart';
 import 'package:sixam_mart_store/common/widgets/custom_image_widget.dart';
+import 'package:sixam_mart_store/common/widgets/custom_video_player_widget.dart';
+import 'package:sixam_mart_store/common/widgets/custom_youtube_player_widget.dart';
 
 class PendingItemDetailsScreen extends StatefulWidget {
   final int id;
@@ -92,6 +94,11 @@ class EnglishLanguageItemTab extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final List<Language>? languageList = Get.find<SplashController>().configModel!.language;
+    BoxShadow boxShadow = BoxShadow(color: Theme.of(context).disabledColor.withValues(alpha: 0.3), blurRadius: 10);
+    double cardRadius = Dimensions.radiusDefault;
+    final List<String> additionalImages = (item.imagesFullUrl ?? <String?>[]).whereType<String>().map((image) => image.trim()).where((image) => image.isNotEmpty).toList();
+    final String videoFullUrl = item.videoFullUrl?.trim() ?? '';
+    final String videoLink = item.videoLink?.trim() ?? '';
     String itemName = '';
     String itemDescription = '';
     for(Translation translation in item.translations!){
@@ -209,6 +216,108 @@ class EnglishLanguageItemTab extends StatelessWidget {
               ]),
             ),
             const SizedBox(height: Dimensions.paddingSizeSmall),
+
+            additionalImages.isNotEmpty ? Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(cardRadius),
+                color: Theme.of(context).cardColor,
+                boxShadow: [boxShadow],
+              ),
+              width: double.infinity,
+              padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('additional_images'.tr, style: robotoMedium),
+                  const SizedBox(height: Dimensions.paddingSizeSmall),
+
+                  SizedBox(
+                    height: 90,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: additionalImages.length,
+                      separatorBuilder: (context, index) => const SizedBox(width: Dimensions.paddingSizeSmall),
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                          onTap: () => Get.toNamed(RouteHelper.getItemImagesRoute(item)),
+                          borderRadius: BorderRadius.circular(cardRadius),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(cardRadius),
+                            child: CustomImageWidget(
+                              image: additionalImages[index],
+                              height: 90,
+                              width: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ) : const SizedBox(),
+            SizedBox(height: additionalImages.isNotEmpty ? Dimensions.paddingSizeSmall : 0),
+
+            if(videoLink.isNotEmpty || videoFullUrl.isNotEmpty) ...[
+              InkWell(
+                onTap: (){
+                  if(videoLink.isNotEmpty) {
+                    Get.to(() => CustomYoutubePlayerPage(
+                      videoUrl: videoLink,
+                      title: videoLink,
+                    ));
+                  } else {
+                    Get.to(() => CustomVideoPlayerPage(
+                      filePath: videoFullUrl,
+                      isNetwork: true,
+                      title: videoFullUrl,
+                    ));
+                  }
+                },
+                borderRadius: BorderRadius.circular(cardRadius),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(cardRadius),
+                    color: Theme.of(context).cardColor,
+                    boxShadow: [boxShadow],
+                  ),
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Theme.of(context).primaryColor.withValues(alpha: 0.12),
+                        ),
+                        child: Icon(Icons.play_arrow_rounded, color: Theme.of(context).primaryColor),
+                      ),
+                      const SizedBox(width: Dimensions.paddingSizeSmall),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('video'.tr, style: robotoMedium),
+                            const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                            Text(
+                              'view'.tr,
+                              style: robotoRegular.copyWith(
+                                fontSize: Dimensions.fontSizeSmall,
+                                color: Theme.of(context).disabledColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Theme.of(context).disabledColor),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: Dimensions.paddingSizeSmall),
+            ],
 
             Column(children: [
               TitleTagWidget(title: 'general_information'.tr),

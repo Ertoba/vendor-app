@@ -1,8 +1,19 @@
-import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_switch/flutter_switch.dart';
+import 'package:get/get.dart';
+import 'package:sixam_mart_store/common/models/config_model.dart';
+import 'package:sixam_mart_store/common/widgets/custom_app_bar_widget.dart';
+import 'package:sixam_mart_store/common/widgets/custom_button_widget.dart';
+import 'package:sixam_mart_store/common/widgets/custom_image_widget.dart';
+import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
+import 'package:sixam_mart_store/common/widgets/custom_video_player_widget.dart';
+import 'package:sixam_mart_store/common/widgets/custom_youtube_player_widget.dart';
+import 'package:sixam_mart_store/features/category/controllers/category_controller.dart';
 import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_store/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart_store/common/models/config_model.dart';
+import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
+import 'package:sixam_mart_store/features/store/widgets/review_widget.dart';
 import 'package:sixam_mart_store/features/store/widgets/update_stock_bottom_sheet.dart';
 import 'package:sixam_mart_store/features/store/widgets/variation_view_widget.dart';
 import 'package:sixam_mart_store/helper/date_converter_helper.dart';
@@ -10,14 +21,6 @@ import 'package:sixam_mart_store/helper/price_converter_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/styles.dart';
-import 'package:sixam_mart_store/common/widgets/custom_app_bar_widget.dart';
-import 'package:sixam_mart_store/common/widgets/custom_button_widget.dart';
-import 'package:sixam_mart_store/common/widgets/custom_image_widget.dart';
-import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
-import 'package:sixam_mart_store/features/store/widgets/review_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_switch/flutter_switch.dart';
-import 'package:get/get.dart';
 
 class ItemDetailsScreen extends StatefulWidget {
   final Item product;
@@ -44,6 +47,9 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
     final isPharmacy = Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'pharmacy';
     final isFood = Get.find<SplashController>().getStoreModuleConfig().newVariation!;
 
+    final String videoFullUrl = item.videoFullUrl?.trim() ?? '';
+    final String videoLink = item.videoLink?.trim() ?? '';
+
     Get.find<StoreController>().setAvailability(item.status == 1);
     Get.find<StoreController>().setRecommended(item.recommendedStatus == 1);
     if(isGrocery){
@@ -53,7 +59,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
       Get.find<StoreController>().getItemReviewList(item.id);
     }
     Module? module = Get.find<SplashController>().configModel!.moduleConfig!.module;
-
+    final List<String> additionalImages = (item.imagesFullUrl ?? <String?>[]).whereType<String>().map((image) => image.trim()).where((image) => image.isNotEmpty).toList();
     return Scaffold(
 
       appBar: CustomAppBarWidget(title: 'item_details'.tr),
@@ -174,6 +180,56 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                   ]),
                 ),
                 const SizedBox(height: Dimensions.paddingSizeLarge),
+
+                item.categoryIds != null && item.categoryIds!.isNotEmpty ? Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(cardRadius),
+                    color: Theme.of(context).cardColor,
+                    boxShadow: [boxShadow],
+                  ),
+                  padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                  child: Row(children: [
+                    Text('${'category'.tr}:', style: robotoMedium),
+                    const SizedBox(width: Dimensions.paddingSizeSmall),
+                    Expanded(child: Text(item.categoryIds!.map((c) => c.name ?? c.id).join(', '), style: robotoRegular)),
+                  ]),
+                ) : const SizedBox(),
+                SizedBox(height: item.categoryIds != null && item.categoryIds!.isNotEmpty ? Dimensions.paddingSizeLarge : 0),
+
+                item.brandName != null || item.brandName != '' || item.brandName!.isNotEmpty ? Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(cardRadius),
+                    color: Theme.of(context).cardColor,
+                    boxShadow: [boxShadow],
+                  ),
+                  padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                  child: Row(children: [
+                    Text('${'brand'.tr}:', style: robotoMedium),
+                    const SizedBox(width: Dimensions.paddingSizeSmall),
+                    Expanded(child: Text(item.brandName ?? item.brandId.toString(), style: robotoRegular)),
+                  ]),
+                ) : const SizedBox(),
+                SizedBox(height: (item.brandName != null || item.brandName != '' || item.brandName!.isNotEmpty) ? Dimensions.paddingSizeLarge : 0),
+
+                GetBuilder<CategoryController>(builder: (categoryController) {
+                  final bool showMyCategory = categoryController.isMyCategoryFeatureEnabled;
+                  return showMyCategory && item.storeCategoryName != null && item.storeCategoryName!.isNotEmpty ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(cardRadius),
+                        color: Theme.of(context).cardColor,
+                        boxShadow: [boxShadow],
+                      ),
+                      padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                      child: Row(children: [
+                        Text('${'my_category'.tr}:', style: robotoMedium),
+                        const SizedBox(width: Dimensions.paddingSizeSmall),
+                        Expanded(child: Text(item.storeCategoryName ?? '', style: robotoRegular)),
+                      ]),
+                    ),
+                    const SizedBox(height: Dimensions.paddingSizeLarge),
+                  ]) : const SizedBox();
+                }),
 
                 Container(
                   decoration: BoxDecoration(
@@ -382,6 +438,108 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                 ) : const SizedBox(),
                 SizedBox(height: (item.description != null && item.description!.isNotEmpty) ? Dimensions.paddingSizeDefault : 0),
 
+                additionalImages.isNotEmpty ? Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(cardRadius),
+                    color: Theme.of(context).cardColor,
+                    boxShadow: [boxShadow],
+                  ),
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('additional_images'.tr, style: robotoMedium),
+                      const SizedBox(height: Dimensions.paddingSizeSmall),
+
+                      SizedBox(
+                        height: 90,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: additionalImages.length,
+                          separatorBuilder: (context, index) => const SizedBox(width: Dimensions.paddingSizeSmall),
+                          itemBuilder: (context, index) {
+                            return InkWell(
+                              onTap: () => Get.toNamed(RouteHelper.getItemImagesRoute(item)),
+                              borderRadius: BorderRadius.circular(cardRadius),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(cardRadius),
+                                child: CustomImageWidget(
+                                  image: additionalImages[index],
+                                  height: 90,
+                                  width: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ) : const SizedBox(),
+                SizedBox(height: additionalImages.isNotEmpty ? Dimensions.paddingSizeDefault : 0),
+
+                if(videoLink.isNotEmpty || videoFullUrl.isNotEmpty) ...[
+                  InkWell(
+                    onTap: (){
+                      if(videoLink.isNotEmpty) {
+                        Get.to(() => CustomYoutubePlayerPage(
+                          videoUrl: videoLink,
+                          title: videoLink,
+                        ));
+                      } else {
+                        Get.to(() => CustomVideoPlayerPage(
+                          filePath: videoFullUrl,
+                          isNetwork: true,
+                          title: videoFullUrl,
+                        ));
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(cardRadius),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(cardRadius),
+                        color: Theme.of(context).cardColor,
+                        boxShadow: [boxShadow],
+                      ),
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Theme.of(context).primaryColor.withValues(alpha: 0.12),
+                            ),
+                            child: Icon(Icons.play_arrow_rounded, color: Theme.of(context).primaryColor),
+                          ),
+                          const SizedBox(width: Dimensions.paddingSizeSmall),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('video'.tr, style: robotoMedium),
+                                const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                                Text(
+                                  'view'.tr,
+                                  style: robotoRegular.copyWith(
+                                    fontSize: Dimensions.fontSizeSmall,
+                                    color: Theme.of(context).disabledColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Theme.of(context).disabledColor),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: Dimensions.paddingSizeSmall),
+                ],
+
                 (item.taxData != null && item.taxData!.isNotEmpty) ? Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(cardRadius),
@@ -419,7 +577,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                 ) : const SizedBox(),
                 SizedBox(height: item.taxData != null && item.taxData!.isNotEmpty ? Dimensions.paddingSizeDefault : 0),
 
-                Get.find<ProfileController>().profileModel!.stores![0].reviewsSection! ? Container(
+                Get.find<ProfileController>().profileModel!.stores![0].reviewsSection! && storeController.itemReviewList != null && storeController.itemReviewList!.isNotEmpty? Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(cardRadius),
                     color: Theme.of(context).cardColor,
@@ -434,7 +592,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                       ),
                       const SizedBox(height: Dimensions.paddingSizeSmall),
 
-                      storeController.itemReviewList != null ? storeController.itemReviewList!.isNotEmpty ? SizedBox(
+                      SizedBox(
                         height: 150,
                         child: ListView.builder(
                           itemCount: storeController.itemReviewList!.length,
@@ -447,13 +605,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                             );
                           },
                         ),
-                      ) : Padding(
-                        padding: const EdgeInsets.only(top: Dimensions.paddingSizeSmall, bottom: Dimensions.paddingSizeExtremeLarge),
-                        child: Center(child: Text('no_review_found'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor))),
-                      ) : const Padding(
-                        padding: EdgeInsets.only(top: Dimensions.paddingSizeSmall, bottom: Dimensions.paddingSizeExtremeLarge),
-                        child: Center(child: CircularProgressIndicator()),
-                      ),
+                      ) 
                     ],
                   ),
                 ) : const SizedBox(),

@@ -34,6 +34,23 @@ class ValidateCheck{
     return null;
   }
 
+  static String? validateUrl(String? value, {String? emptyMessage, String? invalidMessage, bool isRequired = true}) {
+    if (value == null || value.trim().isEmpty) {
+      return isRequired ? (emptyMessage?.tr ?? 'this_field_is_required'.tr) : null;
+    }
+
+    final Uri? uri = Uri.tryParse(value.trim());
+    final bool isValid = uri != null
+        && (uri.scheme == 'http' || uri.scheme == 'https')
+        && uri.host.isNotEmpty;
+
+    if (!isValid) {
+      return invalidMessage?.tr ?? 'please_enter_a_valid_url'.tr;
+    }
+
+    return null;
+  }
+
   static String? validatePassword(String? value, String? message) {
     if (value == null || value.isEmpty) {
       return message?.tr ?? 'this_field_is_required'.tr;

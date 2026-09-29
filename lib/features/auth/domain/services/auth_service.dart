@@ -8,7 +8,6 @@ import 'package:sixam_mart_store/features/business/domain/models/package_model.d
 import 'package:sixam_mart_store/features/business/screens/subscription_payment_screen.dart';
 import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_store/features/rental_module/profile/controllers/taxi_profile_controller.dart';
-import 'package:sixam_mart_store/helper/api_error_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 
 class AuthService implements AuthServiceInterface {
@@ -82,7 +81,7 @@ class AuthService implements AuthServiceInterface {
 
   @override
   Future<bool> clearUserNumberAndPassword() async {
-    return authRepositoryInterface.clearUserNumberAndPassword();
+    return await authRepositoryInterface.clearUserNumberAndPassword();
   }
 
   @override
@@ -115,7 +114,7 @@ class AuthService implements AuthServiceInterface {
         if(packageId == null) {
 
           saveUserToken(response.body['subscribed']['token'], response.body['subscribed']['zone_wise_topic'], type);
-          try { await updateToken(); } catch (_) {}
+          await updateToken();
           moduleType == 'rental' ? await Get.find<TaxiProfileController>().getProfile() : await Get.find<ProfileController>().getProfile();
 
           Get.toNamed(RouteHelper.getMySubscriptionRoute(fromNotification: true));
@@ -125,18 +124,12 @@ class AuthService implements AuthServiceInterface {
         }
       }else{
         saveUserToken(response.body['token'], response.body['zone_wise_topic'], type);
-        try { await updateToken(); } catch (_) {}
+        await updateToken();
         moduleType == 'rental' ? Get.find<TaxiProfileController>().getProfile() : Get.find<ProfileController>().getProfile();
         responseModel = ResponseModel(true, 'successful');
       }
     } else {
-      responseModel = ResponseModel(
-        false,
-        ApiErrorHelper.userMessage(
-          response.statusText,
-          statusCode: response.statusCode,
-        ),
-      );
+      responseModel = ResponseModel(false, response.statusText);
     }
     return responseModel;
   }

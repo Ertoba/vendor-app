@@ -60,11 +60,13 @@ class ApiClient extends GetxService {
     try {
       debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
       debugPrint('====> API Body: $body');
+      debugPrint('===check=> API Body: ${body.runtimeType}');
       http.Response response = await http.post(
         Uri.parse(appBaseUrl+uri),
         body: jsonEncode(body),
         headers: headers ?? _mainHeaders,
       ).timeout(Duration(seconds: timeoutInSeconds));
+      print("=1p;l.===> API Response: $response");
       return handleResponse(response, uri, handleError);
     } catch (e) {
       return const Response(statusCode: 1, statusText: noInternetMessage);

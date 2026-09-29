@@ -17,13 +17,17 @@ class AiGeneratorBottomSheet extends StatelessWidget {
   final List<TextEditingController>? descriptionControllerList;
   final TextEditingController? priceController;
   final TextEditingController? discountController;
+  final TextEditingController? stockController;
   final TextEditingController? maxOrderQuantityController;
   final TextEditingController? metaTitleController;
   final TextEditingController? metaDescriptionController;
   final TextEditingController? maxSnippetController;
   final TextEditingController? maxVideoPreviewController;
+  final VoidCallback? onGeneratedDiscountTypeSelected;
+  final VoidCallback? onImageDataApplied;
   const AiGeneratorBottomSheet({super.key, required this.nameControllerList, required this.descriptionControllerList, this.priceController, this.discountController,
-    this.maxOrderQuantityController, this.metaTitleController, this.metaDescriptionController, this.maxSnippetController, this.maxVideoPreviewController, this.languageList, this.tabController});
+    this.stockController, this.maxOrderQuantityController, this.metaTitleController, this.metaDescriptionController, this.maxSnippetController, this.maxVideoPreviewController,
+    this.languageList, this.tabController, this.onGeneratedDiscountTypeSelected, this.onImageDataApplied});
 
   @override
   Widget build(BuildContext context) {
@@ -86,11 +90,14 @@ class AiGeneratorBottomSheet extends StatelessWidget {
                   descriptionControllerList: descriptionControllerList,
                   priceController: priceController,
                   discountController: discountController,
+                  stockController: stockController,
                   maxOrderQuantityController: maxOrderQuantityController,
                   metaTitleController: metaTitleController,
                   metaDescriptionController: metaDescriptionController,
                   maxSnippetController: maxSnippetController,
                   maxVideoPreviewController: maxVideoPreviewController,
+                  onGeneratedDiscountTypeSelected: onGeneratedDiscountTypeSelected,
+                  onImageDataApplied: onImageDataApplied,
                 ),
               );
             },

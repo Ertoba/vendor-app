@@ -8,6 +8,7 @@ import 'package:sixam_mart_store/features/order/domain/models/order_cancellation
 import 'package:sixam_mart_store/features/order/domain/models/order_details_model.dart';
 import 'package:sixam_mart_store/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart_store/features/order/domain/models/running_order_model.dart';
+import 'package:sixam_mart_store/features/order/domain/models/edit_history_log_model.dart';
 import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_store/features/order/domain/services/order_service_interface.dart';
@@ -31,6 +32,18 @@ class OrderController extends GetxController implements GetxService {
 
   List<OrderDetailsModel>? _orderDetailsModel;
   List<OrderDetailsModel>? get orderDetailsModel => _orderDetailsModel;
+
+  List<EditLog>? _editLogList;
+  List<EditLog>? get editLogList => _editLogList;
+
+  int _editLogTotalSize = 0;
+  int get editLogTotalSize => _editLogTotalSize;
+
+  int _editLogOffset = 1;
+  int get editLogOffset => _editLogOffset;
+
+  bool _editLogPaginating = false;
+  bool get editLogPaginating => _editLogPaginating;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -140,9 +153,13 @@ class OrderController extends GetxController implements GetxService {
   }
 
   Future<void> getOrderDetails(int orderId) async {
+    print('🔄 [GET_ORDER_DETAILS] Fetching order status for OrderID: $orderId');
     OrderModel? orderModel = await orderServiceInterface.getOrderWithId(orderId);
     if(orderModel != null) {
+      print('✅ [GET_ORDER_DETAILS] Order fetched - Current Status: ${orderModel.orderStatus}, Edited: ${orderModel.edited}');
       _orderModel = orderModel;
+    } else {
+      print('❌ [GET_ORDER_DETAILS] Failed to fetch order');
     }
     update();
   }
@@ -221,9 +238,6 @@ class OrderController extends GetxController implements GetxService {
       Get.back(result: responseModel.isSuccess);
     }
     if(responseModel.isSuccess) {
-      if(_orderModel != null && _orderModel!.id == orderID) {
-        _orderModel!.orderStatus = status;
-      }
       if(back && fromNotification) {
         Get.offAllNamed(RouteHelper.getInitialRoute());
       }else if(back && !fromNotification){
@@ -278,6 +292,33 @@ class OrderController extends GetxController implements GetxService {
     }else{
       _orderDetailsModel = [];
     }
+  }
+
+  Future<void> getEditHistoryLog(int orderId, int offset, {bool reload = false}) async {
+    if(offset == 1 || reload) {
+      _editLogOffset = 1;
+      _editLogList = null;
+      update();
+    }
+    EditHistoryLogModel? editHistoryLogModel = await orderServiceInterface.getEditHistoryLog(orderId, offset);
+    if(editHistoryLogModel != null) {
+      if(offset == 1) {
+        _editLogList = [];
+      }
+      _editLogList ??= [];
+      _editLogList!.addAll(editHistoryLogModel.editLogs ?? []);
+      _editLogTotalSize = editHistoryLogModel.totalSize ?? 0;
+      _editLogOffset = offset;
+    } else if(offset == 1) {
+      _editLogList = [];
+    }
+    _editLogPaginating = false;
+    update();
+  }
+
+  void showEditLogBottomLoader() {
+    _editLogPaginating = true;
+    update();
   }
 
   void setOrderIndex(int index) {

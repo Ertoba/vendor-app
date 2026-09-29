@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.sixamtech.sixam_mart_store_app">
 
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -37,12 +38,12 @@
         </queries>
 
         <application
-            android:label="მილი ვენდორი"
+            android:label="6amMart Vendor"
             android:name="${applicationName}"
+            android:extractNativeLibs="true"
             android:requestLegacyExternalStorage="true"
-            android:usesCleartextTraffic="true"
-            android:icon="@mipmap/ic_launcher"
-            android:roundIcon="@mipmap/ic_launcher_round">
+            android:usesCleartextTraffic="false"
+            android:icon="@mipmap/ic_launcher">
             <meta-data android:name="com.google.android.geo.API_KEY"
                 android:value="AIzaSyCaCSJ0BZItSyXqBv8vpD1N4WBffJeKhLQ"/>
 

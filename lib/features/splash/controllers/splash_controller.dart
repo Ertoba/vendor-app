@@ -1,8 +1,10 @@
-import 'package:sixam_mart_store/common/models/config_model.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:sixam_mart_store/common/models/config_model.dart';
+import 'package:sixam_mart_store/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_store/features/splash/domain/services/splash_service_interface.dart';
+import 'package:sixam_mart_store/helper/route_helper.dart';
 
 class SplashController extends GetxController implements GetxService {
   final SplashServiceInterface splashServiceInterface;
@@ -25,12 +27,27 @@ class SplashController extends GetxController implements GetxService {
 
   Map<String, dynamic>? _data = {};
 
-  Future<bool> getConfigData() async {
+  Future<bool> getConfigData({bool handleMaintenanceMode = false, bool closeRoute = false}) async {
     Response response = await splashServiceInterface.getConfigData();
     bool isSuccess = false;
     if(response.statusCode == 200) {
       _data = response.body;
       _configModel = ConfigModel.fromJson(response.body);
+
+      splashServiceInterface.handleInitialTopicSubscription();
+      if (closeRoute) return true;
+      bool isMaintenanceMode = _configModel!.maintenanceMode!;
+      String platform = 'vendor_app';
+      bool isInMaintenance = isMaintenanceMode && _configModel!.maintenanceModeData!.maintenanceSystemSetup!.contains(platform);
+
+      if(isInMaintenance) {
+        Get.offNamed(RouteHelper.getUpdateRoute(false));
+      } else if((!isInMaintenance && Get.find<AuthController>().isLoggedIn())){
+        Get.offAllNamed(RouteHelper.getInitialRoute());
+      } else {
+        Get.offAllNamed(RouteHelper.getSignInRoute());
+      }
+
       isSuccess = true;
     }else {
       isSuccess = false;

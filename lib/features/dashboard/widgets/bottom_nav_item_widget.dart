@@ -12,31 +12,36 @@ class BottomNavItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDisabled = onTap == null;
+
     return Expanded(
       child: InkWell(
         onTap: onTap as void Function()?,
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        hoverColor: Colors.transparent,
-        overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        child: Opacity(
+          opacity: isDisabled ? 0.5 : 1.0,
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
 
-          Image.asset(
-            isSelected ? selectedIcon : unSelectedIcon, height: 25, width: 25,
-            color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyMedium!.color!,
-          ),
+            Image.asset(
+              isSelected ? selectedIcon : unSelectedIcon, height: 25, width: 25,
+              color: isDisabled
+                  ? Theme.of(context).disabledColor
+                  : (isSelected ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyMedium!.color!),
+            ),
 
-          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+            SizedBox(height: isSelected ? Dimensions.paddingSizeExtraSmall : Dimensions.paddingSizeSmall),
 
-          Text(
-            title,
-            maxLines: 1,
-            softWrap: false,
-            overflow: TextOverflow.ellipsis,
-            style: robotoRegular.copyWith(color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyMedium!.color!, fontSize: 12),
-          ),
+            Text(
+              title,
+              style: robotoRegular.copyWith(
+                color: isDisabled
+                    ? Theme.of(context).disabledColor
+                    : (isSelected ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyMedium!.color!),
+                fontSize: 12
+              ),
+            ),
 
-        ]),
+          ]),
+        ),
       ),
     );
   }
