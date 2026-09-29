@@ -21,8 +21,18 @@ class WithdrawMethodScreen extends StatefulWidget {
 }
 
 class _WithdrawMethodScreenState extends State<WithdrawMethodScreen> {
-
   DisbursementHelper disbursementHelper = DisbursementHelper();
+
+  String _methodFieldLabel(String? inputName) {
+    switch (inputName) {
+      case DisbursementController.keepzReceiverTypeField:
+        return 'keepz_receiver_type'.tr;
+      case DisbursementController.keepzReceiverIdentifierField:
+        return 'keepz_receiver_identifier'.tr;
+      default:
+        return (inputName ?? '').replaceAll('_', ' ').toTitleCase();
+    }
+  }
 
   @override
   void initState() {
@@ -30,10 +40,13 @@ class _WithdrawMethodScreenState extends State<WithdrawMethodScreen> {
     initCall();
   }
 
-  void initCall() async{
-
+  void initCall() async {
     Get.find<PaymentController>().getWithdrawMethodList();
-    disbursementHelper.enableDisbursementWarningMessage(false, canShowDialog: !widget.isFromDashboard);
+    Get.find<DisbursementController>().getDisbursementMethodList();
+    disbursementHelper.enableDisbursementWarningMessage(
+      false,
+      canShowDialog: !widget.isFromDashboard,
+    );
   }
 
   @override
@@ -49,112 +62,241 @@ class _WithdrawMethodScreenState extends State<WithdrawMethodScreen> {
 
       body: GetBuilder<DisbursementController>(
         builder: (disbursementController) {
-          return disbursementController.disbursementMethodBody != null ? disbursementController.disbursementMethodBody!.methods!.isNotEmpty ? ListView.builder(
-            itemCount: disbursementController.disbursementMethodBody!.methods!.length,
-            shrinkWrap: true,
-            padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-            itemBuilder: (context, index) {
-              Methods method = disbursementController.disbursementMethodBody!.methods![index];
-              return Container(
-                width: context.width,
-                margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeDefault),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Theme.of(context).cardColor,
-                  boxShadow: [BoxShadow(color: Colors.black12.withValues(alpha: 0.1), spreadRadius: 1, blurRadius: 5, offset: const Offset(2, 3))],
-                ),
-                child: Column(children: [
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeExtraSmall),
-                    child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-
-                      Flexible(
-                        child: Text(
-                          '${'payment_method'.tr} : ${method.methodName}' ,
-                          maxLines: 1, overflow: TextOverflow.ellipsis,
-                          style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
+          final List<Methods>? methods =
+              disbursementController.disbursementMethodBody?.methods;
+          return methods != null
+              ? methods.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: methods.length,
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.all(
+                          Dimensions.paddingSizeDefault,
                         ),
-                      ),
-
-                      method.isDefault == true ?  Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                        ),
-                        padding: const EdgeInsets.all(Dimensions.fontSizeSmall),
-                        child: Text('default_method'.tr, style: robotoMedium.copyWith(color: Theme.of(context).primaryColor),),
-                      ) : InkWell(
-                        onTap: () {
-                          disbursementController.makeDefaultMethod({'id': '${method.id}', 'is_default': '1'}, index);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                          ),
-                          padding: const EdgeInsets.all(Dimensions.fontSizeSmall),
-                          child: !(disbursementController.isLoading && (index == disbursementController.index))
-                              ? Text(
-                            'make_default'.tr, style: robotoMedium.copyWith(color: Theme.of(context).cardColor),
-                          ) : SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Theme.of(context).cardColor,),),
-                        ),
-                      ),
-
-                    ]),
-                  ),
-
-                  const Divider(height: 1, thickness: 0.5),
-
-                  Padding(
-                    padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault, right: Dimensions.paddingSizeDefault, top: Dimensions.paddingSizeDefault),
-                    child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: method.methodFields!.length,
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeDefault),
-                              child: Row(children: [
-                                Expanded(
-                                  child: Text(method.methodFields![index].userInput!.replaceAll('_', ' ').toTitleCase(),
-                                    style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
+                        itemBuilder: (context, index) {
+                          Methods method = methods[index];
+                          final List<MethodFields> methodFields =
+                              method.methodFields ?? [];
+                          return Container(
+                            width: context.width,
+                            margin: const EdgeInsets.only(
+                              bottom: Dimensions.paddingSizeDefault,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Theme.of(context).cardColor,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12.withValues(alpha: 0.1),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: const Offset(2, 3),
                                 ),
-                                const Text(' :  ', style: robotoRegular),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: Dimensions.paddingSizeDefault,
+                                    vertical: Dimensions.paddingSizeExtraSmall,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          '${'payment_method'.tr} : ${disbursementController.displayMethodName(method.methodName)}',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: robotoBold.copyWith(
+                                            fontSize: Dimensions.fontSizeLarge,
+                                          ),
+                                        ),
+                                      ),
 
-                                Expanded(
-                                  child: Text('${method.methodFields![index].userData}',
-                                  style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault),
-                                    maxLines: 1, overflow: TextOverflow.ellipsis,),
+                                      method.isDefault == true
+                                          ? Container(
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context)
+                                                    .primaryColor
+                                                    .withValues(alpha: 0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                      Dimensions.radiusDefault,
+                                                    ),
+                                              ),
+                                              padding: const EdgeInsets.all(
+                                                Dimensions.fontSizeSmall,
+                                              ),
+                                              child: Text(
+                                                'default_method'.tr,
+                                                style: robotoMedium.copyWith(
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).primaryColor,
+                                                ),
+                                              ),
+                                            )
+                                          : InkWell(
+                                              onTap: () {
+                                                disbursementController
+                                                    .makeDefaultMethod({
+                                                      'id': '${method.id}',
+                                                      'is_default': '1',
+                                                    }, index);
+                                              },
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).primaryColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        Dimensions
+                                                            .radiusDefault,
+                                                      ),
+                                                ),
+                                                padding: const EdgeInsets.all(
+                                                  Dimensions.fontSizeSmall,
+                                                ),
+                                                child:
+                                                    !(disbursementController
+                                                            .isLoading &&
+                                                        (index ==
+                                                            disbursementController
+                                                                .index))
+                                                    ? Text(
+                                                        'make_default'.tr,
+                                                        style: robotoMedium
+                                                            .copyWith(
+                                                              color: Theme.of(
+                                                                context,
+                                                              ).cardColor,
+                                                            ),
+                                                      )
+                                                    : SizedBox(
+                                                        height: 20,
+                                                        width: 20,
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                              color: Theme.of(
+                                                                context,
+                                                              ).cardColor,
+                                                            ),
+                                                      ),
+                                              ),
+                                            ),
+                                    ],
+                                  ),
                                 ),
 
-                              ]),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: Dimensions.paddingSizeDefault),
+                                const Divider(height: 1, thickness: 0.5),
 
-                      InkWell(
-                        onTap: () {
-                          Get.dialog(ConfirmDialogWidget(id: method.id!));
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: Dimensions.paddingSizeDefault,
+                                    right: Dimensions.paddingSizeDefault,
+                                    top: Dimensions.paddingSizeDefault,
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Expanded(
+                                        child: ListView.builder(
+                                          itemCount: methodFields.length,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          shrinkWrap: true,
+                                          itemBuilder: (context, index) {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                bottom: Dimensions
+                                                    .paddingSizeDefault,
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      _methodFieldLabel(
+                                                        methodFields[index]
+                                                            .userInput,
+                                                      ),
+                                                      style: robotoRegular
+                                                          .copyWith(
+                                                            color: Theme.of(
+                                                              context,
+                                                            ).disabledColor,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  const Text(
+                                                    ' :  ',
+                                                    style: robotoRegular,
+                                                  ),
+
+                                                  Expanded(
+                                                    child: Text(
+                                                      methodFields[index]
+                                                              .userData ??
+                                                          '',
+                                                      style: robotoBold.copyWith(
+                                                        fontSize: Dimensions
+                                                            .fontSizeDefault,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: Dimensions.paddingSizeDefault,
+                                      ),
+
+                                      InkWell(
+                                        onTap: () {
+                                          if (method.id != null) {
+                                            Get.dialog(
+                                              ConfirmDialogWidget(
+                                                id: method.id!,
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom:
+                                                Dimensions.paddingSizeDefault,
+                                            top: Dimensions.paddingSizeDefault,
+                                          ),
+                                          child: Icon(
+                                            CupertinoIcons.delete,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.error,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeDefault, top: Dimensions.paddingSizeDefault),
-                          child: Icon(CupertinoIcons.delete, color: Theme.of(context).colorScheme.error, size: 20),
-                        ),
                       )
-                    ]),
-                  ),
-
-                ]),
-
-              );
-            },
-          ) : Center(child: Text('no_method_found'.tr, style: robotoMedium)) : const Center(child: CircularProgressIndicator());
-        }
+                    : Center(
+                        child: Text('no_method_found'.tr, style: robotoMedium),
+                      )
+              : const Center(child: CircularProgressIndicator());
+        },
       ),
     );
   }

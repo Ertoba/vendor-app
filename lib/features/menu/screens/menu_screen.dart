@@ -110,9 +110,13 @@ class MenuScreen extends StatelessWidget {
     }
 
     if(modulePermission.disbursementReport! || modulePermission.walletMethod!){
-      if(Get.find<SplashController>().configModel!.disbursementType == 'automated') {
-        menuList.add(MenuModel(icon: Images.disbursementIcon, title: 'disbursement'.tr, route: RouteHelper.getDisbursementMenuRoute()));
-      }
+      menuList.add(
+        MenuModel(
+          icon: Images.disbursementIcon,
+          title: 'disbursement'.tr,
+          route: RouteHelper.getDisbursementMenuRoute(),
+        ),
+      );
     }
     menuList.add(MenuModel(icon: Images.settingIcon, title: 'settings'.tr, route: RouteHelper.getSettingRoute()));
 

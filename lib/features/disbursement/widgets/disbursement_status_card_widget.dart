@@ -20,7 +20,7 @@ class DisbursementStatusCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 160, width: context.width * 0.65,
+      height: 160, width: double.infinity,
       padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
       margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeLarge),
       decoration: BoxDecoration(
@@ -89,7 +89,7 @@ class DisbursementStatusCardWidget extends StatelessWidget {
             ),
             const SizedBox(width: Dimensions.paddingSizeDefault),
 
-            Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
               Text(
                 PriceConverterHelper.convertPrice(amount),
                 style: robotoBold.copyWith(
@@ -101,12 +101,14 @@ class DisbursementStatusCardWidget extends StatelessWidget {
 
               Text(
                 text,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: robotoRegular.copyWith(
                   fontSize: Dimensions.fontSizeSmall,
                   color: Theme.of(context).textTheme.bodyLarge!.color,
                 ),
               ),
-            ]),
+            ])),
           ]),
         ),
       ]),
