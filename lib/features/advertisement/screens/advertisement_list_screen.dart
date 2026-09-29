@@ -211,6 +211,13 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
 
 
                           PopupMenuButton<PopupMenuModel>(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 180,
+                              maxWidth: 260,
+                            ),
+                            position: PopupMenuPosition.under,
+                            offset: const Offset(0, 4),
                             shape: RoundedRectangleBorder(
                               borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusDefault)),
                               side: BorderSide(color: Theme.of(context).hintColor.withValues(alpha: 0.1)),
@@ -340,13 +347,19 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
                                 );
                               }).toList();
                             },
-                            child: Container(
-                              decoration: BoxDecoration(
+                            child: SizedBox(
+                              width: 42,
+                              height: 42,
+                              child: Container(
+                                decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                                 border: Border.all(color: Theme.of(context).disabledColor),
                               ),
-                              padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-                              child: const Icon(Icons.more_vert_sharp),
+                                padding: const EdgeInsets.all(
+                                  Dimensions.paddingSizeExtraSmall,
+                                ),
+                                child: const Icon(Icons.more_vert_sharp),
+                              ),
                             ),
                           ),
 
