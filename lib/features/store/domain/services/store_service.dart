@@ -15,6 +15,7 @@ import 'package:sixam_mart_store/features/store/domain/models/variant_type_model
 import 'package:sixam_mart_store/features/store/domain/models/variation_body_model.dart';
 import 'package:sixam_mart_store/features/store/domain/repositories/store_repository_interface.dart';
 import 'package:sixam_mart_store/features/store/domain/services/store_service_interface.dart';
+import 'package:sixam_mart_store/features/store/domain/utils/variation_key_helper.dart';
 
 class StoreService implements StoreServiceInterface {
   final StoreRepositoryInterface storeRepositoryInterface;
@@ -238,128 +239,86 @@ class StoreService implements StoreServiceInterface {
   @override
   List<VariantTypeModel>? variationTypeList(
     List<AttributeModel>? attributeList,
-    Item? item,
-  ) {
-    List<List<String>> mainList = [];
-    int length = 1;
-    bool hasData = false;
-    List<int> indexList = [];
+    Item? item, {
+    bool enforceBrandModelCompatibility = false,
+  }) {
     List<VariantTypeModel>? variantTypeList = [];
-    for (var attribute in attributeList!) {
-      if (attribute.active) {
-        hasData = true;
-        mainList.add(attribute.variants);
-        length = length * attribute.variants.length;
-        indexList.add(0);
+
+    for(final VariationCombination combination
+        in buildVariationCombinations(attributeList)) {
+      if(enforceBrandModelCompatibility &&
+          !combination.isBrandModelCompatible) {
+        continue;
       }
-    }
-    if (!hasData) {
-      length = 0;
-    }
-    for (int i = 0; i < length; i++) {
-      String value = '';
-      for (int j = 0; j < mainList.length; j++) {
-        value =
-            value +
-            (value.isEmpty ? '' : '-') +
-            mainList[j][indexList[j]].trim();
-      }
-      if (item != null && item.variations != null) {
-        double? price = 0;
-        int? stock = 0;
-        for (Variation variation in item.variations!) {
-          if (variation.type == value) {
-            price = variation.price;
-            stock = variation.stock;
+
+      final String value = combination.type;
+
+      if(item != null && item.variations != null) {
+        double price = 0;
+        int stock = 0;
+
+        for(final Variation variation in item.variations!) {
+          if(canonicalVariationType(variation.type ?? '') ==
+              canonicalVariationType(value)) {
+            price = variation.price ?? 0;
+            stock = variation.stock ?? 0;
             break;
           }
         }
-        variantTypeList.add(
-          VariantTypeModel(
-            variantType: value,
-            priceController: TextEditingController(
-              text: price! > 0 ? price.toString() : '',
-            ),
-            priceNode: FocusNode(),
-            stockController: TextEditingController(
-              text: stock! > 0 ? stock.toString() : '',
-            ),
-            stockNode: FocusNode(),
-          ),
-        );
-      } else {
-        variantTypeList.add(
-          VariantTypeModel(
-            variantType: value,
-            priceController: TextEditingController(),
-            priceNode: FocusNode(),
-            stockController: TextEditingController(),
-            stockNode: FocusNode(),
-          ),
-        );
-      }
 
-      for (int j = 0; j < mainList.length; j++) {
-        if (indexList[indexList.length - (1 + j)] <
-            mainList[mainList.length - (1 + j)].length - 1) {
-          indexList[indexList.length - (1 + j)] =
-              indexList[indexList.length - (1 + j)] + 1;
-          break;
-        } else {
-          indexList[indexList.length - (1 + j)] = 0;
-        }
+        variantTypeList.add(VariantTypeModel(
+          variantType: value,
+          priceController: TextEditingController(
+            text: price > 0 ? price.toString() : '',
+          ),
+          priceNode: FocusNode(),
+          stockController: TextEditingController(
+            text: stock > 0 ? stock.toString() : '',
+          ),
+          stockNode: FocusNode(),
+        ));
+      } else {
+        variantTypeList.add(VariantTypeModel(
+          variantType: value,
+          priceController: TextEditingController(),
+          priceNode: FocusNode(),
+          stockController: TextEditingController(),
+          stockNode: FocusNode(),
+        ));
       }
     }
+
     return variantTypeList;
   }
 
   @override
-  int totalStock(List<AttributeModel>? attributeList, Item? item) {
-    List<List<String>> mainList = [];
-    int length = 1;
-    bool hasData = false;
-    List<int> indexList = [];
+  int totalStock(
+    List<AttributeModel>? attributeList,
+    Item? item, {
+    bool enforceBrandModelCompatibility = false,
+  }) {
     int totalStock = 0;
-    for (var attribute in attributeList!) {
-      if (attribute.active) {
-        hasData = true;
-        mainList.add(attribute.variants);
-        length = length * attribute.variants.length;
-        indexList.add(0);
+
+    for(final VariationCombination combination
+        in buildVariationCombinations(attributeList)) {
+      if(enforceBrandModelCompatibility &&
+          !combination.isBrandModelCompatible) {
+        continue;
       }
-    }
-    if (!hasData) {
-      length = 0;
-    }
-    for (int i = 0; i < length; i++) {
-      String value = '';
-      for (int j = 0; j < mainList.length; j++) {
-        value =
-            value +
-            (value.isEmpty ? '' : '-') +
-            mainList[j][indexList[j]].trim();
-      }
-      if (item != null && item.variations != null) {
-        int? stock = 0;
-        for (Variation variation in item.variations!) {
-          if (variation.type == value) {
-            stock = variation.stock;
+
+      final String value = combination.type;
+
+      if(item != null && item.variations != null) {
+        for(final Variation variation in item.variations!) {
+          if(canonicalVariationType(variation.type ?? '') ==
+              canonicalVariationType(value)) {
+            totalStock += variation.stock ?? 0;
             break;
           }
         }
-        totalStock = totalStock + stock!;
-      }
-      for (int j = 0; j < mainList.length; j++) {
-        if (indexList[indexList.length - (1 + j)] <
-            mainList[mainList.length - (1 + j)].length - 1) {
-          indexList[indexList.length - (1 + j)] =
-              indexList[indexList.length - (1 + j)] + 1;
-          break;
-        } else {
-          indexList[indexList.length - (1 + j)] = 0;
-        }
       }
     }
+
     return totalStock;
   }
 

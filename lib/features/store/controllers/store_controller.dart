@@ -32,6 +32,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart_store/features/store/domain/services/store_service_interface.dart';
+import 'package:sixam_mart_store/features/store/domain/utils/variation_key_helper.dart';
 
 class StoreController extends GetxController implements GetxService {
   final StoreServiceInterface storeServiceInterface;
@@ -86,6 +87,16 @@ class StoreController extends GetxController implements GetxService {
 
   List<VariantTypeModel>? _variantTypeList;
   List<VariantTypeModel>? get variantTypeList => _variantTypeList;
+
+  List<String> _unresolvedTechnicalModels = <String>[];
+  List<String> get unresolvedTechnicalModels => _unresolvedTechnicalModels;
+
+  bool get _isTechnicalStore {
+    final stores = Get.find<ProfileController>().profileModel?.stores;
+    return stores != null &&
+        stores.isNotEmpty &&
+        stores.first.module?.moduleType == 'ecommerce';
+  }
 
   bool _isAvailable = true;
   bool get isAvailable => _isAvailable;
@@ -699,7 +710,7 @@ class StoreController extends GetxController implements GetxService {
   }
 
   void addVariant(int index, String variant, Item? product) {
-    _attributeList![index].variants.add(variant);
+    _attributeList![index].variants.add(variant.trim());
     generateVariantTypes(product);
     update();
   }
@@ -782,32 +793,70 @@ class StoreController extends GetxController implements GetxService {
       _showImageSizeError();
       return;
     }
+    if(_isTechnicalStore && _unresolvedTechnicalModels.isNotEmpty) {
+      showCustomSnackBar('technical_model_brand_required'.tr);
+      return;
+    }
     _isLoading = true;
     update();
     Map<String, String> fields = {};
     if(!Get.find<SplashController>().getStoreModuleConfig().newVariation! && _variantTypeList!.isNotEmpty) {
       List<int?> idList = [];
       List<String?> nameList = [];
-      for (var attributeModel in _attributeList!) {
+      for (final attributeModel in _attributeList ?? <AttributeModel>[]) {
         if(attributeModel.active) {
           idList.add(attributeModel.attribute.id);
           nameList.add(attributeModel.attribute.name);
-          String variantString = '';
-          for (var variant in attributeModel.variants) {
-            variantString = variantString + (variantString.isEmpty ? '' : ',') + variant.replaceAll(' ', '');
-          }
-          fields.addAll(<String, String>{'choice_options_${attributeModel.attribute.id}': jsonEncode([variantString])});
+          final String variantString = attributeModel.variants
+              .map((variant) => variant.trim()).join(',');
+          fields.addAll(<String, String>{
+            'choice_options_${attributeModel.attribute.id}':
+                jsonEncode([variantString]),
+          });
         }
       }
-      fields.addAll(<String, String> {
-        'attribute_id': jsonEncode(idList), 'choice_no': jsonEncode(idList), 'choice': jsonEncode(nameList)
+      fields.addAll(<String, String>{
+        'attribute_id': jsonEncode(idList),
+        'choice_no': jsonEncode(idList),
+        'choice': jsonEncode(nameList),
       });
       for(int index=0; index<_variantTypeList!.length; index++) {
-        fields.addAll(<String, String> {'price_${_variantTypeList![index].variantType.replaceAll(' ', '_')}': _variantTypeList![index].priceController.text.trim(),
-          'stock_${_variantTypeList![index].variantType.replaceAll(' ', '_')}': _variantTypeList![index].stockController.text.trim().isEmpty ? '0'
-              : _variantTypeList![index].stockController.text.trim()});
+        final VariantTypeModel variant = _variantTypeList![index];
+        final String requestKey =
+            variationRequestKey(variant.variantType);
+        fields.addAll(<String, String>{
+          'price_$requestKey':
+              variant.priceController.text.trim(),
+          'stock_$requestKey':
+              variant.stockController.text.trim().isEmpty
+                  ? '0'
+                  : variant.stockController.text.trim(),
+        });
+      }
+      if(_isTechnicalStore) {
+        final String fallbackPrice =
+            _variantTypeList!.first.priceController.text.trim().isNotEmpty
+                ? _variantTypeList!.first.priceController.text.trim()
+                : (item.price?.toString() ?? '0');
+
+        for(final VariationCombination combination
+            in buildVariationCombinations(_attributeList)) {
+          if(!combination.isBrandModelCompatible) {
+            final String requestKey =
+                variationRequestKey(combination.type);
+            fields.putIfAbsent(
+              'price_$requestKey',
+              () => fallbackPrice,
+            );
+            fields.putIfAbsent(
+              'stock_$requestKey',
+              () => '0',
+            );
+          }
+        }
       }
     }
+
     String tags = '';
     for (var element in _tagList) {
       tags = tags + (tags.isEmpty ? '' : ',') + element!.replaceAll(' ', '');
@@ -861,8 +910,23 @@ class StoreController extends GetxController implements GetxService {
   }
 
   void generateVariantTypes(Item? item) {
-    _variantTypeList = storeServiceInterface.variationTypeList(_attributeList, item);
-    _totalStock = storeServiceInterface.totalStock(_attributeList, item);
+    final bool enforceCompatibility = _isTechnicalStore;
+
+    _unresolvedTechnicalModels = enforceCompatibility
+        ? findUnresolvedTechnicalModels(_attributeList)
+        : <String>[];
+
+    _variantTypeList = storeServiceInterface.variationTypeList(
+      _attributeList,
+      item,
+      enforceBrandModelCompatibility: enforceCompatibility,
+    );
+
+    _totalStock = storeServiceInterface.totalStock(
+      _attributeList,
+      item,
+      enforceBrandModelCompatibility: enforceCompatibility,
+    );
   }
 
   bool hasAttribute() {

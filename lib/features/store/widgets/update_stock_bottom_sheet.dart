@@ -6,6 +6,7 @@ import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_store/common/widgets/custom_text_field_widget.dart';
 import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
+import 'package:sixam_mart_store/features/store/domain/utils/variation_key_helper.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/styles.dart';
 
@@ -23,26 +24,31 @@ class _UpdateStockBottomSheetState extends State<UpdateStockBottomSheet> {
   TextEditingController mainStockController = TextEditingController();
   late List<TextEditingController> variationStockControllers;
   late List<TextEditingController> priceControllers;
+  late List<int> visibleVariationIndexes;
 
   int totalStock = 0;
 
   @override
   void initState() {
     super.initState();
-    totalStock = widget.item.stock ?? 0;
-
-    mainStockController.text = totalStock.toString();
+    visibleVariationIndexes = compatibleTechnicalVariationIndexes(widget.item);
     variationStockControllers = widget.item.variations!.map((variation) => TextEditingController(
       text: variation.stock.toString(),
     )).toList();
     priceControllers = widget.item.variations!.map((variation) => TextEditingController(
       text: variation.price.toString(),
     )).toList();
+    totalStock = visibleVariationIndexes.fold<int>(
+      0,
+      (total, index) => total + (widget.item.variations![index].stock ?? 0),
+    );
+    mainStockController.text = totalStock.toString();
   }
 
   void _setTotalStock() {
     totalStock = 0;
-    for (TextEditingController stockController in variationStockControllers) {
+    for (final int index in visibleVariationIndexes) {
+      final TextEditingController stockController = variationStockControllers[index];
       totalStock = stockController.text.trim().isNotEmpty ? totalStock + int.parse(stockController.text.trim()) : totalStock;
     }
     mainStockController.text = totalStock.toString();
@@ -117,22 +123,23 @@ class _UpdateStockBottomSheetState extends State<UpdateStockBottomSheet> {
                 const SizedBox(height: Dimensions.paddingSizeDefault),
 
                 ListView.builder(
-                  itemCount: variationStockControllers.length,
+                  itemCount: visibleVariationIndexes.length,
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
+                    final int variationIndex = visibleVariationIndexes[index];
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 0),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
                         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                          Expanded(flex: 3, child: Text(widget.item.variations![index].type!, style: robotoRegular)),
+                          Expanded(flex: 3, child: Text(widget.item.variations![variationIndex].type!, style: robotoRegular)),
 
                           Expanded(
                             flex: 3,
                             child: CustomTextFieldWidget(
                               hintText: 'enter_price'.tr,
-                              controller: priceControllers[index],
+                              controller: priceControllers[variationIndex],
                               inputType: TextInputType.number,
                               isAmount: true,
                             ),
@@ -143,7 +150,7 @@ class _UpdateStockBottomSheetState extends State<UpdateStockBottomSheet> {
                             flex: 3,
                             child: CustomTextFieldWidget(
                               hintText: 'enter_stock'.tr,
-                              controller: variationStockControllers[index],
+                              controller: variationStockControllers[variationIndex],
                               inputType: TextInputType.number,
                               isNumber: true,
                               onChanged: (String text) => _setTotalStock(),
@@ -190,7 +197,7 @@ class _UpdateStockBottomSheetState extends State<UpdateStockBottomSheet> {
                     color: Theme.of(context).primaryColor,
                     buttonText: 'update'.tr,
                     onPressed: () {
-                      if(mainStockController.text == '0' || variationStockControllers.any((element) => element.text == '0')){
+                      if(mainStockController.text == '0' || visibleVariationIndexes.any((index) => variationStockControllers[index].text == '0')){
                         showCustomSnackBar('stock_cannot_be_zero'.tr);
                       }else{
                         _updateStock(storeController);
@@ -221,7 +228,12 @@ class _UpdateStockBottomSheetState extends State<UpdateStockBottomSheet> {
     }
     data.addAll({"type": jsonEncode(types)});
     for (var variation in widget.item.variations!) {
-      data.addAll({"stock_${widget.item.variations!.indexOf(variation)}_${variation.type}": variationStockControllers[widget.item.variations!.indexOf(variation)].text.trim()});
+      final int index = widget.item.variations!.indexOf(variation);
+      data.addAll({
+        "stock_${index}_${variation.type}": visibleVariationIndexes.contains(index)
+            ? variationStockControllers[index].text.trim()
+            : '0',
+      });
     }
 
     storeController.stockUpdate(data, widget.item.id!).then((isSuccess) {

@@ -545,6 +545,10 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
       }
     }
 
+    if(storeController.unresolvedTechnicalModels.isNotEmpty) {
+      return 'technical_model_brand_required'.tr;
+    }
+
     if (_isNewVariationEnabled) {
       for (final VariationModelBodyModel variationModel in storeController.variationList ?? []) {
         if (variationModel.nameController!.text.trim().isEmpty) {

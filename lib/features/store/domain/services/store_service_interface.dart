@@ -35,8 +35,16 @@ abstract class StoreServiceInterface {
   Future<XFile?> pickImageFromGallery();
   bool hasAttributeData(List<AttributeModel>? attributeList);
   int setUnitIndex (List<UnitModel>? unitList, Item? item, int unitIndex);
-  List<VariantTypeModel>? variationTypeList(List<AttributeModel>? attributeList, Item? item);
-  int totalStock(List<AttributeModel>? attributeList, Item? item);
+  List<VariantTypeModel>? variationTypeList(
+    List<AttributeModel>? attributeList,
+    Item? item, {
+    bool enforceBrandModelCompatibility = false,
+  });
+  int totalStock(
+    List<AttributeModel>? attributeList,
+    Item? item, {
+    bool enforceBrandModelCompatibility = false,
+  });
   List<VariationModelBodyModel>? setExistingVariation(List<FoodVariation>? variationList);
   Future<List<BrandModel>?> getBrandList();
   int? setBrandIndex(List<BrandModel>? brands, Item? item);
