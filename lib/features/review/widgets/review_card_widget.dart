@@ -40,20 +40,46 @@ class ReviewCardWidget extends StatelessWidget {
 
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(review.itemName ?? '', style: robotoBold, overflow: TextOverflow.ellipsis, maxLines: 2),
+                Text(
+                  review.itemName ?? '',
+                  style: robotoBold.copyWith(
+                    fontSize: Dimensions.fontSizeSmall,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
                 const SizedBox(height: Dimensions.paddingSizeExtraSmall),
                 RatingBarWidget(rating: (review.rating ?? 0).toDouble(), ratingCount: null, size: 15),
               ]),
             ),
             const SizedBox(width: Dimensions.paddingSizeDefault),
 
-            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text(review.reviewId != null ? "${'review_id'.tr} # ${review.reviewId}" : '', style: robotoBold),
-              Text(
-                DateConverterHelper.utcToDateTime(review.createdAt!),
-                style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    review.reviewId != null
+                        ? "${'review_id'.tr} # ${review.reviewId}"
+                        : '',
+                    style: robotoBold.copyWith(
+                      fontSize: Dimensions.fontSizeSmall,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    DateConverterHelper.utcToDateTime(review.createdAt!),
+                    style: robotoRegular.copyWith(
+                      fontSize: Dimensions.fontSizeExtraSmall,
+                      color: Theme.of(context).disabledColor,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-            ]),
+            ),
           ]),
         ),
 
@@ -66,7 +92,14 @@ class ReviewCardWidget extends StatelessWidget {
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('reviewer'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
               const SizedBox(height: Dimensions.paddingSizeSmall),
-              Text(review.customerName ?? '', style: robotoBold),
+              Text(
+                review.customerName ?? '',
+                style: robotoBold.copyWith(
+                  fontSize: Dimensions.fontSizeSmall,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ]),
 
             // Reply Button
@@ -75,7 +108,7 @@ class ReviewCardWidget extends StatelessWidget {
               width: 95, height: 40,
               radius: 8,
               fontWeight: FontWeight.w500,
-              fontSize: Dimensions.fontSizeDefault,
+              fontSize: Dimensions.fontSizeSmall,
               buttonText: review.reply != null ? 'view_reply'.tr : 'give_reply'.tr,
               color: review.reply != null ? Theme.of(context).primaryColor.withValues(alpha: 0.1) : Theme.of(context).primaryColor,
               isViewReply: review.reply != null,
@@ -84,7 +117,7 @@ class ReviewCardWidget extends StatelessWidget {
               width: 95, height: 40,
               radius: 8,
               fontWeight: FontWeight.w500,
-              fontSize: Dimensions.fontSizeDefault,
+              fontSize: Dimensions.fontSizeSmall,
               buttonText: 'view'.tr,
               color: Theme.of(context).primaryColor,
             ),
