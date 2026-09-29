@@ -14,6 +14,7 @@ import 'package:sixam_mart_store/common/models/config_model.dart';
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
 import 'package:sixam_mart_store/features/profile/domain/models/profile_model.dart' as profile;
 import 'package:sixam_mart_store/helper/custom_validator_helper.dart';
+import 'package:sixam_mart_store/helper/input_language_helper.dart';
 import 'package:sixam_mart_store/helper/validate_check.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
@@ -53,7 +54,10 @@ class _StoreEditScreenState extends State<StoreEditScreen> with TickerProviderSt
 
   late profile.Store _store;
   final Module? _module = Get.find<SplashController>().configModel!.moduleConfig!.module;
-  final List<Language>? _languageList = Get.find<SplashController>().configModel!.language;
+  final List<Language> _languageList = buildInputLanguageList(
+    Get.find<SplashController>().configModel!.language,
+  );
+  int get _defaultLanguageIndex => englishLanguageIndex(_languageList);
 
   final List<Translation>? translation = Get.find<ProfileController>().profileModel!.translations!;
   TabController? _tabController;
@@ -80,7 +84,7 @@ class _StoreEditScreenState extends State<StoreEditScreen> with TickerProviderSt
       _maxVideoPreviewController.text = widget.store.metaData!.metaMaxVideoPreviewValue?.toString() ?? '';
     }
 
-    _tabController = TabController(length: _languageList!.length, vsync: this);
+    _tabController = TabController(length: _languageList.length, vsync: this);
 
     for (var language in _languageList) {
       _tabs.add(Tab(text: language.value));
@@ -169,12 +173,12 @@ class _StoreEditScreenState extends State<StoreEditScreen> with TickerProviderSt
                   const Padding(padding: EdgeInsets.only(bottom: Dimensions.paddingSizeSmall), child: Divider(height: 0)),
                   const SizedBox(height: Dimensions.paddingSizeDefault),
                   CustomTextFieldWidget(
-                    hintText: '${_module.showRestaurantText! ? 'restaurant_name'.tr : 'store_name'.tr} (${_languageList?[_tabController!.index].value!})',
-                    labelText: '${_module.showRestaurantText! ? 'restaurant_name'.tr : 'store_name'.tr} (${_languageList?[_tabController!.index].value!})',
+                    hintText: '${_module.showRestaurantText! ? 'restaurant_name'.tr : 'store_name'.tr} (${_languageList[_tabController!.index].value!})',
+                    labelText: '${_module.showRestaurantText! ? 'restaurant_name'.tr : 'store_name'.tr} (${_languageList[_tabController!.index].value!})',
                     controller: _nameController[_tabController!.index],
                     capitalization: TextCapitalization.words,
                     focusNode: _nameNode[_tabController!.index],
-                    nextFocus: _tabController!.index != _languageList!.length-1 ? _addressNode[_tabController!.index] : _contactNode,
+                    nextFocus: _tabController!.index != _languageList.length-1 ? _addressNode[_tabController!.index] : _contactNode,
                     required: true,
                   ),
                 ]),
@@ -747,11 +751,11 @@ class _StoreEditScreenState extends State<StoreEditScreen> with TickerProviderSt
                   for(int index=0; index<_languageList.length; index++) {
                     translation.add(Translation(
                       locale: _languageList[index].key, key: 'name',
-                      value: _nameController[index].text.trim().isNotEmpty ? _nameController[index].text.trim() : _nameController[0].text.trim(),
+                      value: _nameController[index].text.trim().isNotEmpty ? _nameController[index].text.trim() : _nameController[_defaultLanguageIndex].text.trim(),
                     ));
                     translation.add(Translation(
                       locale: _languageList[index].key, key: 'address',
-                      value: _addressController[index].text.trim().isNotEmpty ? _addressController[index].text.trim() : _addressController[0].text.trim(),
+                      value: _addressController[index].text.trim().isNotEmpty ? _addressController[index].text.trim() : _addressController[_defaultLanguageIndex].text.trim(),
                     ));
                   }
 

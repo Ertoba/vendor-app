@@ -17,6 +17,7 @@ import 'package:sixam_mart_store/features/advertisement/widgets/preview_profile_
 import 'package:sixam_mart_store/features/advertisement/widgets/preview_video_dialog_widget.dart';
 import 'package:sixam_mart_store/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_store/helper/date_converter_helper.dart';
+import 'package:sixam_mart_store/helper/input_language_helper.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
 import 'package:sixam_mart_store/util/styles.dart';
@@ -44,7 +45,7 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
 
   TabController? multiLanguageTabController;
 
-  final List<Language>? _languageList = Get.find<SplashController>().configModel!.language;
+  late final List<Language> _languageList;
   List<Widget> tabList = [];
 
   @override
@@ -52,7 +53,16 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
     super.initState();
 
     _getPromotionList();
-    multiLanguageTabController = TabController(length: _languageList!.length, initialIndex: 0, vsync: this);
+
+    _languageList = buildInputLanguageList(
+      Get.find<SplashController>().configModel!.language,
+    );
+
+    multiLanguageTabController = TabController(
+      length: _languageList.length,
+      initialIndex: 0,
+      vsync: this,
+    );
 
     for (var language in _languageList) {
       titleController.add(TextEditingController());
@@ -76,11 +86,16 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
   }
 
   void _editSetup() {
-    titleController[0].text = widget.adsDetailsModel?.title ?? "";
-    descriptionController[0].text = widget.adsDetailsModel?.description ?? "";
+    final int defaultIndex =
+        englishLanguageIndex(_languageList);
+
+    titleController[defaultIndex].text =
+        widget.adsDetailsModel?.title ?? "";
+    descriptionController[defaultIndex].text =
+        widget.adsDetailsModel?.description ?? "";
     validationController?.text = "${DateConverterHelper.stringToMDY(widget.adsDetailsModel?.startDate ??"")} - ${DateConverterHelper.stringToMDY(widget.adsDetailsModel?.endDate ??"")}";
 
-    for(int index = 1; index < _languageList!.length ; index ++){
+    for(int index = 0; index < _languageList.length ; index ++){
       widget.adsDetailsModel?.translations?.forEach((element){
         if(element.locale == _languageList[index].key && element.key == "title"){
           titleController[index].text = element.value ?? "";
@@ -118,18 +133,35 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
         '${DateConverterHelper.stringToMDY(original.startDate ?? '')} - ${DateConverterHelper.stringToMDY(original.endDate ?? '')}';
     if ((validationController?.text ?? '') != originalDateRange) return true;
 
-    for (int i = 0; i < _languageList!.length; i++) {
-      final langKey = _languageList[i].key;
-      String originalTitle = i == 0 ? (original.title ?? '') : '';
-      String originalDesc  = i == 0 ? (original.description ?? '') : '';
-      if (i > 0) {
-        original.translations?.forEach((t) {
-          if (t.locale == langKey && t.key == 'title')   originalTitle = t.value ?? '';
-          if (t.locale == langKey && t.key == 'description') originalDesc  = t.value ?? '';
-        });
+    for (int i = 0; i < _languageList.length; i++) {
+      final String? langKey = _languageList[i].key;
+
+      String originalTitle =
+          langKey == 'en' ? (original.title ?? '') : '';
+      String originalDesc =
+          langKey == 'en' ? (original.description ?? '') : '';
+
+      original.translations?.forEach((translation) {
+        if (translation.locale == langKey &&
+            translation.key == 'title') {
+          originalTitle = translation.value ?? '';
+        }
+
+        if (translation.locale == langKey &&
+            translation.key == 'description') {
+          originalDesc = translation.value ?? '';
+        }
+      });
+
+      if (titleController[i].text.trim() !=
+          originalTitle.trim()) {
+        return true;
       }
-      if (titleController[i].text.trim() != originalTitle.trim()) return true;
-      if (descriptionController[i].text.trim() != originalDesc.trim()) return true;
+
+      if (descriptionController[i].text.trim() !=
+          originalDesc.trim()) {
+        return true;
+      }
     }
 
     if (adsController.pickedVideoFile != null) return true;
@@ -287,7 +319,7 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
                           const SizedBox(height: Dimensions.paddingSizeDefault),
 
                           CustomTextFieldWidget(
-                            hintText: "${'title'.tr} (${_languageList![multiLanguageTabController!.index].value})".tr,
+                            hintText: "${'title'.tr} (${_languageList[multiLanguageTabController!.index].value})".tr,
                             labelText: "${'title'.tr} (${_languageList[multiLanguageTabController!.index].value})".tr,
                             inputType: TextInputType.text,
                             controller: titleController[multiLanguageTabController!.index],
@@ -666,11 +698,11 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
                 }
 
                 Get.dialog(adsController.selectedAdsType == AdsType.video_promotion.name ? PreviewVideoDialogWidget(
-                  title: titleController[0].text,
-                  description: descriptionController[0].text,
+                  title: titleController[multiLanguageTabController!.index].text,
+                  description: descriptionController[multiLanguageTabController!.index].text,
                 ) : PreviewProviderPromotionWidget(
-                title: titleController[0].text,
-                  description: descriptionController[0].text,
+                title: titleController[multiLanguageTabController!.index].text,
+                  description: descriptionController[multiLanguageTabController!.index].text,
                   validation: validationController?.text,
                   pickedCoverImage: adsController.pickedCoverImage?.path,
                   networkCoverImage: adsController.networkCoverImage,
@@ -698,7 +730,7 @@ class _CreateAdvertisementScreenState extends State<CreateAdvertisementScreen> w
   Future<void> clearTitleDescription() async {
     validationController?.text = '';
 
-    for(int index = 0; index < _languageList!.length ; index ++){
+    for(int index = 0; index < _languageList.length ; index ++){
       titleController[index].text = "";
       descriptionController[index].text = "";
     }

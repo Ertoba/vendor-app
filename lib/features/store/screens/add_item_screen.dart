@@ -37,6 +37,7 @@ import 'package:sixam_mart_store/features/store/widgets/attribute_view_widget.da
 import 'package:sixam_mart_store/features/store/widgets/food_variation_view_widget.dart';
 import 'package:sixam_mart_store/features/store/widgets/meta_seo_item_widget.dart';
 import 'package:sixam_mart_store/features/store/widgets/video_upload_widget.dart';
+import 'package:sixam_mart_store/helper/input_language_helper.dart';
 import 'package:sixam_mart_store/helper/type_converter.dart';
 import 'package:sixam_mart_store/helper/validate_check.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
@@ -86,7 +87,13 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
   final isGrocery = Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'grocery';
   final isFood = Get.find<SplashController>().getStoreModuleConfig().newVariation!;
 
-  final List<Language>? _languageList = Get.find<SplashController>().configModel!.language;
+  final List<Language> _languageList = buildInputLanguageList(
+    Get.find<SplashController>().configModel!.language,
+  );
+
+  int get _defaultLanguageIndex =>
+      englishLanguageIndex(_languageList);
+
   TabController? _tabController;
   final List<Tab> _tabs =[];
 
@@ -110,7 +117,7 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
     }
     storeController.clearVatTax();
 
-    _tabController = TabController(length: _languageList!.length, vsync: this);
+    _tabController = TabController(length: _languageList.length, vsync: this);
     _tabs.addAll(_languageList.map((lang) => Tab(text: lang.value)));
 
     for(int index = 0; index < _languageList.length; index++) {
@@ -152,7 +159,7 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
   }
 
   void _setTranslationData(Item? item) {
-    for(int index = 0; index < _languageList!.length; index++) {
+    for(int index = 0; index < _languageList.length; index++) {
       _nameControllerList[index].clear();
       _descriptionControllerList[index].clear();
 
@@ -608,7 +615,7 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
   }
 
   bool _isEnglishDataIncomplete() {
-    for (int index = 0; index < _languageList!.length; index++) {
+    for (int index = 0; index < _languageList.length; index++) {
       if (_languageList[index].key == 'en') {
         return _nameControllerList[index].text.trim().isEmpty
             || _descriptionControllerList[index].text.trim().isEmpty;
@@ -706,7 +713,7 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
       _item.taxVatIds = storeController.selectedVatTaxIdList;
     }
 
-    final List<Language> languages = _languageList ?? [];
+    final List<Language> languages = _languageList;
     final List<Translation> translations = [];
     for (int index = 0; index < languages.length; index++) {
       translations.add(Translation(
@@ -714,14 +721,14 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
         key: 'name',
         value: _nameControllerList[index].text.trim().isNotEmpty
             ? _nameControllerList[index].text.trim()
-            : _nameControllerList[0].text.trim(),
+            : _nameControllerList[_defaultLanguageIndex].text.trim(),
       ));
       translations.add(Translation(
         locale: languages[index].key,
         key: 'description',
         value: _descriptionControllerList[index].text.trim().isNotEmpty
             ? _descriptionControllerList[index].text.trim()
-            : _descriptionControllerList[0].text.trim(),
+            : _descriptionControllerList[_defaultLanguageIndex].text.trim(),
       ));
     }
 
@@ -1164,7 +1171,7 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
                     controller: _nameControllerList[_tabController!.index],
                     capitalization: TextCapitalization.words,
                     focusNode: _nameFocusList[_tabController!.index],
-                    nextFocus: _tabController!.index != _languageList!.length-1 ? _descriptionFocusList[_tabController!.index] : _descriptionFocusList[0],
+                    nextFocus: _tabController!.index != _languageList.length-1 ? _descriptionFocusList[_tabController!.index] : _descriptionFocusList[0],
                     showTitle: false,
                   ),
                 ),
@@ -1231,17 +1238,17 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
             isLoading: aiController.otherDataLoading,
             showAction: Get.find<SplashController>().configModel!.openAiStatus!,
             onTap: () {
-              if(_nameControllerList[0].text.isEmpty) {
+              if(_nameControllerList[_defaultLanguageIndex].text.isEmpty) {
                 showCustomSnackBar('food_name_required_for_en'.tr);
-              }else if(_descriptionControllerList[0].text.isEmpty){
+              }else if(_descriptionControllerList[_defaultLanguageIndex].text.isEmpty){
                 showCustomSnackBar('description_required'.tr);
               }else{
                 setState(() {
                   _discountTypeSelected = true;
                 });
                 storeController.generateAndSetOtherData(
-                  title: _nameControllerList[0].text.trim(),
-                  description: _descriptionControllerList[0].text.trim(),
+                  title: _nameControllerList[_defaultLanguageIndex].text.trim(),
+                  description: _descriptionControllerList[_defaultLanguageIndex].text.trim(),
                   priceController: _priceController,
                   discountController: _discountController,
                   stockController: _stockController,
@@ -2139,20 +2146,20 @@ class _AddItemScreenState extends State<AddItemScreen> with TickerProviderStateM
             subTitle: 'item_variation_setup'.tr,
             showAction: Get.find<SplashController>().configModel!.openAiStatus!,
             onTap: () {
-              if(_nameControllerList[0].text.isEmpty) {
+              if(_nameControllerList[_defaultLanguageIndex].text.isEmpty) {
                 showCustomSnackBar('food_name_required_for_en'.tr);
-              }else if(_descriptionControllerList[0].text.isEmpty){
+              }else if(_descriptionControllerList[_defaultLanguageIndex].text.isEmpty){
                  showCustomSnackBar('description_required'.tr);
               }else{
                 if(Get.find<SplashController>().getStoreModuleConfig().newVariation!){
                   storeController.generateAndSetVariationData(
-                  title: _nameControllerList[0].text.trim(),
-                  description: _descriptionControllerList[0].text.trim(),
+                  title: _nameControllerList[_defaultLanguageIndex].text.trim(),
+                  description: _descriptionControllerList[_defaultLanguageIndex].text.trim(),
                   );
                 }else{
                   storeController.generateAndSetAttributeData(
-                  title: _nameControllerList[0].text.trim(),
-                  description: _descriptionControllerList[0].text.trim(),
+                  title: _nameControllerList[_defaultLanguageIndex].text.trim(),
+                  description: _descriptionControllerList[_defaultLanguageIndex].text.trim(),
                   );
                 }
               }
