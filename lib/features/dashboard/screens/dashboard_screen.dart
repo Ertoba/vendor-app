@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:sixam_mart_store/common/widgets/navigation_safe_area.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -122,6 +123,7 @@ class DashboardScreenState extends State<DashboardScreen> {
       },
       child: SafeArea(
         top: false,
+        bottom: false,
         child: Scaffold(
 
           floatingActionButton: !GetPlatform.isMobile || keyboardVisible ? null : GetBuilder<ProfileController>(
@@ -154,8 +156,7 @@ class DashboardScreenState extends State<DashboardScreen> {
 
           bottomNavigationBar: !GetPlatform.isMobile ? const SizedBox() : GetBuilder<ProfileController>(
             builder: (profileController) {
-              return Container(
-                height: 65,
+              return BottomNavigationSurface(
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(Dimensions.radiusLarge)),

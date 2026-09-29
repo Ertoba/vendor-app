@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:sixam_mart_store/common/widgets/navigation_safe_area.dart';
 import 'package:flutter/services.dart';
 import 'package:sixam_mart_store/features/home/widgets/trial_widget.dart';
 import 'package:sixam_mart_store/features/language/controllers/language_controller.dart';
@@ -104,17 +105,11 @@ class MyApp extends StatelessWidget {
               initialRoute: RouteHelper.getSplashRoute(body),
               getPages: RouteHelper.routes,
               defaultTransition: Transition.topLevel,
-              transitionDuration: const Duration(milliseconds: 500),
+              transitionDuration: const Duration(milliseconds: 250),
               builder: (BuildContext context, widget) {
-                return MediaQuery(
-                  data: MediaQuery.of(
-                    context,
-                  ).copyWith(textScaler: const TextScaler.linear(1)),
-                  child: Material(
-                    child: SafeArea(
-                      top: false,
-                      bottom: GetPlatform.isAndroid,
-                      child: Stack(
+                return Material(
+                  child: AppSafeArea(
+                    child: Stack(
                         children: [
                           widget!,
 
@@ -168,8 +163,7 @@ class MyApp extends StatelessWidget {
                         ],
                       ),
                     ),
-                  ),
-                );
+                  );
               },
             );
           },
