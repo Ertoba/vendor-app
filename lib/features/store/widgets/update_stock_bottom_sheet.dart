@@ -220,7 +220,8 @@ class _UpdateStockBottomSheetState extends State<UpdateStockBottomSheet> {
     data.addAll({"product_id": widget.item.id.toString()});
     data.addAll({"current_stock": mainStockController.text.trim()});
     for (var variation in widget.item.variations!) {
-      data.addAll({"price_${widget.item.variations!.indexOf(variation)}_${variation.type}": priceControllers[widget.item.variations!.indexOf(variation)].text.trim()});
+      final String variationKey = (variation.type ?? '').replaceAll('.', '_');
+      data.addAll({"price_${widget.item.variations!.indexOf(variation)}_$variationKey": priceControllers[widget.item.variations!.indexOf(variation)].text.trim()});
     }
     List<String> types = [];
     for (var variation in widget.item.variations!) {
@@ -230,7 +231,7 @@ class _UpdateStockBottomSheetState extends State<UpdateStockBottomSheet> {
     for (var variation in widget.item.variations!) {
       final int index = widget.item.variations!.indexOf(variation);
       data.addAll({
-        "stock_${index}_${variation.type}": visibleVariationIndexes.contains(index)
+        "stock_${index}_${(variation.type ?? '').replaceAll('.', '_')}": visibleVariationIndexes.contains(index)
             ? variationStockControllers[index].text.trim()
             : '0',
       });
