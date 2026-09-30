@@ -51,6 +51,7 @@ class Images {
   static const String terms = 'assets/image/terms.png';
   static const String update = 'assets/image/update.png';
   static const String maintenance = 'assets/image/maintenance.png';
+  static const String maintenanceMood = 'assets/image/maintanence_mood.png';
   static const String image = 'assets/image/image.png';
   static const String send = 'assets/image/send.png';
   static const String chat = 'assets/image/chat.png';

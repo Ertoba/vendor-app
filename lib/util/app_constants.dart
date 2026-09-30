@@ -336,6 +336,7 @@ class AppConstants {
   static const String moduleType = '6am_mart_store_module_type';
 
   static const String topic = 'all_zone_store';
+  static const String maintenanceModeTopic = 'maintenance_mode_vendor_app';
   static const String zoneTopic = 'zone_topic';
   static const String moduleId = 'moduleId';
   static const String localizationKey = 'X-localization';
