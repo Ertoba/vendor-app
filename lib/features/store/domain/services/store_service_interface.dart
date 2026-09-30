@@ -21,7 +21,7 @@ abstract class StoreServiceInterface {
   Future<List<AttributeModel>?> getAttributeList(Item? item);
   Future<bool> updateStoreBasicInfo(Store store, XFile? logo, XFile? cover, List<Translation> translation, XFile? metaImage);
   Future<bool> updateStore(Store store, String min, String max, String type);
-  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName);
+  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName, {XFile? videoFile, String videoUploadType = 'file', String? videoLink, bool removeVideo = false});
   Future<bool> deleteItem(int? itemID, bool pendingItem);
   Future<List<ReviewModel>?> getStoreReviewList(int? storeID, String? searchText);
   Future<List<ReviewModel>?> getItemReviewList(int? itemID);

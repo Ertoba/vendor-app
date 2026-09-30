@@ -1530,5 +1530,17 @@
   "edit_this_order": "¿Editar este pedido?",
   "you_want_to_edit_this_order": "¿Quieres editar este pedido?",
   "edit_history_log": "Registro de ediciones",
-  "reels": "Reels"
+  "reels": "Reels",
+  "product_video": "V?deo del producto",
+  "upload_video_file": "Subir archivo de v?deo",
+  "use_video_link": "Usar enlace de v?deo",
+  "video_link": "Enlace de v?deo",
+  "enter_video_link": "Introduce un enlace de YouTube, Vimeo o v?deo directo",
+  "preview_video": "Vista previa del v?deo",
+  "remove_video": "Eliminar v?deo",
+  "product_video_ready": "V?deo del producto listo",
+  "product_video_optional_hint": "Opcional. Sube MP4, WEBM u OGG de hasta 10 MB o usa un enlace de YouTube, Vimeo o v?deo directo.",
+  "invalid_product_video_link": "Introduce un enlace http/https v?lido.",
+  "unsupported_product_video_format": "Usa un archivo de v?deo MP4, WEBM u OGG.",
+  "product_video_max_size": "El v?deo debe tener 10 MB o menos."
 }

@@ -1611,5 +1611,17 @@
   "edit_this_order": "Edit this order?",
   "you_want_to_edit_this_order": "Do you want to edit this order?",
   "edit_history_log": "Edit history",
-  "reels": "Reels"
+  "reels": "Reels",
+  "product_video": "Product Video",
+  "upload_video_file": "Upload video file",
+  "use_video_link": "Use video link",
+  "video_link": "Video link",
+  "enter_video_link": "Enter YouTube, Vimeo or direct video link",
+  "preview_video": "Preview video",
+  "remove_video": "Remove video",
+  "product_video_ready": "Product video ready",
+  "product_video_optional_hint": "Optional. Upload MP4, WEBM or OGG up to 10 MB, or use a YouTube, Vimeo or direct video link.",
+  "invalid_product_video_link": "Enter a valid http/https video link.",
+  "unsupported_product_video_format": "Use an MP4, WEBM or OGG video file.",
+  "product_video_max_size": "Video must be 10 MB or smaller."
 }

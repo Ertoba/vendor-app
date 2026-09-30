@@ -159,13 +159,20 @@ class StoreRepository implements StoreRepositoryInterface {
   }
 
   @override
-  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName) async {
+  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName, {XFile? videoFile, String videoUploadType = 'file', String? videoLink, bool removeVideo = false}) async {
     Map<String, String> fields = {};
     fields.addAll(<String, String>{
       'price': item.price.toString(), 'discount': item.discount.toString(), 'veg': item.veg.toString(),
       'discount_type': item.discountType!, 'category_id': item.categoryIds![0].id!,
       'translations': jsonEncode(item.translations), 'tags': tags, 'maximum_cart_quantity': item.maxOrderQuantity.toString(),
     });
+    fields.addAll(<String, String>{
+      'video_upload_type': videoUploadType,
+      'remove_video': removeVideo ? '1' : '0',
+    });
+    if(videoUploadType == 'link') {
+      fields['video_link'] = videoLink?.trim() ?? '';
+    }
     if(Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'grocery' || Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'food') {
       fields.addAll(<String, String> {'nutritions': nutrition, 'allergies': allergicIngredients});
     }
@@ -238,6 +245,9 @@ class StoreRepository implements StoreRepositoryInterface {
     images0.add(MultipartBody('image', image));
     if(metaImage != null) {
       images0.add(MultipartBody('meta_image', metaImage));
+    }
+    if(videoFile != null) {
+      images0.add(MultipartBody('video', videoFile));
     }
     for(int index=0; index<images.length; index++) {
       images0.add(MultipartBody('item_images[]', images[index]));

@@ -59,8 +59,15 @@ class StoreService implements StoreServiceInterface {
   }
 
   @override
-  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName) async {
-    return await storeRepositoryInterface.addItem(item, metaImage, image, images, savedImages, attributes, isAdd, tags, nutrition, allergicIngredients, genericName);
+  Future<Response> addItem(Item item, XFile? metaImage, XFile? image, List<XFile> images, List<String> savedImages, Map<String, String> attributes, bool isAdd, String tags, String nutrition, String allergicIngredients, String genericName, {XFile? videoFile, String videoUploadType = 'file', String? videoLink, bool removeVideo = false}) async {
+    return await storeRepositoryInterface.addItem(
+      item, metaImage, image, images, savedImages, attributes, isAdd,
+      tags, nutrition, allergicIngredients, genericName,
+      videoFile: videoFile,
+      videoUploadType: videoUploadType,
+      videoLink: videoLink,
+      removeVideo: removeVideo,
+    );
   }
 
   @override

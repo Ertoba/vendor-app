@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sixam_mart_store/features/reels/widgets/reel_preview_dialog_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:sixam_mart_store/common/widgets/custom_asset_image_widget.dart';
 import 'package:sixam_mart_store/common/widgets/custom_drop_down_button.dart.dart';
@@ -73,6 +75,16 @@ class _AddItemScreenState extends State<AddItemScreen>
   final TextEditingController _maxSnippetController = TextEditingController();
   final TextEditingController _maxVideoPreviewController =
       TextEditingController();
+  final TextEditingController _productVideoLinkController =
+      TextEditingController();
+
+  XFile? _pickedProductVideo;
+  String _videoUploadType = 'file';
+  String? _existingProductVideoUrl;
+  String? _existingProductVideoLink;
+  String? _existingProductVideoPreviewUrl;
+  bool _removeProductVideo = false;
+
   final FocusNode _priceNode = FocusNode();
   final FocusNode _discountNode = FocusNode();
   final FocusNode _metaTitleNode = FocusNode();
@@ -130,6 +142,15 @@ class _AddItemScreenState extends State<AddItemScreen>
 
     _update = widget.item != null;
     _discountTypeSelected = _update;
+
+    _existingProductVideoUrl = widget.item?.videoFullUrl;
+    _existingProductVideoLink = widget.item?.videoLink;
+    _existingProductVideoPreviewUrl = widget.item?.videoPreviewUrl;
+
+    if ((_existingProductVideoLink ?? '').trim().isNotEmpty) {
+      _videoUploadType = 'link';
+      _productVideoLinkController.text = _existingProductVideoLink!;
+    }
 
     storeController.initItemData(
       item: widget.item,
@@ -246,6 +267,312 @@ class _AddItemScreenState extends State<AddItemScreen>
     }
   }
 
+  String _normalizeProductVideoLink(String value) {
+    String link = value.trim();
+    if (link.isEmpty) {
+      return '';
+    }
+    if (link.startsWith('//')) {
+      return 'https:$link';
+    }
+    if (!RegExp(r'^[a-zA-Z][a-zA-Z0-9+.-]*://').hasMatch(link) &&
+        RegExp(r'^(www\.)?[\w.-]+\.[a-zA-Z]{2,}([/?#].*)?$').hasMatch(link)) {
+      link = 'https://$link';
+    }
+    return link;
+  }
+
+  bool _isValidProductVideoLink(String value) {
+    final String normalized = _normalizeProductVideoLink(value);
+    final Uri? uri = Uri.tryParse(normalized);
+    return uri != null &&
+        (uri.scheme == 'http' || uri.scheme == 'https') &&
+        uri.host.isNotEmpty &&
+        uri.host.contains('.');
+  }
+
+  bool _isDirectProductVideoLink(String value) {
+    final Uri? uri = Uri.tryParse(_normalizeProductVideoLink(value));
+    final String path = uri?.path.toLowerCase() ?? '';
+    return path.endsWith('.mp4') ||
+        path.endsWith('.webm') ||
+        path.endsWith('.ogg');
+  }
+
+  Future<void> _pickProductVideo() async {
+    final XFile? picked = await ImagePicker().pickVideo(
+      source: ImageSource.gallery,
+    );
+
+    if (picked == null) {
+      return;
+    }
+
+    final String path = picked.path.toLowerCase();
+    final bool validExtension =
+        path.endsWith('.mp4') ||
+        path.endsWith('.webm') ||
+        path.endsWith('.ogg');
+
+    if (!validExtension) {
+      showCustomSnackBar('unsupported_product_video_format'.tr);
+      return;
+    }
+
+    final int bytes = await picked.length();
+    const int maxBytes = 10 * 1024 * 1024;
+
+    if (bytes > maxBytes) {
+      showCustomSnackBar('product_video_max_size'.tr);
+      return;
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _pickedProductVideo = picked;
+      _videoUploadType = 'file';
+      _productVideoLinkController.clear();
+      _removeProductVideo = false;
+    });
+  }
+
+  void _selectProductVideoLinkMode() {
+    setState(() {
+      _pickedProductVideo = null;
+      _videoUploadType = 'link';
+      _removeProductVideo = false;
+    });
+  }
+
+  void _removeProductVideoSelection() {
+    setState(() {
+      _pickedProductVideo = null;
+      _productVideoLinkController.clear();
+      _removeProductVideo = true;
+    });
+  }
+
+  Future<void> _previewProductVideo() async {
+    if (_pickedProductVideo != null) {
+      await Get.dialog(
+        ReelPreviewDialogWidget(
+          mediaFile: _pickedProductVideo,
+          isVideoFile: true,
+        ),
+      );
+      return;
+    }
+
+    if (_videoUploadType == 'link') {
+      final String link = _productVideoLinkController.text.trim().isNotEmpty
+          ? _normalizeProductVideoLink(_productVideoLinkController.text)
+          : _normalizeProductVideoLink(_existingProductVideoLink ?? '');
+
+      if (link.isEmpty || !_isValidProductVideoLink(link)) {
+        showCustomSnackBar('invalid_product_video_link'.tr);
+        return;
+      }
+
+      if (_isDirectProductVideoLink(link)) {
+        await Get.dialog(ReelPreviewDialogWidget(networkVideoUrl: link));
+        return;
+      }
+
+      final Uri uri = Uri.parse(link);
+      final bool launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!launched) {
+        showCustomSnackBar('invalid_product_video_link'.tr);
+      }
+      return;
+    }
+
+    final String networkVideo =
+        (_existingProductVideoPreviewUrl ?? '').trim().isNotEmpty
+        ? _existingProductVideoPreviewUrl!
+        : (_existingProductVideoUrl ?? '');
+
+    if (networkVideo.trim().isNotEmpty) {
+      await Get.dialog(ReelPreviewDialogWidget(networkVideoUrl: networkVideo));
+      return;
+    }
+
+    final String link = _normalizeProductVideoLink(
+      _existingProductVideoLink ?? '',
+    );
+
+    if (link.isNotEmpty && _isValidProductVideoLink(link)) {
+      await launchUrl(Uri.parse(link), mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Widget _buildProductVideoSection(BuildContext context) {
+    final bool hasPickedFile = _pickedProductVideo != null;
+
+    final bool hasExistingFile =
+        !_removeProductVideo &&
+        (_existingProductVideoUrl ?? '').trim().isNotEmpty &&
+        _videoUploadType == 'file';
+
+    final bool hasLink =
+        !_removeProductVideo &&
+        (_videoUploadType == 'link') &&
+        (_productVideoLinkController.text.trim().isNotEmpty ||
+            (_existingProductVideoLink ?? '').trim().isNotEmpty);
+
+    final bool hasVideo = hasPickedFile || hasExistingFile || hasLink;
+
+    String? selectedFileName;
+    if (_pickedProductVideo != null) {
+      selectedFileName = _pickedProductVideo!.path.split(RegExp(r'[\\/]')).last;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: Dimensions.paddingSizeDefault),
+        Row(
+          children: [
+            Text('product_video'.tr, style: robotoBold),
+            const SizedBox(width: Dimensions.paddingSizeSmall),
+            Text(
+              '(${'optional'.tr})',
+              style: robotoRegular.copyWith(
+                fontSize: Dimensions.fontSizeExtraSmall,
+                color: Theme.of(context).disabledColor,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+        Text(
+          'product_video_optional_hint'.tr,
+          style: robotoRegular.copyWith(
+            fontSize: Dimensions.fontSizeSmall,
+            color: Theme.of(context).disabledColor,
+          ),
+        ),
+        const SizedBox(height: Dimensions.paddingSizeSmall),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+            boxShadow: const [
+              BoxShadow(color: Colors.black12, spreadRadius: 0, blurRadius: 5),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _pickProductVideo,
+                      icon: const Icon(Icons.video_library_outlined),
+                      label: Text('upload_video_file'.tr),
+                    ),
+                  ),
+                  const SizedBox(width: Dimensions.paddingSizeSmall),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _selectProductVideoLinkMode,
+                      icon: const Icon(Icons.link),
+                      label: Text('use_video_link'.tr),
+                    ),
+                  ),
+                ],
+              ),
+              if (_videoUploadType == 'link') ...[
+                const SizedBox(height: Dimensions.paddingSizeSmall),
+                TextField(
+                  controller: _productVideoLinkController,
+                  keyboardType: TextInputType.url,
+                  autocorrect: false,
+                  decoration: InputDecoration(
+                    labelText: 'video_link'.tr,
+                    hintText: 'enter_video_link'.tr,
+                    border: const OutlineInputBorder(),
+                  ),
+                  onChanged: (_) {
+                    if (_removeProductVideo) {
+                      setState(() {
+                        _removeProductVideo = false;
+                      });
+                    } else {
+                      setState(() {});
+                    }
+                  },
+                ),
+              ],
+              if (hasVideo) ...[
+                const SizedBox(height: Dimensions.paddingSizeSmall),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).primaryColor.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(
+                      Dimensions.radiusDefault,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.play_circle_outline,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      const SizedBox(width: Dimensions.paddingSizeSmall),
+                      Expanded(
+                        child: Text(
+                          selectedFileName ??
+                              (_videoUploadType == 'link'
+                                  ? (_productVideoLinkController.text
+                                            .trim()
+                                            .isNotEmpty
+                                        ? _productVideoLinkController.text
+                                              .trim()
+                                        : (_existingProductVideoLink ?? ''))
+                                  : 'product_video_ready'.tr),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: robotoRegular,
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'preview_video'.tr,
+                        onPressed: _previewProductVideo,
+                        icon: const Icon(Icons.visibility_outlined),
+                      ),
+                      IconButton(
+                        tooltip: 'remove_video'.tr,
+                        onPressed: _removeProductVideoSelection,
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   void _validateDiscount() {
     double price = double.tryParse(_priceController.text) ?? 0.0;
     double discount = double.tryParse(_discountController.text) ?? 0.0;
@@ -275,6 +602,7 @@ class _AddItemScreenState extends State<AddItemScreen>
     _metaDescriptionController.dispose();
     _maxVideoPreviewController.dispose();
     _maxSnippetController.dispose();
+    _productVideoLinkController.dispose();
     super.dispose();
   }
 
@@ -3944,6 +4272,9 @@ class _AddItemScreenState extends State<AddItemScreen>
                                       const SizedBox(
                                         height: Dimensions.paddingSizeSmall,
                                       ),
+
+                                      _buildProductVideoSection(context),
+
                                       // Meta Section
                                       isEcommerce
                                           ? Column(
@@ -5023,7 +5354,21 @@ class _AddItemScreenState extends State<AddItemScreen>
                                       }
                                     }
 
-                                    if (defaultDataNull) {
+                                    if (_videoUploadType == 'link' &&
+                                        !_removeProductVideo &&
+                                        _productVideoLinkController.text
+                                            .trim()
+                                            .isEmpty) {
+                                      showCustomSnackBar('enter_video_link'.tr);
+                                    } else if (_videoUploadType == 'link' &&
+                                        !_removeProductVideo &&
+                                        !_isValidProductVideoLink(
+                                          _productVideoLinkController.text,
+                                        )) {
+                                      showCustomSnackBar(
+                                        'invalid_product_video_link'.tr,
+                                      );
+                                    } else if (defaultDataNull) {
                                       showCustomSnackBar(
                                         'enter_data_for_english'.tr,
                                       );
@@ -5404,6 +5749,15 @@ class _AddItemScreenState extends State<AddItemScreen>
                                               _genericNameSuggestionController
                                                   .text
                                                   .trim(),
+                                          videoFile: _pickedProductVideo,
+                                          videoUploadType: _videoUploadType,
+                                          videoLink: _videoUploadType == 'link'
+                                              ? _normalizeProductVideoLink(
+                                                  _productVideoLinkController
+                                                      .text,
+                                                )
+                                              : null,
+                                          removeVideo: _removeProductVideo,
                                         );
                                       }
                                     }

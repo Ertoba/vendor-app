@@ -56,6 +56,15 @@ class Item {
   String? description;
   String? imageFullUrl;
   List<String?>? imagesFullUrl;
+  String? videoLink;
+  String? videoFullUrl;
+  String? videoPreviewType;
+  String? videoPreviewUrl;
+  String? videoEmbedUrl;
+  String? videoThumbnailUrl;
+  String? videoPreviewModalType;
+  String? videoPreviewModalUrl;
+  bool? hasVideoSource;
   int? categoryId;
   List<CategoryIds>? categoryIds;
   List<Variation>? variations;
@@ -117,6 +126,15 @@ class Item {
     this.description,
     this.imageFullUrl,
     this.imagesFullUrl,
+    this.videoLink,
+    this.videoFullUrl,
+    this.videoPreviewType,
+    this.videoPreviewUrl,
+    this.videoEmbedUrl,
+    this.videoThumbnailUrl,
+    this.videoPreviewModalType,
+    this.videoPreviewModalUrl,
+    this.hasVideoSource,
     this.categoryId,
     this.categoryIds,
     this.variations,
@@ -186,6 +204,17 @@ class Item {
         }
       });
     }
+    videoLink = json['video_link']?.toString();
+    videoFullUrl = json['video_full_url']?.toString();
+    videoPreviewType = json['video_preview_type']?.toString();
+    videoPreviewUrl = json['video_preview_url']?.toString();
+    videoEmbedUrl = json['video_embed_url']?.toString();
+    videoThumbnailUrl = json['video_thumbnail_url']?.toString();
+    videoPreviewModalType = json['video_preview_modal_type']?.toString();
+    videoPreviewModalUrl = json['video_preview_modal_url']?.toString();
+    hasVideoSource =
+        json['has_video_source'] == true ||
+        json['has_video_source']?.toString() == '1';
     categoryId = json['category_id'];
     if (json['category_ids'] != null) {
       categoryIds = [];
@@ -353,6 +382,15 @@ class Item {
     data['description'] = description;
     data['image_full_url'] = imageFullUrl;
     data['images_full_url'] = imagesFullUrl;
+    data['video_link'] = videoLink;
+    data['video_full_url'] = videoFullUrl;
+    data['video_preview_type'] = videoPreviewType;
+    data['video_preview_url'] = videoPreviewUrl;
+    data['video_embed_url'] = videoEmbedUrl;
+    data['video_thumbnail_url'] = videoThumbnailUrl;
+    data['video_preview_modal_type'] = videoPreviewModalType;
+    data['video_preview_modal_url'] = videoPreviewModalUrl;
+    data['has_video_source'] = hasVideoSource;
     data['category_id'] = categoryId;
     if (categoryIds != null) {
       data['category_ids'] = categoryIds!.map((v) => v.toJson()).toList();

@@ -743,7 +743,7 @@ class StoreController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> addItem(Item item, bool isAdd, {String? genericNameData}) async {
+  Future<void> addItem(Item item, bool isAdd, {String? genericNameData, XFile? videoFile, String videoUploadType = 'file', String? videoLink, bool removeVideo = false}) async {
     _isLoading = true;
     update();
     if(_isTechnicalStore && _unresolvedTechnicalModels.isNotEmpty) {
@@ -812,7 +812,14 @@ class StoreController extends GetxController implements GetxService {
       genericName = genericNameData ?? '';
     }
 
-    Response response = await storeServiceInterface.addItem(item, _pickedMetaImage, _rawLogo, _rawImages, _savedImages, fields, isAdd, tags, nutrition, allergicIngredients, genericName);
+    Response response = await storeServiceInterface.addItem(
+      item, _pickedMetaImage, _rawLogo, _rawImages, _savedImages, fields,
+      isAdd, tags, nutrition, allergicIngredients, genericName,
+      videoFile: videoFile,
+      videoUploadType: videoUploadType,
+      videoLink: videoLink,
+      removeVideo: removeVideo,
+    );
     if(response.statusCode == 200) {
       Get.offAll(() => const DashboardScreen(pageIndex: 2));
       showCustomSnackBar(response.body['message'], isError: false);
