@@ -14,12 +14,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: upgrade-v42-20261002
-      - name: Pack source
+          ref: cbf4fccae93caf479af3174fe50a5181ae9dafa4
+      - name: Pack baseline source
         run: |
-          tar --exclude=.git --exclude=.dart_tool --exclude=build -czf /tmp/vendor-app-upgrade-v42-current.tar.gz .
+          tar --exclude=.git --exclude=.dart_tool --exclude=build -czf /tmp/vendor-app-v42-baseline.tar.gz .
       - uses: actions/upload-artifact@v4
         with:
-          name: vendor-app-upgrade-v42-current
-          path: /tmp/vendor-app-upgrade-v42-current.tar.gz
+          name: vendor-app-v42-baseline
+          path: /tmp/vendor-app-v42-baseline.tar.gz
           retention-days: 1
