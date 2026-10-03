@@ -281,7 +281,7 @@ class _AddNewItemsScreenState extends State<AddNewItemsScreen> {
   }
 
   void _showDeleteDialog(OrderEditController orderEditController, int cartIndex) {
-    final module = Get.find<ProfileController>().profileModel?.stores?.first.module?.moduleType;
+    final module = Get.find<ProfileController>().profileModel?.stores?.module?.moduleType;
     final String titleKey = module  != 'food' ? 'are_you_sure_to_delete_this_food' : 'are_you_sure_to_delete_this_item';
 
     Get.dialog(ConfirmationDialogWidget(

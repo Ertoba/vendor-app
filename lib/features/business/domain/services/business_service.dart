@@ -5,6 +5,7 @@ import 'package:sixam_mart_store/features/business/domain/models/package_model.d
 import 'package:sixam_mart_store/features/business/domain/repositories/business_repo_interface.dart';
 import 'package:sixam_mart_store/features/business/domain/services/business_service_interface.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class BusinessService implements BusinessServiceInterface{
   final BusinessRepoInterface businessRepoInterface;
@@ -46,8 +47,8 @@ class BusinessService implements BusinessServiceInterface{
   Future<String> setUpBusinessPlan(BusinessPlanBody businessPlanBody, String? digitalPaymentName, String businessPlanStatus, int storeId, int? packageId) async {
     Response response = await businessRepoInterface.setUpBusinessPlan(businessPlanBody);
     if (response.statusCode == 200) {
-      if(response.body['redirect_link'] != null) {
-        String redirectUrl = response.body['redirect_link'];
+      if(response.contentMap['redirect_link'] != null) {
+        String redirectUrl = response.contentMap['redirect_link'];
         Get.back();
         Get.toNamed(RouteHelper.getPaymentRoute(digitalPaymentName, redirectUrl, storeId, true, packageId));
       }else {

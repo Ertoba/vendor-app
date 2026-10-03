@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:sixam_mart_store/api/api_client.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 import 'package:sixam_mart_store/features/addon/domain/repositories/addon_repository_interface.dart';
 import 'package:sixam_mart_store/features/addon/models/addon_category_model.dart';
 import 'package:sixam_mart_store/features/splash/controllers/splash_controller.dart';
@@ -62,9 +63,9 @@ class AddonRepository implements AddonRepositoryInterface<AddOns> {
     Response response = await apiClient.getData(AppConstants.addonUri);
     if(response.statusCode == 200) {
       addonList = [];
-      response.body.forEach((addon) {
-        addonList!.add(AddOns.fromJson(addon));
-      });
+      for (final addon in response.dataList) {
+        addonList.add(AddOns.fromJson(addon));
+      }
     }
     return addonList;
   }
@@ -76,9 +77,9 @@ class AddonRepository implements AddonRepositoryInterface<AddOns> {
 
     if(response.statusCode == 200){
       addonCategoryList = [];
-      response.body.forEach((addon) {
-        addonCategoryList!.add(AddonCategoryModel.fromJson(addon));
-      });
+      for (final addon in response.dataList) {
+        addonCategoryList.add(AddonCategoryModel.fromJson(addon));
+      }
     }
     return addonCategoryList;
   }

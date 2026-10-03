@@ -12,7 +12,6 @@ class ReviewModel {
   Customer? customer;
   int? orderId;
   String? reply;
-  String? customerPhone;
   String? reviewId;
 
   ReviewModel({
@@ -27,7 +26,6 @@ class ReviewModel {
     this.customer,
     this.orderId,
     this.reply,
-    this.customerPhone,
     this.reviewId,
   });
 
@@ -43,7 +41,6 @@ class ReviewModel {
     customer = json['customer'] != null ? Customer.fromJson(json['customer']) : null;
     orderId = json['order_id'];
     reply = json['reply'];
-    customerPhone = json['customer_phone'];
     reviewId = json['review_id'];
   }
 
@@ -62,7 +59,6 @@ class ReviewModel {
     }
     data['order_id'] = orderId;
     data['reply'] = reply;
-    data['customer_phone'] = customerPhone;
     data['review_id'] = reviewId;
     return data;
   }

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_store/features/address/domain/services/address_service_interface.dart';
 import 'package:sixam_mart_store/features/splash/controllers/splash_controller.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class AddressController extends GetxController implements GetxService {
   final AddressServiceInterface addressServiceInterface;
@@ -149,7 +150,7 @@ class AddressController extends GetxController implements GetxService {
     Response response = await addressServiceInterface.getPlaceDetails(placeID);
 
     if(response.statusCode == 200) {
-      final data = response.body;
+      final data = response.contentMap;
       final location = data['location'];
       final double lat = location['latitude'];
       final double lng = location['longitude'];
@@ -185,9 +186,9 @@ class AddressController extends GetxController implements GetxService {
     Response response = await addressServiceInterface.getZone(lat, long);
     if(response.statusCode == 200) {
       _inZone = true;
-      _zoneID = int.parse(jsonDecode(response.body['zone_id'])[0].toString());
+      _zoneID = int.parse(jsonDecode(response.contentMap['zone_id'])[0].toString());
       List<int> zoneIds = [];
-      jsonDecode(response.body['zone_id']).forEach((zoneId){
+      jsonDecode(response.contentMap['zone_id']).forEach((zoneId){
         zoneIds.add(int.parse(zoneId.toString()));
       });
       responseModel = ZoneResponseModel(true, '' , zoneIds);

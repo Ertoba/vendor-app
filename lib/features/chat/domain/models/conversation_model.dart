@@ -7,12 +7,14 @@ class ConversationsModel {
   ConversationsModel({this.totalSize, this.limit, this.offset, this.conversations});
 
   ConversationsModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['conversation'] != null) {
+    final dynamic pageRaw = json['pagination'];
+    final Map<String, dynamic>? page = pageRaw is Map ? Map<String, dynamic>.from(pageRaw) : null;
+    totalSize = int.tryParse('${(page != null ? page['total'] : json['total_size'])}');
+    limit = int.tryParse('${(page != null ? page['per_page'] : json['limit'])}');
+    offset = int.tryParse('${(page != null ? page['current_page'] : json['offset'])}');
+    if ((json['data'] ?? json['conversation']) != null) {
       conversations = <Conversation>[];
-      json['conversation'].forEach((v) {
+      (json['data'] ?? json['conversation']).forEach((v) {
         conversations!.add(Conversation.fromJson(v));
       });
     }

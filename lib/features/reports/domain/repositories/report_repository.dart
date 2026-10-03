@@ -1,9 +1,11 @@
 import 'package:get/get.dart';
 import 'package:sixam_mart_store/api/api_client.dart';
+import 'package:sixam_mart_store/features/reports/domain/models/earning_report_model.dart';
 import 'package:sixam_mart_store/features/reports/domain/models/expense_model.dart';
 import 'package:sixam_mart_store/features/reports/domain/models/tax_report_model.dart';
 import 'package:sixam_mart_store/features/reports/domain/repositories/report_repository_interface.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class ReportRepository implements ReportRepositoryInterface {
   final ApiClient apiClient;
@@ -14,7 +16,7 @@ class ReportRepository implements ReportRepositoryInterface {
     ExpenseBodyModel? expenseModel;
     Response response = await apiClient.getData('${AppConstants.expenseListUri}?limit=10&offset=$offset&restaurant_id=$restaurantId&from=$from&to=$to&search=${searchText ?? ''}');
     if(response.statusCode == 200){
-      expenseModel = ExpenseBodyModel.fromJson(response.body);
+      expenseModel = ExpenseBodyModel.fromJson(response.contentMap);
     }
     return expenseModel;
   }
@@ -24,9 +26,19 @@ class ReportRepository implements ReportRepositoryInterface {
     TaxReportModel? taxReportModel;
     Response response = await apiClient.getData('${AppConstants.getTaxReportUri}?limit=10&offset=$offset&from=$from&to=$to');
     if(response.statusCode == 200){
-      taxReportModel = TaxReportModel.fromJson(response.body);
+      taxReportModel = TaxReportModel.fromJson(response.contentMap);
     }
     return taxReportModel;
+  }
+
+  @override
+  Future<EarningReportModel?> getEarningReport({required int offset, required int restaurantId, required String? from, required String? to, required String type}) async {
+    EarningReportModel? earningReportModel;
+    Response response = await apiClient.getData('${AppConstants.earningReportUri}?restaurant_id=$restaurantId&offset=$offset&limit=10${(from != null && to != null && from.isNotEmpty && to.isNotEmpty) ? '&filter=custom&from=$from&to=$to' : ''}&type=$type');
+    if(response.statusCode == 200) {
+      earningReportModel = EarningReportModel.fromJson(response.contentMap);
+    }
+    return earningReportModel;
   }
 
   @override

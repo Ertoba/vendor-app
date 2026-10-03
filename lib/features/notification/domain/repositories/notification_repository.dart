@@ -4,6 +4,7 @@ import 'package:sixam_mart_store/api/api_client.dart';
 import 'package:sixam_mart_store/features/notification/domain/models/notification_model.dart';
 import 'package:sixam_mart_store/features/notification/domain/repositories/notification_repository_interface.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class NotificationRepository implements NotificationRepositoryInterface {
   final ApiClient apiClient;
@@ -16,13 +17,13 @@ class NotificationRepository implements NotificationRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.notificationUri);
     if(response.statusCode == 200){
       notificationList = [];
-      response.body.forEach((notify) {
+      for (dynamic notify in response.dataList) {
         NotificationModel notification = NotificationModel.fromJson(notify);
-        notification.title = notify['data']['title'];
-        notification.description = notify['data']['description'].toString();
+        notification.title = notify['data']?['title'];
+        notification.description = notify['data']?['description']?.toString();
         notification.imageFullUrl = notify['image_full_url'];
-        notificationList!.add(notification);
-      });
+        notificationList.add(notification);
+      }
     }
     return notificationList;
   }

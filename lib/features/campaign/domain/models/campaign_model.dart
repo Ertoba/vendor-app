@@ -1,3 +1,5 @@
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
+
 class CampaignModel {
   int? id;
   String? title;
@@ -39,7 +41,7 @@ class CampaignModel {
     availableDateStarts = json['available_date_starts'];
     availableDateEnds = json['available_date_ends'];
     vendorStatus = json['vendor_status'];
-    isJoined = json['is_joined'];
+    isJoined = DataParserHelper.parseBool(json['is_joined']);
   }
 
   Map<String, dynamic> toJson() {

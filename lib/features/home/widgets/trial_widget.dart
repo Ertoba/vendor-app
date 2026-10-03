@@ -39,8 +39,10 @@ class _TrialWidgetState extends State<TrialWidget> {
             onTap: () => businessController.changeFreeTrialExpandStatus().then((value) {
               _showButton = false;
               Future.delayed(const Duration(milliseconds: 400), () {
-                _showButton = true;
-                setState(() {});
+                if (mounted) {
+                  _showButton = true;
+                  setState(() {});
+                }
               });
             }),
             child: Icon(businessController.freeTrialExpand ? Icons.arrow_forward_ios : Icons.arrow_back_ios, color: Theme.of(context).cardColor,),
@@ -85,8 +87,10 @@ class _TrialWidgetState extends State<TrialWidget> {
                 businessController.changeFreeTrialExpandStatus().then((value) {
                   _showButton = false;
                   Future.delayed(const Duration(milliseconds: 400), () {
-                    _showButton = true;
-                    setState(() {});
+                    if (mounted) {
+                      _showButton = true;
+                      setState(() {});
+                    }
                   });
                 });
               },

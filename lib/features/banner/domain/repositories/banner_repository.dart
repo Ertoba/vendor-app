@@ -5,6 +5,7 @@ import 'package:sixam_mart_store/features/banner/domain/models/store_banner_list
 import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_store/features/banner/domain/repositories/banner_repository_interface.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class BannerRepository implements BannerRepositoryInterface {
   final ApiClient apiClient;
@@ -27,7 +28,9 @@ class BannerRepository implements BannerRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.storeBannerUri);
     if(response.statusCode == 200) {
       storeBannerList = [];
-      response.body.forEach((item) => storeBannerList!.add(StoreBannerListModel.fromJson(item)));
+      for (final item in response.dataList) {
+        storeBannerList.add(StoreBannerListModel.fromJson(item));
+      }
     }
     return storeBannerList;
   }
@@ -56,7 +59,7 @@ class BannerRepository implements BannerRepositoryInterface {
     StoreBannerListModel? bannersDetails;
     Response response = await apiClient.getData('${AppConstants.storeBannerDetailsUri}/$id');
     if(response.statusCode == 200) {
-      bannersDetails = StoreBannerListModel.fromJson(response.body);
+      bannersDetails = StoreBannerListModel.fromJson(response.contentMap);
     }
     return bannersDetails;
   }

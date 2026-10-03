@@ -47,26 +47,16 @@ class PredictionModel {
 
 class TextModel {
   String? text;
-  List<Match>? matches;
 
-  TextModel({this.text, this.matches});
+  TextModel({this.text});
 
   TextModel.fromJson(Map<String, dynamic> json) {
     text = json['text'];
-    if (json['matches'] != null) {
-      matches = <Match>[];
-      json['matches'].forEach((v) {
-        matches!.add(Match.fromJson(v));
-      });
-    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['text'] = text;
-    if (matches != null) {
-      data['matches'] = matches!.map((v) => v.toJson()).toList();
-    }
     return data;
   }
 }
@@ -88,50 +78,29 @@ class Match {
 }
 
 class StructuredFormat {
-  MainText? mainText;
-  SecondaryText? secondaryText;
 
-  StructuredFormat({this.mainText, this.secondaryText});
+  StructuredFormat();
 
-  StructuredFormat.fromJson(Map<String, dynamic> json) {
-    mainText = json['mainText'] != null ? MainText.fromJson(json['mainText']) : null;
-    secondaryText = json['secondaryText'] != null ? SecondaryText.fromJson(json['secondaryText']) : null;
-  }
+  StructuredFormat.fromJson(Map<String, dynamic> json);
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    if (mainText != null) {
-      data['mainText'] = mainText!.toJson();
-    }
-    if (secondaryText != null) {
-      data['secondaryText'] = secondaryText!.toJson();
-    }
     return data;
   }
 }
 
 class MainText {
   String? text;
-  List<Match>? matches;
 
-  MainText({this.text, this.matches});
+  MainText({this.text});
 
   MainText.fromJson(Map<String, dynamic> json) {
     text = json['text'];
-    if (json['matches'] != null) {
-      matches = <Match>[];
-      json['matches'].forEach((v) {
-        matches!.add(Match.fromJson(v));
-      });
-    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['text'] = text;
-    if (matches != null) {
-      data['matches'] = matches!.map((v) => v.toJson()).toList();
-    }
     return data;
   }
 }

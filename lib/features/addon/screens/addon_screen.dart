@@ -41,8 +41,9 @@ class _AddonScreenState extends State<AddonScreen> {
       appBar: CustomAppBarWidget(title: 'addons'.tr),
 
       floatingActionButton: FloatingActionButton(
+        heroTag: 'addon_fab',
         onPressed: () {
-          if(Get.find<ProfileController>().profileModel!.stores![0].itemSection!) {
+          if(Get.find<ProfileController>().profileModel!.stores!.itemSection!) {
             Get.toNamed(RouteHelper.getAddAddonRoute(null));
           }else {
             showCustomSnackBar('this_feature_is_blocked_by_admin'.tr);

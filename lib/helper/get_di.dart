@@ -37,6 +37,21 @@ import 'package:sixam_mart_store/features/business/domain/repositories/business_
 import 'package:sixam_mart_store/features/business/domain/services/business_service.dart';
 import 'package:sixam_mart_store/features/business/domain/services/business_service_interface.dart';
 import 'package:sixam_mart_store/features/campaign/controllers/campaign_controller.dart';
+import 'package:sixam_mart_store/features/bogo_offer/controllers/bogo_offer_controller.dart';
+import 'package:sixam_mart_store/features/bogo_offer/domain/repositories/bogo_offer_repository.dart';
+import 'package:sixam_mart_store/features/bogo_offer/domain/repositories/bogo_offer_repository_interface.dart';
+import 'package:sixam_mart_store/features/bogo_offer/domain/services/bogo_offer_service.dart';
+import 'package:sixam_mart_store/features/bogo_offer/domain/services/bogo_offer_service_interface.dart';
+import 'package:sixam_mart_store/features/bundle_item/controllers/bundle_item_controller.dart';
+import 'package:sixam_mart_store/features/bundle_item/domain/repositories/bundle_item_repository.dart';
+import 'package:sixam_mart_store/features/bundle_item/domain/repositories/bundle_item_repository_interface.dart';
+import 'package:sixam_mart_store/features/bundle_item/domain/services/bundle_item_service.dart';
+import 'package:sixam_mart_store/features/bundle_item/domain/services/bundle_item_service_interface.dart';
+import 'package:sixam_mart_store/features/happy_hour/controllers/happy_hour_controller.dart';
+import 'package:sixam_mart_store/features/happy_hour/domain/repositories/happy_hour_repository.dart';
+import 'package:sixam_mart_store/features/happy_hour/domain/repositories/happy_hour_repository_interface.dart';
+import 'package:sixam_mart_store/features/happy_hour/domain/services/happy_hour_service.dart';
+import 'package:sixam_mart_store/features/happy_hour/domain/services/happy_hour_service_interface.dart';
 import 'package:sixam_mart_store/features/campaign/domain/repositories/campaign_repository.dart';
 import 'package:sixam_mart_store/features/campaign/domain/repositories/campaign_repository_interface.dart';
 import 'package:sixam_mart_store/features/campaign/domain/services/campaign_service.dart';
@@ -61,6 +76,11 @@ import 'package:sixam_mart_store/features/deliveryman/domain/repositories/delive
 import 'package:sixam_mart_store/features/deliveryman/domain/repositories/deliveryman_repository_interface.dart';
 import 'package:sixam_mart_store/features/deliveryman/domain/services/deliveryman_service.dart';
 import 'package:sixam_mart_store/features/deliveryman/domain/services/deliveryman_service_interface.dart';
+import 'package:sixam_mart_store/features/service_module/serviceman/controllers/service_man_controller.dart';
+import 'package:sixam_mart_store/features/service_module/serviceman/domain/repositories/serviceman_repository.dart';
+import 'package:sixam_mart_store/features/service_module/serviceman/domain/repositories/serviceman_repository_interface.dart';
+import 'package:sixam_mart_store/features/service_module/serviceman/domain/services/serviceman_service.dart';
+import 'package:sixam_mart_store/features/service_module/serviceman/domain/services/serviceman_service_interface.dart';
 import 'package:sixam_mart_store/features/disbursement/controllers/disbursement_controller.dart';
 import 'package:sixam_mart_store/features/disbursement/domain/repositories/disbursement_repository.dart';
 import 'package:sixam_mart_store/features/disbursement/domain/repositories/disbursement_repository_interface.dart';
@@ -131,6 +151,26 @@ import 'package:sixam_mart_store/features/store/domain/repositories/store_reposi
 import 'package:sixam_mart_store/features/store/domain/repositories/store_repository_interface.dart';
 import 'package:sixam_mart_store/features/store/domain/services/store_service.dart';
 import 'package:sixam_mart_store/features/store/domain/services/store_service_interface.dart';
+import 'package:sixam_mart_store/features/service_module/store/controllers/service_controller.dart';
+import 'package:sixam_mart_store/features/service_module/store/domain/repositories/service_repository.dart';
+import 'package:sixam_mart_store/features/service_module/store/domain/repositories/service_repository_interface.dart';
+import 'package:sixam_mart_store/features/service_module/store/domain/services/service_service.dart';
+import 'package:sixam_mart_store/features/service_module/store/domain/services/service_service_interface.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/controllers/service_report_controller.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/controllers/service_disbursement_controller.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/controllers/service_booking_report_controller.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/domain/repositories/service_report_repository.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/domain/repositories/service_report_repository_interface.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/domain/repositories/service_disbursement_repository.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/domain/repositories/service_disbursement_repository_interface.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/domain/repositories/service_booking_report_repository.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/domain/repositories/service_booking_report_repository_interface.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/domain/services/service_report_service.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/domain/services/service_report_service_interface.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/domain/services/service_disbursement_service.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/domain/services/service_disbursement_service_interface.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/domain/services/service_booking_report_service.dart';
+import 'package:sixam_mart_store/features/service_module/service_report/domain/services/service_booking_report_service_interface.dart';
 import 'package:sixam_mart_store/features/subscription/controllers/subscription_controller.dart';
 import 'package:sixam_mart_store/features/subscription/domain/repositories/subscription_repository.dart';
 import 'package:sixam_mart_store/features/subscription/domain/repositories/subscription_repository_interface.dart';
@@ -171,6 +211,46 @@ import 'package:sixam_mart_store/features/rental_module/trips/domain/repositorie
 import 'package:sixam_mart_store/features/rental_module/trips/domain/repositories/trip_repository_interface.dart';
 import 'package:sixam_mart_store/features/rental_module/trips/domain/services/trip_service.dart';
 import 'package:sixam_mart_store/features/rental_module/trips/domain/services/trip_service_interface.dart';
+import 'package:sixam_mart_store/features/service_module/store/controllers/service_store_controller.dart';
+import 'package:sixam_mart_store/features/service_module/store/domain/repositories/service_store_repository.dart';
+import 'package:sixam_mart_store/features/service_module/store/domain/repositories/service_store_repository_interface.dart';
+import 'package:sixam_mart_store/features/service_module/store/domain/services/service_store_service.dart';
+import 'package:sixam_mart_store/features/service_module/store/domain/services/service_store_service_interface.dart';
+import 'package:sixam_mart_store/features/service_module/service_reviews/controllers/service_review_controller.dart';
+import 'package:sixam_mart_store/features/service_module/service_reviews/domain/repositories/service_review_repository.dart';
+import 'package:sixam_mart_store/features/service_module/service_reviews/domain/repositories/service_review_repository_interface.dart';
+import 'package:sixam_mart_store/features/service_module/service_reviews/domain/services/service_review_service.dart';
+import 'package:sixam_mart_store/features/service_module/service_reviews/domain/services/service_review_service_interface.dart';
+import 'package:sixam_mart_store/features/service_module/store/controllers/service_faq_controller.dart';
+import 'package:sixam_mart_store/features/service_module/store/domain/repositories/service_faq_repository.dart';
+import 'package:sixam_mart_store/features/service_module/store/domain/repositories/service_faq_repository_interface.dart';
+import 'package:sixam_mart_store/features/service_module/store/domain/services/service_faq_service.dart';
+import 'package:sixam_mart_store/features/service_module/store/domain/services/service_faq_service_interface.dart';
+import 'package:sixam_mart_store/features/service_module/custom_service/controllers/custom_service_controller.dart';
+import 'package:sixam_mart_store/features/service_module/custom_service/domain/repositories/custom_service_repository.dart';
+import 'package:sixam_mart_store/features/service_module/custom_service/domain/repositories/custom_service_repository_interface.dart';
+import 'package:sixam_mart_store/features/service_module/custom_service/domain/services/custom_service_service.dart';
+import 'package:sixam_mart_store/features/service_module/custom_service/domain/services/custom_service_service_interface.dart';
+import 'package:sixam_mart_store/features/service_module/service_campaign/controllers/service_campaign_controller.dart';
+import 'package:sixam_mart_store/features/service_module/service_campaign/domain/repositories/service_campaign_repository.dart';
+import 'package:sixam_mart_store/features/service_module/service_campaign/domain/repositories/service_campaign_repository_interface.dart';
+import 'package:sixam_mart_store/features/service_module/service_campaign/domain/services/service_campaign_service.dart';
+import 'package:sixam_mart_store/features/service_module/service_campaign/domain/services/service_campaign_service_interface.dart';
+import 'package:sixam_mart_store/features/service_module/booking_edit/controllers/booking_edit_controller.dart';
+import 'package:sixam_mart_store/features/service_module/booking_edit/domain/repositories/booking_edit_repository.dart';
+import 'package:sixam_mart_store/features/service_module/booking_edit/domain/repositories/booking_edit_repository_interface.dart';
+import 'package:sixam_mart_store/features/service_module/booking_edit/domain/services/booking_edit_service.dart';
+import 'package:sixam_mart_store/features/service_module/booking_edit/domain/services/booking_edit_service_interface.dart';
+import 'package:sixam_mart_store/features/service_module/order/controllers/booking_controller.dart';
+import 'package:sixam_mart_store/features/service_module/order/domain/repositories/booking_repository.dart';
+import 'package:sixam_mart_store/features/service_module/order/domain/repositories/booking_repository_interface.dart';
+import 'package:sixam_mart_store/features/service_module/order/domain/services/booking_service.dart';
+import 'package:sixam_mart_store/features/service_module/order/domain/services/booking_service_interface.dart';
+import 'package:sixam_mart_store/features/service_module/provider_config/controllers/provider_config_controller.dart';
+import 'package:sixam_mart_store/features/service_module/provider_config/domain/repositories/provider_config_repository.dart';
+import 'package:sixam_mart_store/features/service_module/provider_config/domain/repositories/provider_config_repository_interface.dart';
+import 'package:sixam_mart_store/features/service_module/provider_config/domain/services/provider_config_service.dart';
+import 'package:sixam_mart_store/features/service_module/provider_config/domain/services/provider_config_service_interface.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:sixam_mart_store/features/language/domain/models/language_model.dart';
 import 'package:flutter/services.dart';
@@ -200,6 +280,15 @@ Future<Map<String, Map<String, String>>> init() async {
   CampaignRepositoryInterface campaignRepositoryInterface = CampaignRepository(apiClient: Get.find());
   Get.lazyPut(() => campaignRepositoryInterface);
 
+  HappyHourRepositoryInterface happyHourRepositoryInterface = HappyHourRepository(apiClient: Get.find());
+  Get.lazyPut(() => happyHourRepositoryInterface);
+
+  BogoOfferRepositoryInterface bogoOfferRepositoryInterface = BogoOfferRepository(apiClient: Get.find());
+  Get.lazyPut(() => bogoOfferRepositoryInterface, fenix: true);
+
+  BundleItemRepositoryInterface bundleItemRepositoryInterface = BundleItemRepository(apiClient: Get.find());
+  Get.lazyPut(() => bundleItemRepositoryInterface, fenix: true);
+
   CategoryRepositoryInterface categoryRepositoryInterface = CategoryRepository(apiClient: Get.find());
   Get.lazyPut(() => categoryRepositoryInterface);
 
@@ -217,6 +306,9 @@ Future<Map<String, Map<String, String>>> init() async {
 
   DeliverymanRepositoryInterface deliverymanRepositoryInterface = DeliverymanRepository(apiClient: Get.find());
   Get.lazyPut(() => deliverymanRepositoryInterface);
+
+  ServicemanRepositoryInterface servicemanRepositoryInterface = ServicemanRepository(apiClient: Get.find());
+  Get.lazyPut(() => servicemanRepositoryInterface);
 
   DisbursementRepositoryInterface disbursementRepositoryInterface = DisbursementRepository(apiClient: Get.find());
   Get.lazyPut(() => disbursementRepositoryInterface);
@@ -251,6 +343,18 @@ Future<Map<String, Map<String, String>>> init() async {
   StoreRepositoryInterface storeRepositoryInterface = StoreRepository(apiClient: Get.find());
   Get.lazyPut(() => storeRepositoryInterface);
 
+  ServiceRepositoryInterface serviceRepositoryInterface = ServiceRepository(apiClient: Get.find());
+  Get.lazyPut(() => serviceRepositoryInterface);
+
+  ServiceReportRepositoryInterface serviceReportRepositoryInterface = ServiceReportRepository(apiClient: Get.find());
+  Get.lazyPut(() => serviceReportRepositoryInterface);
+
+  ServiceDisbursementRepositoryInterface serviceDisbursementRepositoryInterface = ServiceDisbursementRepository(apiClient: Get.find());
+  Get.lazyPut(() => serviceDisbursementRepositoryInterface);
+
+  ServiceBookingReportRepositoryInterface serviceBookingReportRepositoryInterface = ServiceBookingReportRepository(apiClient: Get.find());
+  Get.lazyPut(() => serviceBookingReportRepositoryInterface);
+
   SubscriptionRepositoryInterface subscriptionRepositoryInterface = SubscriptionRepository(apiClient: Get.find());
   Get.lazyPut(() => subscriptionRepositoryInterface);
 
@@ -262,6 +366,31 @@ Future<Map<String, Map<String, String>>> init() async {
 
   AiRepositoryInterface aiRepositoryInterface = AiRepository(apiClient: Get.find());
   Get.lazyPut(() => aiRepositoryInterface);
+
+  ///Service module Repositories
+  ServiceStoreRepositoryInterface serviceStoreRepositoryInterface = ServiceStoreRepository(apiClient: Get.find());
+  Get.lazyPut(() => serviceStoreRepositoryInterface);
+
+  ServiceReviewRepositoryInterface serviceReviewRepositoryInterface = ServiceReviewRepository(apiClient: Get.find());
+  Get.lazyPut(() => serviceReviewRepositoryInterface);
+
+  ServiceFaqRepositoryInterface serviceFaqRepositoryInterface = ServiceFaqRepository(apiClient: Get.find());
+  Get.lazyPut(() => serviceFaqRepositoryInterface);
+
+  CustomServiceRepositoryInterface customServiceRepositoryInterface = CustomServiceRepository(apiClient: Get.find());
+  Get.lazyPut(() => customServiceRepositoryInterface);
+
+  ServiceCampaignRepositoryInterface serviceCampaignRepositoryInterface = ServiceCampaignRepository(apiClient: Get.find());
+  Get.lazyPut(() => serviceCampaignRepositoryInterface);
+
+  BookingRepositoryInterface bookingRepositoryInterface = BookingRepository(apiClient: Get.find());
+  Get.lazyPut(() => bookingRepositoryInterface);
+
+  BookingEditRepositoryInterface bookingEditRepositoryInterface = BookingEditRepository(apiClient: Get.find());
+  Get.lazyPut(() => bookingEditRepositoryInterface);
+
+  ProviderConfigRepositoryInterface providerConfigRepositoryInterface = ProviderConfigRepository(apiClient: Get.find());
+  Get.lazyPut(() => providerConfigRepositoryInterface, fenix: true);
 
   ///Taxi module Repositories
   ProviderRepositoryInterface providerRepositoryInterface = ProviderRepository(apiClient: Get.find());
@@ -304,6 +433,15 @@ Future<Map<String, Map<String, String>>> init() async {
   CampaignServiceInterface campaignServiceInterface = CampaignService(campaignRepositoryInterface: Get.find());
   Get.lazyPut(() => campaignServiceInterface);
 
+  HappyHourServiceInterface happyHourServiceInterface = HappyHourService(happyHourRepositoryInterface: Get.find());
+  Get.lazyPut(() => happyHourServiceInterface);
+
+  BogoOfferServiceInterface bogoOfferServiceInterface = BogoOfferService(bogoOfferRepositoryInterface: Get.find());
+  Get.lazyPut(() => bogoOfferServiceInterface, fenix: true);
+
+  BundleItemServiceInterface bundleItemServiceInterface = BundleItemService(bundleItemRepositoryInterface: Get.find());
+  Get.lazyPut(() => bundleItemServiceInterface, fenix: true);
+
   CategoryServiceInterface categoryServiceInterface = CategoryService(categoryRepositoryInterface: Get.find());
   Get.lazyPut(() => categoryServiceInterface);
 
@@ -321,6 +459,9 @@ Future<Map<String, Map<String, String>>> init() async {
 
   DeliverymanServiceInterface deliverymanServiceInterface = DeliverymanService(deliverymanRepositoryInterface: Get.find());
   Get.lazyPut(() => deliverymanServiceInterface);
+
+  ServicemanServiceInterface servicemanServiceInterface = ServicemanService(servicemanRepositoryInterface: Get.find());
+  Get.lazyPut(() => servicemanServiceInterface);
 
   DisbursementServiceInterface disbursementServiceInterface = DisbursementService(disbursementRepositoryInterface: Get.find());
   Get.lazyPut(() => disbursementServiceInterface);
@@ -355,6 +496,18 @@ Future<Map<String, Map<String, String>>> init() async {
   StoreServiceInterface storeServiceInterface = StoreService(storeRepositoryInterface: Get.find());
   Get.lazyPut(() => storeServiceInterface);
 
+  ServiceServiceInterface serviceServiceInterface = ServiceService(serviceRepositoryInterface: Get.find());
+  Get.lazyPut(() => serviceServiceInterface);
+
+  ServiceReportServiceInterface serviceReportServiceInterface = ServiceReportService(serviceReportRepositoryInterface: Get.find());
+  Get.lazyPut(() => serviceReportServiceInterface);
+
+  ServiceDisbursementServiceInterface serviceDisbursementServiceInterface = ServiceDisbursementService(serviceDisbursementRepositoryInterface: Get.find());
+  Get.lazyPut(() => serviceDisbursementServiceInterface);
+
+  ServiceBookingReportServiceInterface serviceBookingReportServiceInterface = ServiceBookingReportService(serviceBookingReportRepositoryInterface: Get.find());
+  Get.lazyPut(() => serviceBookingReportServiceInterface);
+
   SubscriptionServiceInterface subscriptionServiceInterface = SubscriptionService(subscriptionRepositoryInterface: Get.find());
   Get.lazyPut(() => subscriptionServiceInterface);
 
@@ -366,6 +519,31 @@ Future<Map<String, Map<String, String>>> init() async {
 
   AiServiceInterface aiServiceInterface = AiService(aiRepositoryInterface: Get.find());
   Get.lazyPut(() => aiServiceInterface);
+
+  ///Service module Services
+  ServiceStoreServiceInterface serviceStoreServiceInterface = ServiceStoreService(serviceStoreRepositoryInterface: Get.find());
+  Get.lazyPut(() => serviceStoreServiceInterface);
+
+  ServiceReviewServiceInterface serviceReviewServiceInterface = ServiceReviewService(serviceReviewRepositoryInterface: Get.find());
+  Get.lazyPut(() => serviceReviewServiceInterface);
+
+  ServiceFaqServiceInterface serviceFaqServiceInterface = ServiceFaqService(serviceFaqRepositoryInterface: Get.find());
+  Get.lazyPut(() => serviceFaqServiceInterface);
+
+  CustomServiceServiceInterface customServiceServiceInterface = CustomServiceService(customServiceRepositoryInterface: Get.find());
+  Get.lazyPut(() => customServiceServiceInterface);
+
+  ServiceCampaignServiceInterface serviceCampaignServiceInterface = ServiceCampaignService(serviceCampaignRepositoryInterface: Get.find());
+  Get.lazyPut(() => serviceCampaignServiceInterface);
+
+  BookingServiceInterface bookingServiceInterface = BookingService(bookingRepositoryInterface: Get.find());
+  Get.lazyPut(() => bookingServiceInterface);
+
+  BookingEditServiceInterface bookingEditServiceInterface = BookingEditService(bookingEditRepositoryInterface: Get.find());
+  Get.lazyPut(() => bookingEditServiceInterface);
+
+  ProviderConfigServiceInterface providerConfigServiceInterface = ProviderConfigService(providerConfigRepositoryInterface: Get.find());
+  Get.lazyPut(() => providerConfigServiceInterface, fenix: true);
 
   ///Taxi module Services
   ProviderServiceInterface providerServiceInterface = ProviderService(providerRepositoryInterface: Get.find());
@@ -398,12 +576,16 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => AddonController(addonServiceInterface: Get.find()));
   Get.lazyPut(() => BannerController(bannerServiceInterface: Get.find()));
   Get.lazyPut(() => CampaignController(campaignServiceInterface: Get.find()));
+  Get.lazyPut(() => HappyHourController(happyHourServiceInterface: Get.find()));
+  Get.lazyPut(() => BogoOfferController(bogoOfferServiceInterface: Get.find()), fenix: true);
+  Get.lazyPut(() => BundleItemController(bundleItemServiceInterface: Get.find()), fenix: true);
   Get.lazyPut(() => CategoryController(categoryServiceInterface: Get.find()));
   Get.lazyPut(() => SplashController(splashServiceInterface: Get.find()));
   Get.lazyPut(() => HtmlController(htmlServiceInterface: Get.find()));
   Get.lazyPut(() => ReportController(reportServiceInterface: Get.find()));
   Get.lazyPut(() => CouponController(couponServiceInterface: Get.find()));
   Get.lazyPut(() => DeliveryManController(deliverymanServiceInterface: Get.find()));
+  Get.lazyPut(() => ServiceManController(servicemanServiceInterface: Get.find()));
   Get.lazyPut(() => DisbursementController(disbursementServiceInterface: Get.find()));
   Get.lazyPut(() => ForgotPasswordController(forgotPasswordServiceInterface: Get.find()));
   Get.lazyPut(() => LocalizationController(languageServiceInterface: Get.find()));
@@ -416,10 +598,24 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => OrderController(orderServiceInterface: Get.find()));
   Get.lazyPut(() => OrderEditController(orderEditServiceInterface: Get.find()));
   Get.lazyPut(() => StoreController(storeServiceInterface: Get.find()));
+  Get.lazyPut(() => ServiceController(serviceServiceInterface: Get.find()));
+  Get.lazyPut(() => ServiceReportController(serviceReportServiceInterface: Get.find()));
+  Get.lazyPut(() => ServiceDisbursementController(serviceDisbursementServiceInterface: Get.find()));
+  Get.lazyPut(() => ServiceBookingReportController(serviceBookingReportServiceInterface: Get.find()));
   Get.lazyPut(() => SubscriptionController(subscriptionServiceInterface: Get.find()));
   Get.lazyPut(() => AdvertisementController(advertisementServiceInterface: Get.find()));
   Get.lazyPut(() => ReelsController(reelServiceInterface: Get.find()));
   Get.lazyPut(() => AiController(aiServiceInterface: Get.find()));
+
+  ///Service module Controllers
+  Get.lazyPut(() => ServiceStoreController(serviceStoreServiceInterface: Get.find()));
+  Get.lazyPut(() => ServiceReviewController(serviceReviewServiceInterface: Get.find()));
+  Get.lazyPut(() => ServiceFaqController(serviceFaqServiceInterface: Get.find()));
+  Get.lazyPut(() => CustomServiceController(customServiceServiceInterface: Get.find()));
+  Get.lazyPut(() => ServiceCampaignController(serviceCampaignServiceInterface: Get.find()));
+  Get.lazyPut(() => BookingController(bookingServiceInterface: Get.find()));
+  Get.lazyPut(() => BookingEditController(bookingEditServiceInterface: Get.find()));
+  Get.lazyPut(() => ProviderConfigController(providerConfigServiceInterface: Get.find()), fenix: true);
 
   ///Taxi module Controllers
   Get.lazyPut(() => ProviderController(providerServiceInterface: Get.find()));

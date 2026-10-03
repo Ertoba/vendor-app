@@ -5,6 +5,7 @@ import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_store/features/coupon/domain/models/coupon_body_model.dart';
 import 'package:sixam_mart_store/features/coupon/domain/repositories/coupon_repository_interface.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class CouponRepository implements CouponRepositoryInterface {
   final ApiClient apiClient;
@@ -40,9 +41,9 @@ class CouponRepository implements CouponRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.couponListUri}?limit=50&offset=$offset');
     if(response.statusCode == 200) {
       coupons = [];
-      response.body.forEach((coupon){
-        coupons!.add(CouponBodyModel.fromJson(coupon));
-      });
+      for (final coupon in response.dataList) {
+        coupons.add(CouponBodyModel.fromJson(coupon));
+      }
     }
     return coupons;
   }
@@ -52,7 +53,7 @@ class CouponRepository implements CouponRepositoryInterface {
     CouponBodyModel? couponDetails;
     Response response = await apiClient.getData('${AppConstants.couponDetailsUri}?coupon_id=$id');
     if(response.statusCode == 200) {
-      couponDetails = CouponBodyModel.fromJson(response.body[0]);
+      couponDetails = CouponBodyModel.fromJson(response.contentMap);
     }
     return couponDetails;
   }

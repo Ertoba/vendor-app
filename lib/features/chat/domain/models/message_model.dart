@@ -1,4 +1,5 @@
 import 'package:sixam_mart_store/features/chat/domain/models/conversation_model.dart';
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
 
 class MessageModel {
   int? totalSize;
@@ -11,14 +12,16 @@ class MessageModel {
   MessageModel({this.totalSize, this.limit, this.offset, this.messages, this.status, this.conversation});
 
   MessageModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    status = json['status'];
+    final dynamic pageRaw = json['pagination'];
+    final Map<String, dynamic>? page = pageRaw is Map ? Map<String, dynamic>.from(pageRaw) : null;
+    totalSize = int.tryParse('${(page != null ? page['total'] : json['total_size'])}');
+    limit = int.tryParse('${(page != null ? page['per_page'] : json['limit'])}');
+    offset = int.tryParse('${(page != null ? page['current_page'] : json['offset'])}');
+    status = DataParserHelper.parseBool(json['status']);
     conversation = json['conversation'] != null ? Conversation.fromJson(json['conversation']) : null;
-    if (json['messages'] != null) {
+    if ((json['data'] ?? json['messages']) != null) {
       messages = <Message>[];
-      json['messages'].forEach((v) {
+      (json['data'] ?? json['messages']).forEach((v) {
         messages!.add(Message.fromJson(v));
       });
     }

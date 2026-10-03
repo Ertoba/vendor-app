@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../widgets/filter_popup_widget.dart';
+part '../widgets/category_list_widget.dart';
 
 class AllItemsScreen extends StatefulWidget {
   const AllItemsScreen({super.key});
@@ -65,17 +66,26 @@ class _AllItemsScreenState extends State<AllItemsScreen> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    _categoryScrollController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GetBuilder<StoreController>(builder: (storeController) {
       return GetBuilder<ProfileController>(builder: (profileController) {
-        Store? store = profileController.profileModel != null ? profileController.profileModel!.stores![0] : null;
+        Store? store = profileController.profileModel?.stores;
+        final theme = Theme.of(context);
         bool isShowingTrialContent = profileController.profileModel != null && profileController.profileModel!.subscription != null
-            && profileController.profileModel!.subscription!.isTrial == 1
+            && profileController.profileModel!.subscription!.isTrial == true
             && DateConverterHelper.differenceInDaysIgnoringTime(DateTime.parse(profileController.profileModel!.subscription!.expiryDate!), null) > 0;
 
         return PopScope(
           canPop: true,
-          onPopInvoked: (bool didPop) {
+          onPopInvokedWithResult: (didPop, result) {
             if (didPop) {
               // Reset filters when navigating back
               storeController.resetFilters();
@@ -84,31 +94,29 @@ class _AllItemsScreenState extends State<AllItemsScreen> {
           child: Scaffold(
           appBar: CustomAppBarWidget(title: 'all_items'.tr),
 
-          floatingActionButton: GetBuilder<StoreController>(builder: (storeController) {
-            return storeController.isFabVisible && Get.find<ProfileController>().modulePermission!.item! ? Padding(
-              padding: EdgeInsets.only(bottom: isShowingTrialContent ? 100 : 0),
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), spreadRadius: 2, blurRadius: 8, offset: const Offset(0, 4))],
-                ),
-                child: FloatingActionButton(
-                  heroTag: 'nothing',
-                  onPressed: () {
-                    if(Get.find<ProfileController>().profileModel!.stores![0].itemSection!) {
-                      if (store != null) {
-                        Get.toNamed(RouteHelper.getAddItemRoute(null));
-                      }
-                    }else {
-                      showCustomSnackBar('this_feature_is_blocked_by_admin'.tr);
-                    }
-                  },
-                  backgroundColor: Theme.of(context).primaryColor,
-                  child: Icon(Icons.add, color: Theme.of(context).cardColor, size: 30),
-                ),
+          floatingActionButton: storeController.isFabVisible && Get.find<ProfileController>().modulePermission!.item! ? Padding(
+            padding: EdgeInsets.only(bottom: isShowingTrialContent ? 100 : 0),
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), spreadRadius: 2, blurRadius: 8, offset: const Offset(0, 4))],
               ),
-            ) : const SizedBox();
-          }),
+              child: FloatingActionButton(
+                heroTag: 'all_items_fab',
+                onPressed: () {
+                  if(Get.find<ProfileController>().profileModel!.stores!.itemSection!) {
+                    if (store != null) {
+                      Get.toNamed(RouteHelper.getAddItemRoute(null));
+                    }
+                  }else {
+                    showCustomSnackBar('this_feature_is_blocked_by_admin'.tr);
+                  }
+                },
+                backgroundColor: theme.primaryColor,
+                child: Icon(Icons.add, color: theme.cardColor, size: 30),
+              ),
+            ),
+          ) : const SizedBox(),
 
           body: store != null ? Stack(
             children: [
@@ -117,7 +125,7 @@ class _AllItemsScreenState extends State<AllItemsScreen> {
                 controller: _scrollController,
                 child: Column(children: [
 
-                  SizedBox(key: _categoryKey, height: 40, child: _buildCategory(storeController)),
+                  SizedBox(key: _categoryKey, height: 40, child: _CategoryListWidget(storeController: storeController, categoryScrollController: _categoryScrollController)),
                   const SizedBox(height: Dimensions.paddingSizeDefault),
 
                   Row(children: [
@@ -136,10 +144,10 @@ class _AllItemsScreenState extends State<AllItemsScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(Dimensions.paddingSizeSmall - 2),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                          color: theme.primaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                         ),
-                        child: Icon(storeController.isSearchVisible ? Icons.close : CupertinoIcons.search, color: Theme.of(context).primaryColor, size: 18),
+                        child: Icon(storeController.isSearchVisible ? Icons.close : CupertinoIcons.search, color: theme.primaryColor, size: 18),
                       ),
                     ),
                     SizedBox(width: (Get.find<SplashController>().configModel!.toggleVegNonVeg! && Get.find<SplashController>().configModel!.moduleConfig!.module!.vegNonVeg!) ? Dimensions.paddingSizeSmall : 0),
@@ -162,9 +170,9 @@ class _AllItemsScreenState extends State<AllItemsScreen> {
                         padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                          border: Border.all(color: Theme.of(context).primaryColor),
+                          border: Border.all(color: theme.primaryColor),
                         ),
-                        child: Icon(Icons.filter_list, color: Theme.of(context).primaryColor, size: 18),
+                        child: Icon(Icons.filter_list, color: theme.primaryColor, size: 18),
                       ),
                     ) : const SizedBox(),
 
@@ -233,8 +241,8 @@ class _AllItemsScreenState extends State<AllItemsScreen> {
                   child: Container(
                     height: 60,
                     padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
-                    color: Theme.of(context).cardColor,
-                    child: _buildCategory(storeController),
+                    color: theme.cardColor,
+                    child: _CategoryListWidget(storeController: storeController, categoryScrollController: _categoryScrollController),
                   ),
                 ),
             ],
@@ -244,64 +252,5 @@ class _AllItemsScreenState extends State<AllItemsScreen> {
       });
     });
   }
-
-  Widget _buildCategory(StoreController storeController) {
-    if (storeController.categoryNameList != null) {
-      return ListView.builder(
-        controller: _categoryScrollController,
-        scrollDirection: Axis.horizontal,
-        itemCount: storeController.categoryNameList!.length,
-        itemBuilder: (context, index) {
-          return InkWell(
-            onTap: () => storeController.setCategory(index: index, foodType: 'all'),
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            child: Row(children: [
-              Container(
-                margin: const EdgeInsets.only(right: Dimensions.paddingSizeSmall),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: Dimensions.paddingSizeDefault,
-                  vertical: Dimensions.paddingSizeExtraSmall,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
-                  color: index == storeController.categoryIndex
-                      ? Theme.of(context).primaryColor
-                      : Theme.of(context).hintColor.withValues(alpha: 0.1),
-                ),
-                child: Text(index == 0 ? 'all'.tr : storeController.categoryNameList![index],
-                  style: robotoRegular.copyWith(
-                    fontSize: Dimensions.fontSizeSmall,
-                    color: index == storeController.categoryIndex
-                        ? Theme.of(context).cardColor
-                        : Theme.of(context).textTheme.bodyLarge?.color,
-                    fontWeight: index == storeController.categoryIndex ? FontWeight.w700 : FontWeight.w400,
-                  ),
-                ),
-              ),
-            ]),
-          );
-        },
-      );
-    }
-
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      itemCount: 5,
-      itemBuilder: (_, _) => Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: Dimensions.paddingSizeSmall,
-          vertical: Dimensions.paddingSizeExtraSmall,
-        ),
-        margin: const EdgeInsets.only(right: Dimensions.paddingSizeSmall),
-        decoration: BoxDecoration(
-          borderRadius:
-          BorderRadius.circular(Dimensions.radiusSmall + 2),
-          color: Theme.of(context).hintColor.withValues(alpha: 0.2),
-        ),
-      ),
-    );
-  }
 }
-
 

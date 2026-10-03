@@ -1,3 +1,5 @@
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
+
 class ModulePermissionModel {
   bool? dashboard;
   bool? profile;
@@ -13,6 +15,8 @@ class ModulePermissionModel {
   bool? advertisementList;
   bool? deliveryman;
   bool? deliverymanList;
+  bool? serviceman;
+  bool? servicemanList;
   bool? wallet;
   bool? walletMethod;
   bool? role;
@@ -26,6 +30,7 @@ class ModulePermissionModel {
   bool? businessPlan;
   bool? reviews;
   bool? chat;
+  bool? reels;
 
   ModulePermissionModel({
     this.dashboard,
@@ -42,6 +47,8 @@ class ModulePermissionModel {
     this.advertisementList,
     this.deliveryman,
     this.deliverymanList,
+    this.serviceman,
+    this.servicemanList,
     this.wallet,
     this.walletMethod,
     this.role,
@@ -55,36 +62,40 @@ class ModulePermissionModel {
     this.businessPlan,
     this.reviews,
     this.chat,
+    this.reels,
   });
 
   ModulePermissionModel.fromJson(Map<String, dynamic> json) {
-    dashboard = json['dashboard'];
-    profile = json['profile'];
-    order = json['order'];
-    pos = json['pos'];
-    item = json['item'];
-    addon = json['addon'];
-    category = json['category'];
-    campaign = json['campaign'];
-    coupon = json['coupon'];
-    banner = json['banner'];
-    advertisement = json['advertisement'];
-    advertisementList = json['advertisement_list'];
-    deliveryman = json['deliveryman'];
-    deliverymanList = json['deliveryman_list'];
-    wallet = json['wallet'];
-    walletMethod = json['wallet_method'];
-    role = json['role'];
-    employee = json['employee'];
-    expenseReport = json['expense_report'];
-    disbursementReport = json['disbursement_report'];
-    vatReport = json['vat_report'];
-    storeSetup = json['store_setup'];
-    notificationSetup = json['notification_setup'];
-    myShop = json['my_shop'];
-    businessPlan = json['business_plan'];
-    reviews = json['reviews'];
-    chat = json['chat'];
+    dashboard = DataParserHelper.parseBool(json['dashboard']);
+    profile = DataParserHelper.parseBool(json['profile']);
+    order = DataParserHelper.parseBool(json['order']);
+    pos = DataParserHelper.parseBool(json['pos']);
+    item = DataParserHelper.parseBool(json['item']);
+    addon = DataParserHelper.parseBool(json['addon']);
+    category = DataParserHelper.parseBool(json['category']);
+    campaign = DataParserHelper.parseBool(json['campaign']);
+    coupon = DataParserHelper.parseBool(json['coupon']);
+    banner = DataParserHelper.parseBool(json['banner']);
+    advertisement = DataParserHelper.parseBool(json['advertisement']);
+    advertisementList = DataParserHelper.parseBool(json['advertisement_list']);
+    deliveryman = DataParserHelper.parseBool(json['deliveryman']);
+    deliverymanList = DataParserHelper.parseBool(json['deliveryman_list']);
+    serviceman = DataParserHelper.parseBool(json['serviceman']);
+    servicemanList = DataParserHelper.parseBool(json['serviceman_list']);
+    wallet = DataParserHelper.parseBool(json['wallet']);
+    walletMethod = DataParserHelper.parseBool(json['wallet_method']);
+    role = DataParserHelper.parseBool(json['role']);
+    employee = DataParserHelper.parseBool(json['employee']);
+    expenseReport = DataParserHelper.parseBool(json['expense_report']);
+    disbursementReport = DataParserHelper.parseBool(json['disbursement_report']);
+    vatReport = DataParserHelper.parseBool(json['vat_report']);
+    storeSetup = DataParserHelper.parseBool(json['store_setup']);
+    notificationSetup = DataParserHelper.parseBool(json['notification_setup']);
+    myShop = DataParserHelper.parseBool(json['my_shop']);
+    businessPlan = DataParserHelper.parseBool(json['business_plan']);
+    reviews = DataParserHelper.parseBool(json['reviews']);
+    chat = DataParserHelper.parseBool(json['chat']);
+    reels = DataParserHelper.parseBool(json['reels']);
   }
 
   Map<String, bool?> toJson() {
@@ -103,6 +114,8 @@ class ModulePermissionModel {
     data['advertisement_list'] = advertisementList;
     data['deliveryman'] = deliveryman;
     data['deliveryman_list'] = deliverymanList;
+    data['serviceman'] = serviceman;
+    data['serviceman_list'] = servicemanList;
     data['wallet'] = wallet;
     data['wallet_method'] = walletMethod;
     data['role'] = role;
@@ -116,6 +129,7 @@ class ModulePermissionModel {
     data['business_plan'] = businessPlan;
     data['reviews'] = reviews;
     data['chat'] = chat;
+    data['reels'] = reels;
     return data;
   }
 }

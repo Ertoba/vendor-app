@@ -13,11 +13,20 @@ class CustomAssetImageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSvg = image.contains('.svg', image.length - '.svg'.length);
-    return isSvg ? SvgPicture.asset(
-      image,
-      width: height, height: width,
-      colorFilter: color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,
-      fit: fit!,
-    ) : Image.asset(image, fit: fit, width: width, height: height, color: color);
+    if (isSvg) {
+      return SvgPicture.asset(
+        image,
+        width: height, height: width,
+        colorFilter: color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,
+        fit: fit!,
+      );
+    }
+    final double pixelRatio = MediaQuery.of(context).devicePixelRatio;
+    final bool constrainByWidth = width != null && (height == null || width! >= height!);
+    return Image.asset(
+      image, fit: fit, width: width, height: height, color: color,
+      cacheWidth: constrainByWidth ? (width! * pixelRatio).round() : null,
+      cacheHeight: !constrainByWidth && height != null ? (height! * pixelRatio).round() : null,
+    );
   }
 }

@@ -60,133 +60,155 @@ class _PendingItemScreenState extends State<PendingItemScreen> with SingleTicker
               Get.find<StoreController>().offset.toString(), Get.find<StoreController>().type, canNotify: false,
             );
           },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
-            child: GetBuilder<StoreController>(builder: (storeController) {
+          child: GetBuilder<StoreController>(builder: (storeController) {
                 return Column(children: [
                   const SizedBox(height: Dimensions.paddingSizeDefault),
 
-                  Row(children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                    child: Row(children: [
 
-                    Expanded(
-                      child: Text('new_product'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
-                    ),
-                    const SizedBox(width: 40),
-                    PopupMenuButton(
-                      itemBuilder: (context) {
-                        return <PopupMenuEntry>[
-                          getMenuItem(Get.find<StoreController>().statusList[0], context),
-                          const PopupMenuDivider(),
-                          getMenuItem(Get.find<StoreController>().statusList[1], context),
-                          const PopupMenuDivider(),
-                          getMenuItem(Get.find<StoreController>().statusList[2], context),
-                        ];
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall, vertical: Dimensions.paddingSizeExtraSmall),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                          border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
-                        ),
-                        child: Icon(Icons.filter_list_sharp, color: Theme.of(context).textTheme.bodyLarge!.color, size: 20),
+                      Expanded(
+                        child: Text('new_product'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
                       ),
+                      const SizedBox(width: 40),
+                      PopupMenuButton(
+                        itemBuilder: (context) {
+                          return <PopupMenuEntry>[
+                            getMenuItem(Get.find<StoreController>().statusList[0], context),
+                            const PopupMenuDivider(),
+                            getMenuItem(Get.find<StoreController>().statusList[1], context),
+                            const PopupMenuDivider(),
+                            getMenuItem(Get.find<StoreController>().statusList[2], context),
+                          ];
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall, vertical: Dimensions.paddingSizeExtraSmall),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                            border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
+                          ),
+                          child: Icon(Icons.filter_list_sharp, color: Theme.of(context).textTheme.bodyLarge!.color, size: 20),
+                        ),
 
-                      onSelected: (dynamic value) {
-                        int index = Get.find<StoreController>().statusList.indexOf(value);
-                        Get.find<StoreController>().getPendingItemList(
-                          Get.find<StoreController>().offset.toString(), Get.find<StoreController>().statusList[index],
-                        );
-                      },
-                    )
-                  ]),
+                        onSelected: (dynamic value) {
+                          int index = Get.find<StoreController>().statusList.indexOf(value);
+                          Get.find<StoreController>().getPendingItemList(
+                            Get.find<StoreController>().offset.toString(), Get.find<StoreController>().statusList[index],
+                          );
+                        },
+                      )
+                    ]),
+                  ),
 
                   Expanded(
                     child: storeController.pendingItem != null ? storeController.pendingItem!.isNotEmpty ? ListView.builder(
                       itemCount: storeController.pendingItem!.length,
                       shrinkWrap: true,
-                      itemBuilder: (context, index) => InkWell(
-                        onTap: () {
-                          Get.toNamed(RouteHelper.getPendingItemDetailsRoute(storeController.pendingItem![index].id!));
-                        },
-                        child: Container(
-                          height: 90, width: double.infinity,
-                          margin: const EdgeInsets.only(top: Dimensions.paddingSizeSmall),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                            color: Theme.of(context).cardColor,
-                            boxShadow: [BoxShadow(color: Theme.of(context).disabledColor.withValues(alpha: 0.1), spreadRadius: 1, blurRadius: 1, offset: const Offset(0, 0))],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                            child: Row(children: [
-
-                              Container(
-                                height: 70, width: 70,
-                                padding: const EdgeInsets.all(2),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                  color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                  child: CustomImageWidget(
-                                    image: '${storeController.pendingItem![index].imageFullUrl}',
-                                    fit: BoxFit.cover, width: 70, height: 70,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: Dimensions.paddingSizeDefault),
-
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-
-                                    Text(storeController.pendingItem![index].name.toString(), style: robotoMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
-                                    const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-
-                                    Row(children: [
-                                      Text('${'category'.tr} : ', style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeSmall)),
-                                      Text(storeController.pendingItem![index].categoryIds![index].name.toString(), style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall)),
-                                    ]),
-
-                                    const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                                    Text(PriceConverterHelper.convertPrice(storeController.pendingItem![index].price), style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall)),
-
-                                  ],
-                                ),
-                              ),
-
-                              Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.end, children: [
+                      /// Sits inside the list rather than on the wrapper around it, so the
+                      /// cards' shadows have gutter to bleed into instead of meeting the
+                      /// viewport's clip edge. The bottom inset does the same for the last card.
+                      padding: const EdgeInsets.fromLTRB(
+                        Dimensions.paddingSizeDefault, 0, Dimensions.paddingSizeDefault, Dimensions.paddingSizeDefault,
+                      ),
+                      itemBuilder: (context, index) => Container(
+                        height: 90, width: double.infinity,
+                        margin: const EdgeInsets.only(top: Dimensions.paddingSizeSmall),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                          boxShadow: [BoxShadow(offset: const Offset(0, 3), color: Colors.grey[Get.isDarkMode ? 700 : 200]!, blurRadius: 8, spreadRadius: 0)],
+                        ),
+                        /// The card surface is a Material so the tap ripple has something to
+                        /// paint on — ink is drawn by the Material beneath, so the opaque
+                        /// Container that used to sit on top of the InkWell hid it entirely.
+                        child: Material(
+                          color: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            onTap: () {
+                              Get.toNamed(RouteHelper.getPendingItemDetailsRoute(storeController.pendingItem![index].id!));
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                              child: Row(children: [
 
                                 Container(
-                                  padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
+                                  height: 70, width: 70,
+                                  padding: const EdgeInsets.all(2),
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                                    color: storeController.pendingItem![index].isRejected  == 0 ? Colors.blue.withValues(alpha: 0.1) : Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                    color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
                                   ),
-                                  child: Text(
-                                    storeController.pendingItem![index].isRejected  == 0 ? 'pending'.tr : 'rejected'.tr,
-                                    style: robotoMedium.copyWith(
-                                      color: storeController.pendingItem![index].isRejected  == 0 ? Colors.blue : Theme.of(context).colorScheme.error,
-                                      fontSize: Dimensions.fontSizeSmall,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                    child: CustomImageWidget(
+                                      image: '${storeController.pendingItem![index].imageFullUrl}',
+                                      fit: BoxFit.cover, width: 70, height: 70,
                                     ),
                                   ),
                                 ),
+                                const SizedBox(width: Dimensions.paddingSizeDefault),
 
-                                EditButtonWidget(
-                                  onTap: () async{
-                                    await storeController.getPendingItemDetails(storeController.pendingItem![index].id!).then((success) {
-                                      if(success){
-                                        Get.toNamed(RouteHelper.getAddItemRoute(storeController.item));
-                                      }
-                                    });
-                                  },
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+
+                                      Text(storeController.pendingItem![index].name.toString(), style: robotoMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
+                                      const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+
+                                      Row(children: [
+                                        Text('${'category'.tr} : ', style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeSmall)),
+                                        /// The item's own first category. `[index]` here was the row
+                                        /// number of the list view, so any row past the first indexed
+                                        /// off the end of that item's category list.
+                                        Flexible(child: Text(
+                                          (storeController.pendingItem![index].categoryIds ?? []).isNotEmpty
+                                              ? storeController.pendingItem![index].categoryIds!.first.name ?? ''
+                                              : '',
+                                          style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall), overflow: TextOverflow.ellipsis, maxLines: 1,
+                                        )),
+                                      ]),
+
+                                      const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                                      Text(PriceConverterHelper.convertPrice(storeController.pendingItem![index].price), style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall)),
+
+                                    ],
+                                  ),
                                 ),
-                              ]),
 
-                            ]),
+                                Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.end, children: [
+
+                                  Container(
+                                    padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                                      color: storeController.pendingItem![index].isRejected  == 0 ? Colors.blue.withValues(alpha: 0.1) : Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+                                    ),
+                                    child: Text(
+                                      storeController.pendingItem![index].isRejected  == 0 ? 'pending'.tr : 'rejected'.tr,
+                                      style: robotoMedium.copyWith(
+                                        color: storeController.pendingItem![index].isRejected  == 0 ? Colors.blue : Theme.of(context).colorScheme.error,
+                                        fontSize: Dimensions.fontSizeSmall,
+                                      ),
+                                    ),
+                                  ),
+
+                                  EditButtonWidget(
+                                    onTap: () async{
+                                      await storeController.getPendingItemDetails(storeController.pendingItem![index].id!).then((success) {
+                                        if(success){
+                                          Get.toNamed(RouteHelper.getAddItemRoute(storeController.item));
+                                        }
+                                      });
+                                    },
+                                  ),
+                                ]),
+
+                              ]),
+                            ),
                           ),
                         ),
                       ),
@@ -195,7 +217,6 @@ class _PendingItemScreenState extends State<PendingItemScreen> with SingleTicker
                   ),
                 ]);
               }
-            ),
           ),
         ),
       ),

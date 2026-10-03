@@ -12,8 +12,9 @@ class HtmlController extends GetxController implements GetxService {
     _htmlText = null;
     Response response = await htmlServiceInterface.getHtmlText(isPrivacyPolicy);
     if (response.statusCode == 200) {
-      if(response.body != null && response.body.isNotEmpty && response.body is String) {
-        _htmlText = response.body.replaceAll('href=', 'target="_blank" href=');
+      dynamic content = response.body is Map ? response.body['content'] : response.body;
+      if(content != null && content is String && content.isNotEmpty) {
+        _htmlText = content.replaceAll('href=', 'target="_blank" href=');
       }else {
         _htmlText = '';
       }

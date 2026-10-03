@@ -33,6 +33,7 @@ class _DeliveryManScreenState extends State<DeliveryManScreen> {
         appBar: CustomAppBarWidget(title: 'delivery_man'.tr),
 
         floatingActionButton: profileController.modulePermission!.deliveryman! ? FloatingActionButton(
+          heroTag: 'delivery_man_fab',
           onPressed: () => Get.toNamed(RouteHelper.getAddDeliveryManRoute(null)),
           backgroundColor: Theme.of(context).primaryColor,
           child: Icon(Icons.add_circle_outline, color: Theme.of(context).cardColor, size: 30),

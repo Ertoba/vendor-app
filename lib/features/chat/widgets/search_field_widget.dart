@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart_store/util/debouncer.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/styles.dart';
 
@@ -9,7 +10,7 @@ class SearchFieldWidget extends StatefulWidget {
   final IconData suffixIcon;
   final Function iconPressed;
   final Function? onSubmit;
-  final Function? onChanged;
+  final ValueChanged<String>? onChanged;
   final bool fromReview;
   const SearchFieldWidget({super.key, required this.controller, required this.hint, required this.suffixIcon, required this.iconPressed, this.onSubmit,
     this.onChanged, this.fromReview = false});
@@ -19,6 +20,14 @@ class SearchFieldWidget extends StatefulWidget {
 }
 
 class _SearchFieldWidgetState extends State<SearchFieldWidget> {
+  final Debouncer _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
+
+  @override
+  void dispose() {
+    _debouncer.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -42,7 +51,7 @@ class _SearchFieldWidgetState extends State<SearchFieldWidget> {
           ),
         ),
         onSubmitted: widget.onSubmit as void Function(String)?,
-        onChanged: widget.onChanged as void Function(String)?,
+        onChanged: widget.onChanged == null ? null : (value) => _debouncer.run(() => widget.onChanged!(value)),
       ),
     );
   }

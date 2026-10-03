@@ -6,6 +6,7 @@ import 'package:sixam_mart_store/common/models/response_model.dart';
 import 'package:sixam_mart_store/features/profile/domain/models/profile_model.dart';
 import 'package:sixam_mart_store/features/profile/domain/repositories/profile_repository_interface.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class ProfileRepository implements ProfileRepositoryInterface {
   final ApiClient apiClient;
@@ -17,9 +18,9 @@ class ProfileRepository implements ProfileRepositoryInterface {
     ProfileModel? profileModel;
     Response response = await apiClient.getData(AppConstants.profileUri);
     if (response.statusCode == 200) {
-      profileModel = ProfileModel.fromJson(response.body);
-      if (profileModel.stores != null && profileModel.stores!.isNotEmpty) {
-        print('RECEIVED FROM API - Halal: ${profileModel.stores![0].isHalalActive}, Veg: ${profileModel.stores![0].veg}, Non-Veg: ${profileModel.stores![0].nonVeg}');
+      profileModel = ProfileModel.fromJson(response.contentMap);
+      if (profileModel.stores != null) {
+        print('RECEIVED FROM API - Halal: ${profileModel.stores!.isHalalActive}, Veg: ${profileModel.stores!.veg}, Non-Veg: ${profileModel.stores!.nonVeg}');
       }
     }
     return profileModel;
@@ -84,15 +85,5 @@ class ProfileRepository implements ProfileRepositoryInterface {
   Future update(Map<String, dynamic> body) {
     throw UnimplementedError();
   }
-
-  // @override
-  // Future<bool> saveLowStockStatus(bool status) async {
-  //   return await sharedPreferences.setBool(AppConstants.lowStockStatus, status);
-  // }
-  //
-  // @override
-  // bool getLowStockStatus() {
-  //   return sharedPreferences.getBool(AppConstants.lowStockStatus) ?? false;
-  // }
 
 }

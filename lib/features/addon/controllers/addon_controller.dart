@@ -76,7 +76,7 @@ class AddonController extends GetxController implements GetxService {
   }
 
   Future<void> getAddonCategoryList() async {
-    List<AddonCategoryModel>? addonCategoryList = await addonServiceInterface.getAddonCategory(moduleId: Get.find<ProfileController>().profileModel!.stores![0].module!.id!);
+    List<AddonCategoryModel>? addonCategoryList = await addonServiceInterface.getAddonCategory(moduleId: Get.find<ProfileController>().profileModel!.stores!.module!.id!);
     if(addonCategoryList != null) {
       _addonCategoryList = [];
       _addonCategoryList!.addAll(addonCategoryList);

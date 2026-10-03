@@ -3,6 +3,7 @@ import 'package:sixam_mart_store/api/api_client.dart';
 import 'package:sixam_mart_store/features/campaign/domain/models/campaign_model.dart';
 import 'package:sixam_mart_store/features/campaign/domain/repositories/campaign_repository_interface.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class CampaignRepository implements CampaignRepositoryInterface {
   final ApiClient apiClient;
@@ -14,9 +15,9 @@ class CampaignRepository implements CampaignRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.basicCampaignUri);
     if (response.statusCode == 200) {
       campaignList = [];
-      response.body.forEach((campaign) {
-        campaignList!.add(CampaignModel.fromJson(campaign));
-      });
+      for (final campaign in response.dataList) {
+        campaignList.add(CampaignModel.fromJson(campaign));
+      }
     }
     return campaignList;
   }

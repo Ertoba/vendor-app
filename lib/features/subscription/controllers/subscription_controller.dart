@@ -18,6 +18,7 @@ import 'package:sixam_mart_store/features/rental_module/profile/controllers/taxi
 import 'package:sixam_mart_store/helper/date_converter_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/util/images.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class SubscriptionController extends GetxController implements GetxService {
   final SubscriptionServiceInterface subscriptionServiceInterface;
@@ -164,8 +165,8 @@ class SubscriptionController extends GetxController implements GetxService {
     Response response = await subscriptionServiceInterface.renewBusinessPlan(body, header);
     ResponseModel? responseModel;
     if (response.statusCode == 200) {
-      if(response.body['redirect_link'] != null) {
-        String redirectUrl = response.body['redirect_link'];
+      if(response.contentMap['redirect_link'] != null) {
+        String redirectUrl = response.contentMap['redirect_link'];
         Get.back();
         Get.toNamed(RouteHelper.getPaymentRoute(digitalPaymentName, redirectUrl,  null, false, null));
       } else {
@@ -177,13 +178,13 @@ class SubscriptionController extends GetxController implements GetxService {
         getProfile(Get.find<ProfileController>().profileModel);
         Get.back();
         Get.back();
-        showCustomSnackBar(response.body['store_business_model'] == 'commission' ? 'successfully_switched_to_commission_based_plan'.tr : 'subscription_payment_successfully'.tr, isError: false);
+        showCustomSnackBar(response.contentMap['store_business_model'] == 'commission' ? 'successfully_switched_to_commission_based_plan'.tr : 'subscription_payment_successfully'.tr, isError: false);
       }
     }else {
       if(response.statusCode == 403) {
         showCustomSnackBar('you_have_not_sufficient_balance_on_you_wallet_please_add_money_to_your_wallet_to_purchase_the_packages'.tr, isError: true);
       }else {
-        showCustomSnackBar(response.body['errors']['message'], isError: true);
+        showCustomSnackBar(response.body['message'], isError: true);
       }
     }
     _isLoading = false;
@@ -209,8 +210,8 @@ class SubscriptionController extends GetxController implements GetxService {
   }
 
   Future<void> getPackageList() async {
-    if(Get.find<AuthController>().packageModel == null || Get.find<AuthController>().packageModel!.packages!.isEmpty) {
-      await Get.find<AuthController>().getPackageList(moduleId: Get.find<ProfileController>().profileModel!.stores![0].module?.id);
+    if(Get.find<AuthController>().packageModel == null || (Get.find<AuthController>().packageModel!.data?.isEmpty ?? true)) {
+      await Get.find<AuthController>().getPackageList(moduleId: Get.find<ProfileController>().profileModel!.stores!.module?.id);
     }
     _packageList = [];
     if(Get.find<SplashController>().configModel?.commissionBusinessModel == 1){
@@ -221,7 +222,7 @@ class SubscriptionController extends GetxController implements GetxService {
         description: "${'vendor_will_pay'.tr} ${Get.find<SplashController>().configModel!.adminCommission}% ${'commission_to'.tr} ${Get.find<SplashController>().configModel!.businessName} ${'from_each_order_You_will_get_access_of_all'.tr}",
       ));
     }
-    for (var package in Get.find<AuthController>().packageModel!.packages!) {
+    for (var package in Get.find<AuthController>().packageModel?.data ?? []) {
       _packageList!.add(package);
     }
 
@@ -257,7 +258,7 @@ class SubscriptionController extends GetxController implements GetxService {
 
       SubscriptionTransactionModel? subscriptionTransactionModel = await subscriptionServiceInterface.getSubscriptionTransactionList(
         offset: int.parse(offset), from: from, to: to,
-        restaurantId: Get.find<ProfileController>().profileModel!.stores![0].id, searchText: searchText,
+        restaurantId: Get.find<ProfileController>().profileModel!.stores!.id, searchText: searchText,
       );
       if (subscriptionTransactionModel != null) {
         if (offset == '1') {
@@ -305,11 +306,11 @@ class SubscriptionController extends GetxController implements GetxService {
   }
 
   Future<bool> trialEndBottomSheet() async {
-    if(Get.find<ProfileController>().profileModel != null && Get.find<ProfileController>().profileModel!.stores![0].storeBusinessModel != 'commission' && Get.find<ProfileController>().profileModel!.subscription?.status == 0) {
+    if(Get.find<ProfileController>().profileModel != null && Get.find<ProfileController>().profileModel!.stores!.storeBusinessModel != 'commission' && Get.find<ProfileController>().profileModel!.subscription?.status == 0) {
       Future.delayed(const Duration(seconds: 1), () {
         showModalBottomSheet(
           context: Get.context!, isScrollControlled: true, backgroundColor: Colors.transparent,
-          builder: (con) => TrialEndBottomSheet(isTrial: Get.find<ProfileController>().profileModel!.subscription?.isTrial == 1),
+          builder: (con) => TrialEndBottomSheet(isTrial: Get.find<ProfileController>().profileModel!.subscription?.isTrial == true),
         ).whenComplete(() {
           _isTrialEndModalShown = false;
           update();

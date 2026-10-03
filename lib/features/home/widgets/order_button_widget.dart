@@ -15,15 +15,11 @@ class OrderButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     int selectedIndex;
     int length = 0;
-    int titleLength = 0;
     if(fromHistory) {
       selectedIndex = orderController.historyIndex;
-      titleLength = orderController.statusList.length;
       length = 0;
-      debugPrint('$titleLength');
     }else {
       selectedIndex = orderController.orderIndex;
-      titleLength = orderController.runningOrders!.length;
       length = orderController.runningOrders![index].orderList.length;
     }
     bool isSelected = selectedIndex == index;

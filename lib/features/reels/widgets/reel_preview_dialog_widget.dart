@@ -106,7 +106,7 @@ class _ReelPreviewDialogWidgetState extends State<ReelPreviewDialogWidget> {
   @override
   Widget build(BuildContext context) {
     bool isRental = Get.find<AuthController>().getModuleType() == 'rental';
-    final store = Get.find<ProfileController>().profileModel?.stores?.first;
+    final store = Get.find<ProfileController>().profileModel?.stores;
     final String storeName = store?.name ?? '';
     final String? storeLogo = store?.logoFullUrl;
 

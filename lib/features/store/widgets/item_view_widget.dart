@@ -38,15 +38,20 @@ class ItemViewWidget extends StatelessWidget {
         storeController.itemList != null ? storeController.itemList!.isNotEmpty ? GridView.builder(
           key: UniqueKey(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisSpacing: Dimensions.paddingSizeLarge,
             mainAxisSpacing: 0.01,
             crossAxisCount: 1,
             mainAxisExtent: 104,
           ),
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
+          /// The grid never scrolls on its own, so nothing needs hiding — and
+          /// the default hard edge clip would otherwise cut every card's shadow
+          /// off flush with the card.
+          clipBehavior: Clip.none,
           itemCount: storeController.itemList!.length,
-          padding: EdgeInsets.all(fromAllItems ? 0 : Dimensions.paddingSizeSmall),
+          /// Horizontal inset belongs to the screen around it; this only keeps
+          /// the first and last card's shadow off the neighbouring sections.
+          padding: EdgeInsets.only(top: fromAllItems ? 0 : Dimensions.paddingSizeSmall),
           itemBuilder: (context, index) {
             return Padding(
               padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
@@ -63,15 +68,15 @@ class ItemViewWidget extends StatelessWidget {
         ) : GridView.builder(
           key: UniqueKey(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisSpacing: Dimensions.paddingSizeLarge,
             mainAxisSpacing: 0.01,
             crossAxisCount: 1,
             mainAxisExtent: 120,
           ),
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
+          clipBehavior: Clip.none,
           itemCount: 20,
-          padding: EdgeInsets.all(fromAllItems ? 0 : Dimensions.paddingSizeSmall),
+          padding: EdgeInsets.only(top: fromAllItems ? 0 : Dimensions.paddingSizeSmall),
           itemBuilder: (context, index) {
             return ItemShimmerWidget(
               isEnabled: storeController.itemList == null, hasDivider: index != 19,

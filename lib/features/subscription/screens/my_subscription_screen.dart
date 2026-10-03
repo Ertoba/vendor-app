@@ -28,7 +28,7 @@ class _MySubscriptionScreenState extends State<MySubscriptionScreen> with Ticker
 
   double _getCommissionPercentage(SubscriptionController subscriptionController) {
     final stores = subscriptionController.profileModel?.stores;
-    final storeCommission = stores != null && stores.isNotEmpty ? stores.first.comission : null;
+    final storeCommission = stores?.comission;
 
     if(storeCommission != null && storeCommission > 0) {
       return storeCommission;
@@ -84,9 +84,9 @@ class _MySubscriptionScreenState extends State<MySubscriptionScreen> with Ticker
   Widget build(BuildContext context) {
     return GetBuilder<SubscriptionController>(builder: (subscriptionController) {
 
-      bool businessIsCommission = subscriptionController.profileModel != null ? subscriptionController.profileModel!.stores![0].storeBusinessModel == 'commission' : false;
-      bool businessIsNone = subscriptionController.profileModel != null ?  subscriptionController.profileModel!.stores![0].storeBusinessModel == 'none' : false;
-      bool businessIsUnsubscribed = subscriptionController.profileModel != null ?  subscriptionController.profileModel!.stores![0].storeBusinessModel == 'unsubscribed' : false;
+      bool businessIsCommission = subscriptionController.profileModel != null ? subscriptionController.profileModel!.stores!.storeBusinessModel == 'commission' : false;
+      bool businessIsNone = subscriptionController.profileModel != null ?  subscriptionController.profileModel!.stores!.storeBusinessModel == 'none' : false;
+      bool businessIsUnsubscribed = subscriptionController.profileModel != null ?  subscriptionController.profileModel!.stores!.storeBusinessModel == 'unsubscribed' : false;
       final String commissionPercentageText = _formatCommissionPercentage(_getCommissionPercentage(subscriptionController));
 
       return PopScope(
@@ -183,8 +183,8 @@ class _MySubscriptionScreenState extends State<MySubscriptionScreen> with Ticker
                 //     const SizedBox(height: Dimensions.paddingSizeDefault),
                 //
                 //     Text(
-                //       '${Get.find<ProfileController>().profileModel != null && Get.find<ProfileController>().profileModel!.stores?[0].comission != null && Get.find<ProfileController>().profileModel!.stores![0].comission! > 0
-                //           ? Get.find<ProfileController>().profileModel!.stores![0].comission!
+                //       '${Get.find<ProfileController>().profileModel != null && Get.find<ProfileController>().profileModel!.stores?.comission != null && Get.find<ProfileController>().profileModel!.stores!.comission! > 0
+                //           ? Get.find<ProfileController>().profileModel!.stores!.comission!
                 //           :  Get.find<SplashController>().configModel?.adminCommission} %',
                 //       style: robotoBold.copyWith(color: Colors.teal, fontSize: 24),
                 //     ),

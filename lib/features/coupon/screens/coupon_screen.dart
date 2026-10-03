@@ -35,6 +35,7 @@ class _CouponScreenState extends State<CouponScreen> {
     return Scaffold(
       appBar: CustomAppBarWidget(title: 'coupon_list'.tr),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'coupon_fab',
         onPressed: () => Get.to(() => const AddCouponScreen()),
         child: Icon(Icons.add_circle_outline, size: 30, color: Theme.of(context).cardColor),
       ),
@@ -89,7 +90,7 @@ class _CouponScreenState extends State<CouponScreen> {
                                   ),
                                   const SizedBox(height: Dimensions.paddingSizeSmall),
 
-                                  Text('on ${Get.find<ProfileController>().profileModel!.stores?[0].name ?? ''}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor)),
+                                  Text('on ${Get.find<ProfileController>().profileModel!.stores?.name ?? ''}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor)),
 
                                 ]),
                               ),

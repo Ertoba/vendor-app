@@ -1,25 +1,24 @@
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
+
 class DisbursementMethodBody {
   int? totalSize;
   String? limit;
   String? offset;
   List<Methods>? methods;
 
-  DisbursementMethodBody({
-    this.totalSize,
-    this.limit,
-    this.offset,
-    this.methods,
-  });
+  DisbursementMethodBody({this.totalSize, this.limit, this.offset, this.methods});
 
   DisbursementMethodBody.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    methods = <Methods>[];
-    if (json['methods'] != null) {
-      json['methods'].forEach((v) {
+    final Map<String, dynamic>? pagination = json['pagination'] != null ? Map<String, dynamic>.from(json['pagination']) : null;
+    totalSize = pagination != null ? pagination['total'] : json['total_size'];
+    limit = (pagination != null ? pagination['per_page'] : json['limit'])?.toString();
+    offset = (pagination != null ? pagination['current_page'] : json['offset'])?.toString();
+    final dynamic methodList = json['data'] ?? json['methods'];
+    if (methodList is List) {
+      methods = <Methods>[];
+      for (dynamic v in methodList) {
         methods!.add(Methods.fromJson(v));
-      });
+      }
     }
   }
 
@@ -69,28 +68,10 @@ class Methods {
       json['method_fields'].forEach((v) {
         methodFields!.add(MethodFields.fromJson(v));
       });
-    } else {
-      methodFields = <MethodFields>[];
     }
-    isDefault = _parseBool(json['is_default']);
+    isDefault = DataParserHelper.parseBool(json['is_default']);
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-  }
-
-  bool _parseBool(dynamic value) {
-    if (value is bool) {
-      return value;
-    }
-
-    if (value is int) {
-      return value == 1;
-    }
-
-    if (value is String) {
-      return value == '1' || value.toLowerCase() == 'true';
-    }
-
-    return false;
   }
 
   Map<String, dynamic> toJson() {

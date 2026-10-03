@@ -4,6 +4,7 @@ import 'package:sixam_mart_store/features/disbursement/domain/repositories/disbu
 import 'package:sixam_mart_store/features/disbursement/domain/models/disbursement_method_model.dart' as disburse;
 import 'package:sixam_mart_store/features/disbursement/domain/models/disbursement_report_model.dart' as report;
 import 'package:sixam_mart_store/util/app_constants.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class DisbursementRepository implements DisbursementRepositoryInterface {
   final ApiClient apiClient;
@@ -20,7 +21,7 @@ class DisbursementRepository implements DisbursementRepositoryInterface {
     disburse.DisbursementMethodBody? disbursementMethodBody;
     Response response = await apiClient.getData('${AppConstants.disbursementMethodListUri}?limit=10&offset=1');
     if(response.statusCode == 200) {
-      disbursementMethodBody = disburse.DisbursementMethodBody.fromJson(response.body);
+      disbursementMethodBody = disburse.DisbursementMethodBody.fromJson(response.contentMap);
     }
     return disbursementMethodBody;
   }
@@ -42,7 +43,7 @@ class DisbursementRepository implements DisbursementRepositoryInterface {
     report.DisbursementReportModel? disbursementReportModel;
     Response response = await apiClient.getData('${AppConstants.getDisbursementReportUri}?limit=10&offset=$offset');
     if(response.statusCode == 200) {
-      disbursementReportModel = report.DisbursementReportModel.fromJson(response.body);
+      disbursementReportModel = report.DisbursementReportModel.fromJson(response.contentMap);
     }
     return disbursementReportModel;
   }

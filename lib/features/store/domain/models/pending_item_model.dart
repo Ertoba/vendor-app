@@ -1,3 +1,4 @@
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
 class PendingItemModel {
   int? totalSize;
   int? limit;
@@ -7,14 +8,16 @@ class PendingItemModel {
   PendingItemModel({this.totalSize, this.limit, this.offset, this.items});
 
   PendingItemModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['items'] != null) {
+    final Map<String, dynamic>? page = json['pagination'] is Map ? Map<String, dynamic>.from(json['pagination']) : null;
+    totalSize = DataParserHelper.parseInt(page != null ? page['total'] : json['total_size']);
+    limit = DataParserHelper.parseInt(page != null ? page['per_page'] : json['limit']);
+    offset = (page != null ? page['current_page'] : json['offset'])?.toString();
+    final dynamic rows = json['data'] ?? json['items'];
+    if (rows is List) {
       items = <Items>[];
-      json['items'].forEach((v) {
+      for (dynamic v in rows) {
         items!.add(Items.fromJson(v));
-      });
+      }
     }
   }
 

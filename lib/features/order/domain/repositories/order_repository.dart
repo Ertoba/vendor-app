@@ -11,6 +11,7 @@ import 'package:sixam_mart_store/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart_store/features/order/domain/models/update_status_body_model.dart';
 import 'package:sixam_mart_store/features/order/domain/repositories/order_repository_interface.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class OrderRepository implements OrderRepositoryInterface {
   final ApiClient apiClient;
@@ -23,10 +24,9 @@ class OrderRepository implements OrderRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.currentOrdersUri);
     if (response.statusCode == 200) {
       runningOrderList = [];
-      response.body.forEach((order) {
-        OrderModel orderModel = OrderModel.fromJson(order);
-        runningOrderList!.add(orderModel);
-      });
+      for (dynamic order in response.dataList) {
+        runningOrderList.add(OrderModel.fromJson(order));
+      }
     }
     return runningOrderList;
   }
@@ -36,7 +36,7 @@ class OrderRepository implements OrderRepositoryInterface {
     PaginatedOrderModel? historyOrderModel;
     Response response = await apiClient.getData('${AppConstants.completedOrdersUri}?status=$status&offset=$offset&limit=10');
     if (response.statusCode == 200) {
-      historyOrderModel = PaginatedOrderModel.fromJson(response.body);
+      historyOrderModel = PaginatedOrderModel.fromJson(response.contentMap);
     }
     return historyOrderModel;
   }
@@ -59,7 +59,9 @@ class OrderRepository implements OrderRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.orderDetailsUri}$orderID');
     if(response.statusCode == 200) {
       orderDetailsModel = [];
-      response.body.forEach((orderDetails) => orderDetailsModel!.add(OrderDetailsModel.fromJson(orderDetails)));
+      for (final orderDetails in response.dataList) {
+        orderDetailsModel.add(OrderDetailsModel.fromJson(orderDetails));
+      }
       log( "Order details: ${orderDetailsModel.first.toJson()}");
     }
     return orderDetailsModel;
@@ -70,7 +72,7 @@ class OrderRepository implements OrderRepositoryInterface {
     EditHistoryLogModel? editHistoryLogModel;
     Response response = await apiClient.getData('${AppConstants.orderEditLogUri}$orderId&limit=10&offset=$offset');
     if (response.statusCode == 200) {
-      editHistoryLogModel = EditHistoryLogModel.fromJson(response.body);
+      editHistoryLogModel = EditHistoryLogModel.fromJson(response.contentMap);
     }
     return editHistoryLogModel;
   }
@@ -80,7 +82,7 @@ class OrderRepository implements OrderRepositoryInterface {
     OrderModel? orderModel;
     Response response = await apiClient.getData('${AppConstants.currentOrderDetailsUri}$id');
     if (response.statusCode == 200) {
-      orderModel = OrderModel.fromJson(response.body);
+      orderModel = OrderModel.fromJson(response.contentMap);
     }
     return orderModel;
   }
@@ -102,7 +104,7 @@ class OrderRepository implements OrderRepositoryInterface {
     OrderCancellationBodyModel? orderCancellationBody;
     Response response = await apiClient.getData('${AppConstants.orderCancellationUri}?offset=1&limit=30&type=store');
     if (response.statusCode == 200) {
-      orderCancellationBody = OrderCancellationBodyModel.fromJson(response.body);
+      orderCancellationBody = OrderCancellationBodyModel.fromJson(response.contentMap);
     }
     return orderCancellationBody;
   }

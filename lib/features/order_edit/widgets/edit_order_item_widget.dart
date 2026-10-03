@@ -20,7 +20,6 @@ class EditOrderItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("---------> ${orderDetails.variation}");
     final OrderEditController orderEditController = Get.find<OrderEditController>();
     final bool isEditable = orderDetails.isEditable ?? false;
     final String addOnText = _buildAddOnText();
@@ -123,7 +122,7 @@ class EditOrderItemWidget extends StatelessWidget {
   }
 
   void _showDeleteDialog(OrderEditController orderEditController) {
-    final module = Get.find<ProfileController>().profileModel?.stores?.first.module?.moduleType;
+    final module = Get.find<ProfileController>().profileModel?.stores?.module?.moduleType;
     final String titleKey = module  == 'food' ? 'are_you_sure_to_delete_this_food' : 'are_you_sure_to_delete_this_item';
 
     Get.dialog(ConfirmationDialogWidget(

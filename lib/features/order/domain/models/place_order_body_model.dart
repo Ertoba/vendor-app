@@ -1,5 +1,4 @@
 class PlaceOrderBodyModel {
-  List<Cart>? cart;
   String? orderNote;
   int? storeId;
   double? discount;
@@ -9,7 +8,6 @@ class PlaceOrderBodyModel {
   String? paymentMethod;
 
   PlaceOrderBodyModel({
-    this.cart,
     this.orderNote,
     this.storeId,
     this.discount,
@@ -20,12 +18,6 @@ class PlaceOrderBodyModel {
   });
 
   PlaceOrderBodyModel.fromJson(Map<String, dynamic> json) {
-    if (json['cart'] != null) {
-      cart = [];
-      json['cart'].forEach((v) {
-        cart!.add(Cart.fromJson(v));
-      });
-    }
     orderNote = json['order_note'];
     storeId = json['store_id'];
     discount = json['discount'].toDouble();
@@ -37,9 +29,6 @@ class PlaceOrderBodyModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    if (cart != null) {
-      data['cart'] = cart!.map((v) => v.toJson()).toList();
-    }
     data['order_note'] = orderNote;
     data['store_id'] = storeId;
     data['discount'] = discount;

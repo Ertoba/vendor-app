@@ -1,24 +1,17 @@
 class PackageModel {
-  List<Packages>? packages;
+  List<Packages>? data;
 
-  PackageModel({this.packages});
+  PackageModel({this.data});
 
   PackageModel.fromJson(Map<String, dynamic> json) {
-    if (json['packages'] != null) {
-      packages = <Packages>[];
-      json['packages'].forEach((v) {
-        packages!.add(Packages.fromJson(v));
+    if (json['data'] != null) {
+      data = <Packages>[];
+      json['data'].forEach((v) {
+        data!.add(Packages.fromJson(v));
       });
     }
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (packages != null) {
-      data['packages'] = packages!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
 }
 
 class Packages {
@@ -77,7 +70,8 @@ class Packages {
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     color = json['colour'];
-    description = json['description'];
+    // The API sends this as `text`; `description` was the older key.
+    description = json['description'] ?? json['text'];
   }
 
   Map<String, dynamic> toJson() {

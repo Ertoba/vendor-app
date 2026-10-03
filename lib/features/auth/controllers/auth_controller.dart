@@ -13,10 +13,9 @@ import 'package:sixam_mart_store/features/auth/domain/services/auth_service_inte
 import 'package:sixam_mart_store/features/rental_module/profile/controllers/taxi_profile_controller.dart';
 import 'package:sixam_mart_store/helper/date_converter_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class AuthController extends GetxController implements GetxService {
-  static const int _maxRegistrationUploadBytes = 10 * 1024 * 1024;
-
   final AuthServiceInterface authServiceInterface;
   AuthController({required this.authServiceInterface}){
     _notification = authServiceInterface.isNotificationActive();
@@ -109,19 +108,10 @@ class AuthController extends GetxController implements GetxService {
       _pickedLogo = null;
       _pickedCover = null;
     }else {
-      final XFile? pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (pickedImage == null) {
-        return;
-      }
-      final int fileSize = await pickedImage.length();
-      if (fileSize > _maxRegistrationUploadBytes) {
-        showCustomSnackBar('please_upload_lower_size_file'.tr);
-        return;
-      }
       if (isLogo) {
-        _pickedLogo = pickedImage;
+        _pickedLogo = await ImagePicker().pickImage(source: ImageSource.gallery);
       } else {
-        _pickedCover = pickedImage;
+        _pickedCover = await ImagePicker().pickImage(source: ImageSource.gallery);
       }
       update();
     }
@@ -238,8 +228,8 @@ class AuthController extends GetxController implements GetxService {
     Response response = await authServiceInterface.registerRestaurant(data, _pickedLogo, _pickedCover, document);
 
     if(response.statusCode == 200){
-      int? storeId = int.tryParse(response.body['store_id'].toString());
-      int? packageId = int.tryParse(response.body['package_id'].toString());
+      int? storeId = int.tryParse(response.contentMap['store_id'].toString());
+      int? packageId = int.tryParse(response.contentMap['package_id'].toString());
 
       if(packageId == null) {
         Get.find<BusinessController>().submitBusinessPlan(storeId: storeId!, packageId: null);
@@ -371,7 +361,7 @@ class AuthController extends GetxController implements GetxService {
 
     if (result != null && result.files.isNotEmpty) {
       for (var file in result.files) {
-        if (file.size > _maxRegistrationUploadBytes) {
+        if (file.size > 2000000) {
           showCustomSnackBar('please_upload_lower_size_file'.tr);
         } else {
           _tinFiles.add(result);

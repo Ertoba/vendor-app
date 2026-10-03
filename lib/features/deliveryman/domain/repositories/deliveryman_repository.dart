@@ -5,6 +5,7 @@ import 'package:sixam_mart_store/features/store/domain/models/review_model.dart'
 import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_store/features/deliveryman/domain/repositories/deliveryman_repository_interface.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class DeliverymanRepository implements DeliverymanRepositoryInterface {
   final ApiClient apiClient;
@@ -16,7 +17,9 @@ class DeliverymanRepository implements DeliverymanRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.dmListUri);
     if(response.statusCode == 200) {
       deliveryManList = [];
-      response.body.forEach((deliveryMan) => deliveryManList!.add(DeliveryManModel.fromJson(deliveryMan)));
+      for (final deliveryMan in response.dataList) {
+        deliveryManList.add(DeliveryManModel.fromJson(deliveryMan));
+      }
     }
     return deliveryManList;
   }
@@ -58,7 +61,12 @@ class DeliverymanRepository implements DeliverymanRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.dmReviewUri}?delivery_man_id=$id');
     if(response.statusCode == 200) {
       dmReviewList = [];
-      response.body['reviews'].forEach((review) => dmReviewList!.add(ReviewModel.fromJson(review)));
+      final List<dynamic> rows = response.dataList.isNotEmpty
+          ? response.dataList
+          : ((response.contentMap['reviews'] as List?) ?? const []);
+      for (final review in rows) {
+        dmReviewList.add(ReviewModel.fromJson(review));
+      }
     }
     return dmReviewList;
   }

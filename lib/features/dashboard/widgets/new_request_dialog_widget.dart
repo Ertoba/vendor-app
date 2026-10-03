@@ -3,6 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:sixam_mart_store/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart_store/features/rental_module/trips/screens/trip_details_screen.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
+import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
 import 'package:sixam_mart_store/util/styles.dart';
@@ -21,6 +22,7 @@ class NewRequestDialogWidget extends StatefulWidget {
 
 class _NewRequestDialogWidgetState extends State<NewRequestDialogWidget> {
   Timer? _timer;
+  AudioPlayer? _audioPlayer;
 
   @override
   void initState() {
@@ -31,16 +33,17 @@ class _NewRequestDialogWidgetState extends State<NewRequestDialogWidget> {
 
   @override
   void dispose() {
-    super.dispose();
-
     _timer?.cancel();
+    _audioPlayer?.dispose();
+
+    super.dispose();
   }
 
   void _startAlarm() async {
-    AudioPlayer audio = AudioPlayer();
-    audio.play(AssetSource('notification.mp3'));
+    _audioPlayer = AudioPlayer();
+    _audioPlayer!.play(AssetSource('notification.mp3'));
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      audio.play(AssetSource('notification.mp3'));
+      _audioPlayer!.play(AssetSource('notification.mp3'));
     });
   }
 
@@ -75,6 +78,8 @@ class _NewRequestDialogWidgetState extends State<NewRequestDialogWidget> {
               }
               if(isRental) {
                 Get.offAll(() => TripDetailsScreen(tripId: widget.orderId, fromNotification: true));
+              } else if(Get.find<AuthController>().getModuleType() == AppConstants.service){
+                Get.offAllNamed(RouteHelper.getBookingDetailsRoute(widget.orderId, fromNotification: true));
               } else{
                 Get.offAllNamed(RouteHelper.getOrderDetailsRoute(widget.orderId, fromNotification: true));
               }

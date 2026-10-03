@@ -4,6 +4,7 @@ import 'package:sixam_mart_store/features/business/domain/models/business_plan_b
 import 'package:sixam_mart_store/features/business/domain/models/package_model.dart';
 import 'package:sixam_mart_store/features/business/domain/repositories/business_repo_interface.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class BusinessRepo implements BusinessRepoInterface<dynamic> {
   final ApiClient apiClient;
@@ -20,7 +21,7 @@ class BusinessRepo implements BusinessRepoInterface<dynamic> {
     PackageModel? packageModel;
     Response response = await apiClient.getData(AppConstants.restaurantPackagesUri);
     if(response.statusCode == 200) {
-      packageModel = PackageModel.fromJson(response.body);
+      packageModel = PackageModel.fromJson(response.contentMap);
     }
     return packageModel;
   }

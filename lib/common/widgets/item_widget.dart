@@ -6,6 +6,7 @@ import 'package:sixam_mart_store/features/store/widgets/update_stock_bottom_shee
 import 'package:sixam_mart_store/helper/date_converter_helper.dart';
 import 'package:sixam_mart_store/helper/price_converter_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
+import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
 import 'package:sixam_mart_store/util/styles.dart';
@@ -14,7 +15,6 @@ import 'package:sixam_mart_store/common/widgets/custom_image_widget.dart';
 import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_store/common/widgets/discount_tag_widget.dart';
 import 'package:sixam_mart_store/common/widgets/not_available_widget.dart';
-import 'package:sixam_mart_store/features/store/screens/item_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -24,8 +24,9 @@ class ItemWidget extends StatelessWidget {
   final int length;
   final bool inStore;
   final bool isCampaign;
+  final bool showMenu;
   const ItemWidget({super.key, required this.item, required this.index,
-   required this.length, this.inStore = false, this.isCampaign = false});
+   required this.length, this.inStore = false, this.isCampaign = false, this.showMenu = true});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +40,7 @@ class ItemWidget extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
 
     return InkWell(
-      onTap: () => Get.toNamed(RouteHelper.getItemDetailsRoute(item), arguments: ItemDetailsScreen(product: item)),
+      onTap: () => Get.toNamed(RouteHelper.getItemDetailsRoute(itemId: item.id!)),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
         decoration: BoxDecoration(
@@ -141,7 +142,7 @@ class ItemWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                PopupMenuButton<String>(
+                showMenu ? PopupMenuButton<String>(
                   padding: EdgeInsets.zero,
                   onSelected: (String result) {
                     if(result == '1') {
@@ -150,7 +151,13 @@ class ItemWidget extends StatelessWidget {
                         backgroundColor: Colors.transparent, isScrollControlled: true,
                       );
                     } else if(result == '2') {
-                      if(Get.find<ProfileController>().profileModel!.stores![0].itemSection!) {
+                      if(Get.find<SplashController>().moduleType == AppConstants.service) {
+                        if(Get.find<ProfileController>().profileModel!.stores!.canManageServiceSetup!) {
+                          Get.toNamed(RouteHelper.getUpdateServiceRoute(item.id!));
+                        } else {
+                          showCustomSnackBar('this_feature_is_blocked_by_admin'.tr);
+                        }
+                      } else if(Get.find<ProfileController>().profileModel!.stores!.itemSection!) {
                         Get.find<StoreController>().getItemDetails(item.id!).then((itemDetails) {
                           if(itemDetails != null){
                             Get.toNamed(RouteHelper.getAddItemRoute(itemDetails));
@@ -160,7 +167,7 @@ class ItemWidget extends StatelessWidget {
                         showCustomSnackBar('this_feature_is_blocked_by_admin'.tr);
                       }
                     } else if(result == '3') {
-                      if(Get.find<ProfileController>().profileModel!.stores![0].itemSection!) {
+                      if(Get.find<ProfileController>().profileModel!.stores!.itemSection!) {
                         Get.dialog(ConfirmationDialogWidget(
                           icon: Images.warning, description: 'are_you_sure_want_to_delete_this_product'.tr,
                           onYesPressed: () => Get.find<StoreController>().deleteItem(item.id),
@@ -202,13 +209,13 @@ class ItemWidget extends StatelessWidget {
                     padding: const EdgeInsets.all(3),
                     child: Icon(Icons.more_vert_sharp, size: 20),
                   ),
-                ),
+                ) : const SizedBox.shrink(),
                 Padding(
                   padding: const EdgeInsets.only(right: Dimensions.paddingSizeSmall, bottom: Dimensions.paddingSizeSmall),
                   child: item.stock != 0 && item.stock != null ? Text('Stock : ${item.stock}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)) : SizedBox.shrink(),
                 )
               ],
-            ) : Row(children: [
+            ) : showMenu ? Row(children: [
               if(!Get.find<SplashController>().getStoreModuleConfig().newVariation!)
                 GestureDetector(
                   onTap: () {
@@ -222,7 +229,13 @@ class ItemWidget extends StatelessWidget {
 
               GestureDetector(
                 onTap: () {
-                  if(Get.find<ProfileController>().profileModel!.stores![0].itemSection!) {
+                  if(Get.find<SplashController>().moduleType == AppConstants.service) {
+                    if(Get.find<ProfileController>().profileModel!.stores!.canManageServiceSetup!) {
+                      Get.toNamed(RouteHelper.getUpdateServiceRoute(item.id!));
+                    } else {
+                      showCustomSnackBar('this_feature_is_blocked_by_admin'.tr);
+                    }
+                  } else if(Get.find<ProfileController>().profileModel!.stores!.itemSection!) {
                     Get.find<StoreController>().getItemDetails(item.id!).then((itemDetails) {
                       if(itemDetails != null){
                         Get.toNamed(RouteHelper.getAddItemRoute(itemDetails));
@@ -237,7 +250,7 @@ class ItemWidget extends StatelessWidget {
 
               GestureDetector(
                 onTap: () {
-                  if(Get.find<ProfileController>().profileModel!.stores![0].itemSection!) {
+                  if(Get.find<ProfileController>().profileModel!.stores!.itemSection!) {
                     Get.dialog(ConfirmationDialogWidget(
                       icon: Images.warning, description: 'are_you_sure_want_to_delete_this_product'.tr,
                       onYesPressed: () => Get.find<StoreController>().deleteItem(item.id),
@@ -248,7 +261,7 @@ class ItemWidget extends StatelessWidget {
                 },
                 child: const Icon(Icons.delete_forever, color: Colors.red),
               ),
-            ]),
+            ]) : const SizedBox.shrink(),
           ],
         ),
       ),

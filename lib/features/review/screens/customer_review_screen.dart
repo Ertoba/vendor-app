@@ -27,7 +27,7 @@ class _CustomerReviewScreenState extends State<CustomerReviewScreen> {
   void initState() {
     super.initState();
 
-    Get.find<StoreController>().getStoreReviewList(Get.find<ProfileController>().profileModel!.stores![0].id, '', willUpdate: false);
+    Get.find<StoreController>().getStoreReviewList(Get.find<ProfileController>().profileModel!.stores!.id, '', willUpdate: false);
   }
 
   @override
@@ -47,8 +47,8 @@ class _CustomerReviewScreenState extends State<CustomerReviewScreen> {
             SizedBox(height: Dimensions.paddingSizeDefault),
             if (searchReviewList != null && !storeController.isSearching) ...[
               ReviewSummaryWidget(
-                avgRating: Get.find<ProfileController>().profileModel!.stores![0].avgRating ?? 0,
-                totalReviews: Get.find<ProfileController>().profileModel!.stores![0].ratingCount ?? 0,
+                avgRating: Get.find<ProfileController>().profileModel!.stores!.avgRating ?? 0,
+                totalReviews: Get.find<ProfileController>().profileModel!.stores!.ratingCount ?? 0,
                 ratingBreakdown: _calculateRatingBreakdown(storeController.storeReviewList ?? []),
               ),
               const SizedBox(height: Dimensions.paddingSizeDefault),

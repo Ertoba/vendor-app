@@ -99,12 +99,12 @@ class PreviewProviderPromotionWidget extends StatelessWidget {
                       isShowRatings != null && isShowRatings! ? Row(children: [
                         Icon(Icons.star, color: Theme.of(context).cardColor, size: 16),
                         const SizedBox(width: 2),
-                        Text('${Get.find<ProfileController>().profileModel!.stores![0].avgRating ?? 0.0}', style: robotoMedium.copyWith(color: Theme.of(context).cardColor))
+                        Text('${Get.find<ProfileController>().profileModel!.stores!.avgRating ?? 0.0}', style: robotoMedium.copyWith(color: Theme.of(context).cardColor))
                       ]) : const SizedBox(),
                       const SizedBox(width: 5),
 
                       isShowReview != null && isShowReview! ? Text(
-                        '(${Get.find<ProfileController>().profileModel!.stores![0].ratingCount ?? 0}+)',
+                        '(${Get.find<ProfileController>().profileModel!.stores!.ratingCount ?? 0}+)',
                         style: robotoRegular.copyWith(color: Theme.of(context).cardColor),
                       ) : const SizedBox(),
                     ]),

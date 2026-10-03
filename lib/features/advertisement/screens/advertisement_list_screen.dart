@@ -118,6 +118,7 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
           ),
 
           floatingActionButton: advertisementController.advertisementList != null && advertisementController.advertisementList!.isNotEmpty ? FloatingActionButton(
+            heroTag: 'advertisement_list_fab',
             elevation: 0,
             backgroundColor: Theme.of(context).primaryColor,
             onPressed: () {
@@ -174,21 +175,17 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Row(children: [
-                              Flexible(child: Text(
-                                '${'ads_id'.tr} # ${advertisementList[index].id}',
-                                style: robotoBold,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              )),
-                              const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                              Text('ads_id'.tr, style: robotoMedium),
+                              Text(' # ${advertisementList[index].id}', style: robotoBold),
+                              const SizedBox(width: 5),
 
                               Container(
                                 decoration: BoxDecoration(
                                   color: status == 'approved' ? Colors.green.withValues(alpha: 0.2)
                                       : status == 'running' ? Colors.indigo.withValues(alpha: 0.2)
-                                      : status == 'expired' ? const Color(0xFF8B1E2D).withValues(alpha: 0.12)
+                                      : status == 'expired' ? Theme.of(context).disabledColor.withValues(alpha: 0.2)
                                       : status == 'denied' ? Colors.red.withValues(alpha: 0.2)
                                       : status == 'paused' ? Colors.orange.withValues(alpha: 0.2)
                                       : Colors.blue.withValues(alpha: 0.2),
@@ -201,7 +198,7 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
                                     fontSize: Dimensions.fontSizeSmall,
                                     color: status == 'approved' ? Colors.green
                                         : status == 'running' ? Colors.indigo
-                                        : status == 'expired' ? const Color(0xFF8B1E2D)
+                                        : status == 'expired' ? Theme.of(context).disabledColor
                                         : status == 'denied' ? Colors.red
                                         : status == 'paused' ? Colors.orange
                                         : Colors.blue,
@@ -211,14 +208,10 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
                             ]),
 
                             Text(advertisementList[index].addType!.tr.replaceAll('_', ' ').toTitleCase(), style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
-                          ])),
+                          ]),
 
 
                           PopupMenuButton<PopupMenuModel>(
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(minWidth: 180, maxWidth: 260),
-                            position: PopupMenuPosition.under,
-                            offset: const Offset(0, 4),
                             shape: RoundedRectangleBorder(
                               borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusDefault)),
                               side: BorderSide(color: Theme.of(context).hintColor.withValues(alpha: 0.1)),
@@ -348,17 +341,13 @@ class _AdvertisementListScreenState extends State<AdvertisementListScreen>{
                                 );
                               }).toList();
                             },
-                            child: SizedBox(
-                              width: 42,
-                              height: 42,
-                              child: Container(
+                            child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                                 border: Border.all(color: Theme.of(context).disabledColor),
                               ),
-                              alignment: Alignment.center,
-                              child: const Icon(Icons.more_vert_sharp, size: 22),
-                            ),
+                              padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
+                              child: const Icon(Icons.more_vert_sharp),
                             ),
                           ),
 

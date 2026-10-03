@@ -1,3 +1,4 @@
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
 class WalletPaymentModel {
   int? totalSize;
   int? limit;
@@ -7,14 +8,16 @@ class WalletPaymentModel {
   WalletPaymentModel({this.totalSize, this.limit, this.offset, this.transactions});
 
   WalletPaymentModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['transactions'] != null) {
+    final Map<String, dynamic>? page = json['pagination'] is Map ? Map<String, dynamic>.from(json['pagination']) : null;
+    totalSize = DataParserHelper.parseInt(page != null ? page['total'] : json['total_size']);
+    limit = DataParserHelper.parseInt(page != null ? page['per_page'] : json['limit']);
+    offset = DataParserHelper.parseInt(page != null ? page['current_page'] : json['offset']);
+    final dynamic rows = json['data'] ?? json['transactions'];
+    if (rows is List) {
       transactions = <Transactions>[];
-      json['transactions'].forEach((v) {
+      for (dynamic v in rows) {
         transactions!.add(Transactions.fromJson(v));
-      });
+      }
     }
   }
 

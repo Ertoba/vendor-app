@@ -1,20 +1,17 @@
 name: sixam_mart_store
 description: An application for multivendor ecommerce restaurant.
-publish_to: 'none'
-version: 3.8.20+36
-
+publish_to: none
+version: 4.2.0+37
 environment:
   sdk: ^3.10.0
-
 dependencies:
   flutter:
     sdk: flutter
-
   cupertino_icons: ^1.0.8
   get: ^4.7.3
   shared_preferences: ^2.5.3
   connectivity_plus: ^7.0.0
-  firebase_core: ^4.2.1
+  firebase_core: ^4.11.0
   firebase_messaging: ^16.0.4
   flutter_local_notifications: ^19.5.0
   path_provider: ^2.1.5
@@ -23,7 +20,7 @@ dependencies:
   http: ^1.6.0
   pin_code_fields: ^8.0.1
   url_launcher: ^6.3.2
-  vibration: ^3.1.4
+  vibration: ^3.1.8
   audioplayers: ^6.5.1
   flutter_switch: ^0.3.2
   flutter_typeahead: ^5.2.0
@@ -55,20 +52,16 @@ dependencies:
   fluttertoast: ^9.0.0
   flutter_foreground_task: ^9.1.0
   flutter_image_compress: ^2.4.0
-
-  #Rental Module
   dropdown_button2: ^2.3.9
   lottie: ^3.3.2
   marquee: ^2.3.0
   syncfusion_flutter_datepicker: ^31.2.16
   syncfusion_flutter_charts: ^31.2.18
-
+  open_file: ^4.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^6.0.0
-
 dependency_overrides:
   flutter_inappwebview_android:
     path: third_party/flutter_inappwebview_android
@@ -76,47 +69,45 @@ dependency_overrides:
     path: third_party/file_picker
   google_maps_flutter_android:
     path: third_party/google_maps_flutter_android
-
 flutter:
   uses-material-design: true
-
   assets:
-    - assets/image/
-    - assets/image/taxi_image/
-    - assets/language/
-    - assets/notification.mp3
-    - assets/json/
-
+  - assets/image/
+  - assets/image/taxi_image/
+  - assets/language/
+  - assets/notification.mp3
+  - assets/json/
+  - assets/image/service_module/
   fonts:
-    - family: Noto Sans Georgian
-      fonts:
-        - asset: assets/font/noto/NotoSansGeorgian-Thin.ttf
-          weight: 100
-        - asset: assets/font/noto/NotoSansGeorgian-ExtraLight.ttf
-          weight: 200
-        - asset: assets/font/noto/NotoSansGeorgian-Light.ttf
-          weight: 300
-        - asset: assets/font/noto/NotoSansGeorgian-Regular.ttf
-          weight: 400
-        - asset: assets/font/noto/NotoSansGeorgian-Medium.ttf
-          weight: 500
-        - asset: assets/font/noto/NotoSansGeorgian-SemiBold.ttf
-          weight: 600
-        - asset: assets/font/noto/NotoSansGeorgian-Bold.ttf
-          weight: 700
-        - asset: assets/font/noto/NotoSansGeorgian-ExtraBold.ttf
-          weight: 800
-        - asset: assets/font/noto/NotoSansGeorgian-Black.ttf
-          weight: 900
-    - family: MILI Cyrillic
-      fonts:
-        - asset: assets/font/noto/MiliCyrillic-Regular.ttf
-          weight: 400
-        - asset: assets/font/noto/MiliCyrillic-Bold.ttf
-          weight: 700
-        - asset: assets/font/noto/MiliCyrillic-Italic.ttf
-          weight: 400
-          style: italic
-        - asset: assets/font/noto/MiliCyrillic-BoldItalic.ttf
-          weight: 700
-          style: italic
+  - family: Noto Sans Georgian
+    fonts:
+    - asset: assets/font/noto/NotoSansGeorgian-Thin.ttf
+      weight: 100
+    - asset: assets/font/noto/NotoSansGeorgian-ExtraLight.ttf
+      weight: 200
+    - asset: assets/font/noto/NotoSansGeorgian-Light.ttf
+      weight: 300
+    - asset: assets/font/noto/NotoSansGeorgian-Regular.ttf
+      weight: 400
+    - asset: assets/font/noto/NotoSansGeorgian-Medium.ttf
+      weight: 500
+    - asset: assets/font/noto/NotoSansGeorgian-SemiBold.ttf
+      weight: 600
+    - asset: assets/font/noto/NotoSansGeorgian-Bold.ttf
+      weight: 700
+    - asset: assets/font/noto/NotoSansGeorgian-ExtraBold.ttf
+      weight: 800
+    - asset: assets/font/noto/NotoSansGeorgian-Black.ttf
+      weight: 900
+  - family: MILI Cyrillic
+    fonts:
+    - asset: assets/font/noto/MiliCyrillic-Regular.ttf
+      weight: 400
+    - asset: assets/font/noto/MiliCyrillic-Bold.ttf
+      weight: 700
+    - asset: assets/font/noto/MiliCyrillic-Italic.ttf
+      weight: 400
+      style: italic
+    - asset: assets/font/noto/MiliCyrillic-BoldItalic.ttf
+      weight: 700
+      style: italic

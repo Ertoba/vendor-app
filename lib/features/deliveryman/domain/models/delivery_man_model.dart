@@ -1,3 +1,7 @@
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
+
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
+
 class DeliveryManModel {
   int? id;
   String? fName;
@@ -47,13 +51,13 @@ class DeliveryManModel {
     identityType = json['identity_type'];
     identityImageFullUrl = json['identity_image_full_url'].cast<String>();
     imageFullUrl = json['image_full_url'];
-    status = json['status'];
-    active = json['active'];
-    earning = json['earning'];
+    status = DataParserHelper.parseBool(json['status']);
+    active = DataParserHelper.parseInt(json['active']);
+    earning = DataParserHelper.parseInt(json['earning']);
     type = json['type'];
-    ordersCount = json['orders_count'];
+    ordersCount = DataParserHelper.parseInt(json['orders_count']);
     avgRating = json['avg_rating']?.toDouble();
-    ratingCount = json['rating_count'];
+    ratingCount = DataParserHelper.parseInt(json['rating_count']);
     cashInHands = json['cash_in_hands']?.toDouble();
   }
 

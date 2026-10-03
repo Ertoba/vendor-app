@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart_store/api/api_client.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 import 'package:sixam_mart_store/common/models/response_model.dart';
 import 'package:sixam_mart_store/features/auth/domain/repositories/auth_repository_interface.dart';
 import 'package:sixam_mart_store/features/auth/domain/services/auth_service_interface.dart';
@@ -8,7 +9,6 @@ import 'package:sixam_mart_store/features/business/domain/models/package_model.d
 import 'package:sixam_mart_store/features/business/screens/subscription_payment_screen.dart';
 import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_store/features/rental_module/profile/controllers/taxi_profile_controller.dart';
-import 'package:sixam_mart_store/helper/api_error_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 
 class AuthService implements AuthServiceInterface {
@@ -82,7 +82,7 @@ class AuthService implements AuthServiceInterface {
 
   @override
   Future<bool> clearUserNumberAndPassword() async {
-    return authRepositoryInterface.clearUserNumberAndPassword();
+    return await authRepositoryInterface.clearUserNumberAndPassword();
   }
 
   @override
@@ -102,43 +102,50 @@ class AuthService implements AuthServiceInterface {
 
   @override
   Future<ResponseModel?> manageLogin(Response response, String type) async {
-    ResponseModel? responseModel;
-    if (response.statusCode == 200) {
-
-      String? moduleType = response.body['module_type'];
-      setModuleType(moduleType ?? '');
-
-      if(response.body['subscribed'] != null){
-        int? storeId = response.body['subscribed']['store_id'];
-        int? packageId = response.body['subscribed']['package_id'];
-
-        if(packageId == null) {
-
-          saveUserToken(response.body['subscribed']['token'], response.body['subscribed']['zone_wise_topic'], type);
-          try { await updateToken(); } catch (_) {}
-          moduleType == 'rental' ? await Get.find<TaxiProfileController>().getProfile() : await Get.find<ProfileController>().getProfile();
-
-          Get.toNamed(RouteHelper.getMySubscriptionRoute(fromNotification: true));
-        } else {
-          Get.to(()=> SubscriptionPaymentScreen(storeId: storeId!, packageId: packageId));
-          responseModel = ResponseModel(false, 'please_select_payment_method'.tr);
-        }
-      }else{
-        saveUserToken(response.body['token'], response.body['zone_wise_topic'], type);
-        try { await updateToken(); } catch (_) {}
-        moduleType == 'rental' ? Get.find<TaxiProfileController>().getProfile() : Get.find<ProfileController>().getProfile();
-        responseModel = ResponseModel(true, 'successful');
-      }
-    } else {
-      responseModel = ResponseModel(
-        false,
-        ApiErrorHelper.userMessage(
-          response.statusText,
-          statusCode: response.statusCode,
-        ),
-      );
+    if (response.statusCode != 200) {
+      return ResponseModel(false, response.statusText);
     }
-    return responseModel;
+
+    /// `{identical_code, message, content: {token, zone_wise_topic, module_type}, errors}`
+    final Map<String, dynamic> content = response.contentMap;
+
+    final String? moduleType = content['module_type'];
+    setModuleType(moduleType ?? '');
+
+    final dynamic subscribed = content['subscribed'];
+    if (subscribed != null) {
+      final int? storeId = subscribed['store_id'];
+      final int? packageId = subscribed['package_id'];
+      if (packageId != null) {
+        Get.to(() => SubscriptionPaymentScreen(storeId: storeId!, packageId: packageId));
+        return ResponseModel(false, 'please_select_payment_method'.tr);
+      }
+
+      if (!await _saveSession(subscribed, type)) {
+        return ResponseModel(false, response.apiMessage ?? response.statusText);
+      }
+      moduleType == 'rental' ? await Get.find<TaxiProfileController>().getProfile() : await Get.find<ProfileController>().getProfile();
+      Get.toNamed(RouteHelper.getMySubscriptionRoute(fromNotification: true));
+      return null;
+    }
+
+    if (!await _saveSession(content, type)) {
+      return ResponseModel(false, response.apiMessage ?? response.statusText);
+    }
+    moduleType == 'rental' ? Get.find<TaxiProfileController>().getProfile() : Get.find<ProfileController>().getProfile();
+    return ResponseModel(true, 'successful');
+  }
+
+  /// Stores the session from a login payload. Returns false when the payload
+  /// carried no token, so the caller can report it instead of crashing.
+  Future<bool> _saveSession(dynamic payload, String type) async {
+    final String? token = payload['token'];
+    if (token == null) {
+      return false;
+    }
+    await saveUserToken(token, payload['zone_wise_topic'] ?? '', type);
+    await updateToken();
+    return true;
   }
 
   @override

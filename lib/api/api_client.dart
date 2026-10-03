@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:sixam_mart_store/api/api_checker.dart';
-import 'package:sixam_mart_store/common/models/error_response.dart';
+import 'package:sixam_mart_store/common/models/api_error.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -42,6 +42,8 @@ class ApiClient extends GetxService {
       'vendorType': type??'',
     };
   }
+
+  Map<String, String> getHeader() => _mainHeaders;
 
   Future<Response> getData(String uri, {Map<String, dynamic>? query, Map<String, String>? headers, bool handleError = true}) async {
     try {
@@ -149,17 +151,21 @@ class ApiClient extends GetxService {
       body: body ?? response.body, bodyString: response.body.toString(),
       headers: response.headers, statusCode: response.statusCode, statusText: response.reasonPhrase,
     );
-    if(response0.statusCode != 200 && response0.body != null && response0.body is !String) {
-      if(response0.body.toString().startsWith('{errors: [{code:')) {
-        ErrorResponse errorResponse = ErrorResponse.fromJson(response0.body);
-        response0 = Response(statusCode: response0.statusCode, body: response0.body, statusText: errorResponse.errors![0].message);
-      }else if(response0.body.toString().startsWith('{message')) {
-        response0 = Response(statusCode: response0.statusCode, body: response0.body, statusText: response0.body['message']);
+    if(response0.isSuccessful) {
+      if(response0.statusCode != 200) {
+        response0 = Response(
+          body: response0.body, bodyString: response0.bodyString, headers: response0.headers,
+          statusCode: 200, statusText: response0.statusText,
+        );
       }
-    }else if(response0.statusCode != 200 && response0.body == null) {
-      response0 = const Response(statusCode: 0, statusText: noInternetMessage);
+    } else {
+      ApiError error = ApiError.fromResponse(response0);
+      response0 = Response(
+        body: response0.body, bodyString: response0.bodyString, headers: response0.headers,
+        statusCode: error.statusCode, statusText: error.message,
+      );
     }
-    log('====> API Response: [${response0.statusCode}] $uri\n${response0.body}');
+    log('====> API Response: [${response.statusCode}] $uri\n${response0.body}');
     if(handleError) {
       if(response0.statusCode == 200) {
         return response0;

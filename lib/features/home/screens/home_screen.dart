@@ -1,21 +1,27 @@
-import 'package:just_the_tooltip/just_the_tooltip.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:sixam_mart_store/common/widgets/order_shimmer_widget.dart';
+import 'package:sixam_mart_store/common/widgets/order_widget.dart';
 import 'package:sixam_mart_store/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart_store/features/home/widgets/ads_section_widget.dart';
 import 'package:sixam_mart_store/features/home/widgets/business_analytics_widget.dart';
+import 'package:sixam_mart_store/features/home/widgets/order_button_widget.dart';
 import 'package:sixam_mart_store/features/notification/controllers/notification_controller.dart';
 import 'package:sixam_mart_store/features/order/controllers/order_controller.dart';
-import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_store/features/order/domain/models/order_model.dart';
+import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
+import 'package:sixam_mart_store/helper/bogo_offer_action_helper.dart';
+import 'package:sixam_mart_store/helper/happy_hour_action_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
+import 'package:sixam_mart_store/common/widgets/custom_asset_image_widget.dart';
+import 'package:sixam_mart_store/common/widgets/custom_ink_well_widget.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
 import 'package:sixam_mart_store/util/styles.dart';
-import 'package:sixam_mart_store/common/widgets/order_shimmer_widget.dart';
-import 'package:sixam_mart_store/common/widgets/order_widget.dart';
-import 'package:sixam_mart_store/features/home/widgets/order_button_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
+part '../widgets/permission_warning_widget.dart';
+part '../widgets/bogo_offer_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,7 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
   late final AppLifecycleListener _listener;
   bool _isNotificationPermissionGranted = true;
   bool _isBatteryOptimizationGranted = true;
-  final JustTheController tooltipController = JustTheController();
 
   @override
   void initState() {
@@ -51,6 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
     await Get.find<ProfileController>().getProfile();
     await Get.find<OrderController>().getCurrentOrders();
     await Get.find<NotificationController>().getNotificationList();
+    HappyHourActionHelper.showAdminRequest();
+    BogoOfferActionHelper.showAdminRequest();
   }
 
   Future<void> _checkSystemNotification() async {
@@ -151,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 2,
         title: Padding(
           padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
-          child: Image.asset(Images.brandMark, height: 34, fit: BoxFit.contain),
+          child: Image.asset(Images.logo, height: 30,),
         ),
         actions: [IconButton(
           icon: GetBuilder<NotificationController>(builder: (notificationController) {
@@ -174,7 +181,9 @@ class _HomeScreenState extends State<HomeScreen> {
           await _loadData();
         },
         child: GetBuilder<ProfileController>(builder: (profileController) {
-          return GetBuilder<OrderController>(builder: (orderController) {
+          /// OrderController notifies the running orders with ids only, so this
+          /// builder has to carry one or it never sees the loaded orders.
+          return GetBuilder<OrderController>(id: 'running_header', builder: (orderController) {
             bool isEnableTemporarilyClosed = false;
 
             if(orderController.runningOrders != null) {
@@ -201,14 +210,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 GetPlatform.isAndroid ? SliverToBoxAdapter(
                   child: Column(children: [
                     if(!_isNotificationPermissionGranted)
-                      permissionWarning(isBatteryPermission: false, onTap: requestNotificationPermission, closeOnTap: () {
+                      _PermissionWarningWidget(isBatteryPermission: false, onTap: requestNotificationPermission, closeOnTap: () {
                         setState(() {
                           _isNotificationPermissionGranted = true;
                         });
                       }),
 
                     if(!_isBatteryOptimizationGranted)
-                      permissionWarning(isBatteryPermission: true, onTap: requestBatteryOptimization, closeOnTap: () {
+                      _PermissionWarningWidget(isBatteryPermission: true, onTap: requestBatteryOptimization, closeOnTap: () {
                         setState(() {
                           _isBatteryOptimizationGranted = true;
                         });
@@ -231,16 +240,21 @@ class _HomeScreenState extends State<HomeScreen> {
                       profileController.modulePermission != null && profileController.modulePermission!.advertisement! ? const AdsSectionWidget() : const SizedBox(),
                       const SizedBox(height: Dimensions.paddingSizeSmall),
 
+                      /// Hidden for rental and service stores, where buy-one-get-one
+                      /// has no meaning — the same rule the menu entry uses.
+                      BogoOfferActionHelper.isSupportedModule ? const _BogoOfferCard() : const SizedBox(),
+                      SizedBox(height: BogoOfferActionHelper.isSupportedModule ? Dimensions.paddingSizeSmall : 0),
+
                     ]),
                   ),
                 ),
 
 
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
-                    child: Column(children: [
-                      profileController.modulePermission != null ? Get.find<ProfileController>().modulePermission!.order! ? Column(children: [
+                if(profileController.modulePermission != null && profileController.modulePermission!.order!) ...[
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                      child: Column(children: [
 
                         Row(children: [
                           Text('ongoing_orders'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
@@ -262,11 +276,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 const SizedBox(width: Dimensions.paddingSizeSmall),
 
-                                Flexible(child: Text(
+                                Text(
                                   'campaign_orders_only'.tr,
                                   style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
-                                  maxLines: 2, overflow: TextOverflow.ellipsis,
-                                )),
+                                ),
                               ]),
                             ),
                           ) : const SizedBox(),
@@ -289,40 +302,61 @@ class _HomeScreenState extends State<HomeScreen> {
                         ) : const SizedBox(),
 
                         const SizedBox(height: Dimensions.paddingSizeDefault),
+                      ]),
+                    ),
+                  ),
 
-                        orderController.runningOrders != null ? orderList.isNotEmpty ? ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: orderList.length,
-                          itemBuilder: (context, index) {
-                            return OrderWidget(orderModel: orderList[index], hasDivider: index != orderList.length-1, isRunning: true);
-                          },
-                        ) : Padding(
-                          padding: const EdgeInsets.only(top: 50, bottom: 100),
-                          child: Center(child: Text('no_order_found'.tr)),
-                        ) : ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: 10,
-                          itemBuilder: (context, index) {
-                            return OrderShimmerWidget(isEnabled: orderController.runningOrders == null);
-                          },
-                        ),
-
-                      ]) : Center(child: Padding(
-                        padding: const EdgeInsets.only(top: 100),
-                        child: Text('you_have_no_permission_to_access_this_feature'.tr, style: robotoMedium),
-                      )) : ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
+                  if(orderController.runningOrders == null)
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                      sliver: SliverList.builder(
                         itemCount: 10,
                         itemBuilder: (context, index) {
                           return OrderShimmerWidget(isEnabled: orderController.runningOrders == null);
                         },
                       ),
-                    ]),
+                    )
+                  else if(orderList.isEmpty)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 50, bottom: 100),
+                          child: Center(child: Text('no_order_found'.tr)),
+                        ),
+                      ),
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                      sliver: SliverList.builder(
+                        itemCount: orderList.length,
+                        itemBuilder: (context, index) {
+                          return OrderWidget(orderModel: orderList[index], hasDivider: index != orderList.length-1, isRunning: true);
+                        },
+                      ),
+                    ),
+                ] else if(profileController.modulePermission != null) ...[
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                      child: Center(child: Padding(
+                        padding: const EdgeInsets.only(top: 100),
+                        child: Text('you_have_no_permission_to_access_this_feature'.tr, style: robotoMedium),
+                      )),
+                    ),
                   ),
-                ),
+                ] else ...[
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                    sliver: SliverList.builder(
+                      itemCount: 10,
+                      itemBuilder: (context, index) {
+                        return OrderShimmerWidget(isEnabled: orderController.runningOrders == null);
+                      },
+                    ),
+                  ),
+                ],
 
               ],
             );
@@ -333,55 +367,5 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget permissionWarning({required bool isBatteryPermission, required Function() onTap, required Function() closeOnTap}) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.7),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-              child: Row(children: [
-
-                if(isBatteryPermission)
-                  const Padding(
-                    padding: EdgeInsets.only(right: 8.0),
-                    child: Icon(Icons.warning_rounded, color: Colors.yellow,),
-                  ),
-
-                Expanded(
-                  child: Row(children: [
-                    Flexible(
-                      child: Text(
-                        isBatteryPermission ? 'for_better_performance_allow_notification_to_run_in_background'.tr
-                            : 'notification_is_disabled_please_allow_notification'.tr,
-                        maxLines: 2, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Colors.white),
-                      ),
-                    ),
-                    const SizedBox(width: Dimensions.paddingSizeSmall),
-                    const Icon(Icons.arrow_circle_right_rounded, color: Colors.white, size: 24,),
-                  ]),
-                ),
-
-                const SizedBox(width: 20),
-              ]),
-            ),
-
-            Positioned(
-              top: 5, right: 5,
-              child: InkWell(
-                onTap: closeOnTap,
-                child: const Icon(Icons.clear, color: Colors.white, size: 18),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
 }
+

@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart_store/api/api_client.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_store/common/models/response_model.dart';
 import 'package:sixam_mart_store/features/auth/controllers/auth_controller.dart';
@@ -26,10 +27,10 @@ class PaymentRepository implements PaymentRepositoryInterface {
     List<WithdrawModel>? withdrawList = [];
     Response response = await apiClient.getData(AppConstants.withdrawListUri);
     if (response.statusCode == 200) {
-      response.body.forEach((withdraw) {
+      for (final withdraw in response.dataList) {
         WithdrawModel withdrawModel = WithdrawModel.fromJson(withdraw);
         withdrawList.add(withdrawModel);
-      });
+      }
     }
     return withdrawList;
   }
@@ -46,10 +47,10 @@ class PaymentRepository implements PaymentRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.withdrawRequestMethodUri);
     if(response.statusCode == 200) {
       widthDrawMethods = [];
-      response.body.forEach((method) {
+      for (final method in response.dataList) {
         WidthDrawMethodModel withdrawMethod = WidthDrawMethodModel.fromJson(method);
-        widthDrawMethods!.add(withdrawMethod);
-      });
+        widthDrawMethods.add(withdrawMethod);
+      }
     }
     return widthDrawMethods;
   }
@@ -60,7 +61,7 @@ class PaymentRepository implements PaymentRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.walletPaymentListUri);
     if(response.statusCode == 200) {
       transactions = [];
-      WalletPaymentModel walletPaymentModel = WalletPaymentModel.fromJson(response.body);
+      WalletPaymentModel walletPaymentModel = WalletPaymentModel.fromJson(response.contentMap);
       transactions.addAll(walletPaymentModel.transactions!);
     }
     return transactions;
@@ -84,7 +85,7 @@ class PaymentRepository implements PaymentRepositoryInterface {
       },
     );
     if (response.statusCode == 200) {
-      String redirectUrl = response.body['redirect_link'];
+      String redirectUrl = response.contentMap['redirect_link'];
       Get.back();
       if(GetPlatform.isWeb) {
         // html.window.open(redirectUrl,"_self");

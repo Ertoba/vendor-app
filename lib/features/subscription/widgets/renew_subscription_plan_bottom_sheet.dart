@@ -30,7 +30,7 @@ class RenewSubscriptionPlanBottomSheet extends StatelessWidget {
       double? price = Get.find<ProfileController>().profileModel?.subscriptionOtherData?.pendingBill != null ?
         (Get.find<ProfileController>().profileModel!.subscriptionOtherData!.pendingBill! + package.price!) : package.price;
 
-      bool businessIsCommission = subscriptionController.profileModel!.stores![0].storeBusinessModel == 'commission';
+      bool businessIsCommission = subscriptionController.profileModel!.stores!.storeBusinessModel == 'commission';
 
       return Container(
         width: double.infinity,
@@ -408,7 +408,7 @@ class RenewSubscriptionPlanBottomSheet extends StatelessWidget {
                       if(!subscriptionController.isSelect && !subscriptionController.isDigitalPaymentSelect){
                         showCustomSnackBar('please_select_payment_method'.tr);
                       }else {
-                        subscriptionController.renewBusinessPlan(storeId: subscriptionController.profileModel!.stores![0].id.toString(), isCommission: package.id == -1);
+                        subscriptionController.renewBusinessPlan(storeId: subscriptionController.profileModel!.stores!.id.toString(), isCommission: package.id == -1);
                       }
                     },
                     buttonText: isRenew ? 'renew_subscription_plan'.tr : 'shift_subscription_plan'.tr,

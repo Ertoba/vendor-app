@@ -6,6 +6,7 @@ import 'package:sixam_mart_store/common/models/vat_tax_model.dart';
 import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_store/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_store/api/api_client.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart_store/features/store/domain/models/attr.dart';
 import 'package:sixam_mart_store/features/store/domain/models/attribute_model.dart';
@@ -18,6 +19,7 @@ import 'package:sixam_mart_store/features/store/domain/models/suitable_tag_model
 import 'package:sixam_mart_store/features/store/domain/models/unit_model.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart_store/features/category/controllers/category_controller.dart';
 import 'package:sixam_mart_store/features/store/domain/repositories/store_repository_interface.dart';
 
 class StoreRepository implements StoreRepositoryInterface {
@@ -29,7 +31,7 @@ class StoreRepository implements StoreRepositoryInterface {
     ItemModel? itemModel;
     Response response = await apiClient.getData('${AppConstants.itemListUri}?offset=$offset&limit=10&type=$type&search=$search${categoryId != null ? '&category_id=$categoryId' : 0}');
     if(response.statusCode == 200) {
-      itemModel = ItemModel.fromJson(response.body);
+      itemModel = ItemModel.fromJson(response.contentMap);
     }
     return itemModel;
   }
@@ -39,7 +41,7 @@ class StoreRepository implements StoreRepositoryInterface {
     ItemModel? itemModel;
     Response response = await apiClient.getData('${AppConstants.stockLimitItemsUri}?offset=$offset&limit=10');
     if(response.statusCode == 200) {
-      itemModel = ItemModel.fromJson(response.body);
+      itemModel = ItemModel.fromJson(response.contentMap);
     }
     return itemModel;
   }
@@ -49,7 +51,7 @@ class StoreRepository implements StoreRepositoryInterface {
     PendingItemModel? pendingItemModel;
     Response response = await apiClient.getData('${AppConstants.pendingItemListUri}?status=$type&offset=$offset&limit=20');
     if(response.statusCode == 200) {
-      pendingItemModel = PendingItemModel.fromJson(response.body);
+      pendingItemModel = PendingItemModel.fromJson(response.contentMap);
     }
     return pendingItemModel;
   }
@@ -59,7 +61,7 @@ class StoreRepository implements StoreRepositoryInterface {
     Item? pendingItem;
     Response response = await apiClient.getData('${AppConstants.pendingItemDetailsUri}/$itemId');
     if(response.statusCode == 200) {
-      pendingItem = Item.fromJson(response.body);
+      pendingItem = Item.fromJson(response.contentMap);
     }
     return pendingItem;
   }
@@ -69,7 +71,7 @@ class StoreRepository implements StoreRepositoryInterface {
     Item? item;
     Response response = await apiClient.getData('${AppConstants.itemDetailsUri}/$id');
     if(response.statusCode == 200) {
-      item = Item.fromJson(response.body);
+      item = Item.fromJson(response.contentMap);
     }
     return item;
   }
@@ -80,24 +82,24 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.attributeUri);
     if(response.statusCode == 200) {
       attributeList = [];
-      response.body.forEach((attribute) {
+      for (final attribute in response.dataList) {
         if(item != null) {
           bool active = item.attributes!.contains(Attr.fromJson(attribute).id);
           List<String> options = [];
           if(active) {
             options.addAll(item.choiceOptions![item.attributes!.indexOf(Attr.fromJson(attribute).id)].options!);
           }
-          attributeList!.add(AttributeModel(
+          attributeList.add(AttributeModel(
             attribute: Attr.fromJson(attribute),
             active: item.attributes!.contains(Attr.fromJson(attribute).id),
             controller: TextEditingController(), variants: options,
           ));
         }else {
-          attributeList!.add(AttributeModel(attribute: Attr.fromJson(attribute), active: false,
+          attributeList.add(AttributeModel(attribute: Attr.fromJson(attribute), active: false,
             controller: TextEditingController(), variants: [],
           ));
         }
-      });
+      }
     }
     return attributeList;
   }
@@ -138,11 +140,12 @@ class StoreRepository implements StoreRepositoryInterface {
       'minimum_delivery_charge': store.minimumShippingCharge.toString(), 'per_km_delivery_charge': store.perKmShippingCharge.toString(),
       'veg': store.veg.toString(), 'non_veg': store.nonVeg.toString(),
       'halal_tag_status': store.isHalalActive! ? '1' : '0',
+      'show_low_stock_count': store.showLowStockCount == true ? '1' : '0',
       'order_place_to_schedule_interval': store.orderPlaceToScheduleInterval.toString(), 'minimum_delivery_time': min,
       'maximum_delivery_time': max, 'delivery_time_type': type, 'prescription_order': store.prescriptionStatus! ? '1' : '0',
       'cutlery': store.cutlery! ? '1' : '0', 'free_delivery': store.freeDelivery! ? '1' : '0',
       'extra_packaging_status': store.extraPackagingStatus! ? '1' : '0', 'extra_packaging_amount': store.extraPackagingAmount!.toString(),
-      'minimum_stock_for_warning': store.minimumStockForWarning.toString(),
+      'minimum_stock_for_warning': store.minimumStockForWarning?.toString() ?? '0',
     });
     if(store.maximumShippingCharge != null){
       fields.addAll({'maximum_delivery_charge':  store.maximumShippingCharge.toString()});
@@ -176,18 +179,18 @@ class StoreRepository implements StoreRepositoryInterface {
     if(Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'grocery' || Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'food') {
       fields.addAll(<String, String> {'nutritions': nutrition, 'allergies': allergicIngredients});
     }
-    if(Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'pharmacy') {
+    if(Get.find<ProfileController>().profileModel!.stores!.module!.moduleType == 'pharmacy') {
       fields.addAll(<String, String> {'generic_name': genericName});
       fields.addAll((<String, String> {'condition_id': item.conditionId!.toString()}));
     }
     if(Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!) {
       fields.addAll((<String, String> {'current_stock': item.stock.toString()}));
     }
-    if(Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'pharmacy') {
+    if(Get.find<ProfileController>().profileModel!.stores!.module!.moduleType == 'pharmacy') {
       fields.addAll((<String, String> {'is_prescription_required': item.isPrescriptionRequired!.toString()}));
       fields.addAll((<String, String> {'basic': item.isBasicMedicine!.toString()}));
     }
-    if(Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'ecommerce') {
+    if(Get.find<ProfileController>().profileModel!.stores!.module!.moduleType == 'ecommerce') {
       fields.addAll((<String, String> {
         'brand_id': item.brandId.toString(),
         'meta_title' : item.metaTitle ?? '',
@@ -210,7 +213,7 @@ class StoreRepository implements StoreRepositoryInterface {
       log('fields of add item product meta data: ${fields.toString()}');
     }
 
-    if(Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'grocery' || Get.find<ProfileController>().profileModel!.stores![0].module!.moduleType == 'food') {
+    if(Get.find<ProfileController>().profileModel!.stores!.module!.moduleType == 'grocery' || Get.find<ProfileController>().profileModel!.stores!.module!.moduleType == 'food') {
       fields.addAll((<String, String> {'is_halal': item.isHalal.toString()}));
     }
     if(Get.find<SplashController>().configModel!.moduleConfig!.module!.unit! && item.unitType != null) {
@@ -226,6 +229,10 @@ class StoreRepository implements StoreRepositoryInterface {
     fields.addAll(<String, String> {'addon_ids': addon});
     if(item.categoryIds!.length > 1) {
       fields.addAll(<String, String> {'sub_category_id': item.categoryIds![1].id!});
+    }
+    final CategoryController categoryController = Get.find<CategoryController>();
+    if(categoryController.isMyCategoryFeatureEnabled && (categoryController.myCategories?.isNotEmpty ?? false) && item.storeCategoryId != null) {
+      fields.addAll(<String, String> {'store_category_id': item.storeCategoryId.toString()});
     }
     if(!isAdd) {
       fields.addAll(<String, String> {'_method': 'put', 'id': item.itemId != null ? item.itemId.toString() : item.id.toString(), 'images': jsonEncode(savedImages)});
@@ -252,6 +259,25 @@ class StoreRepository implements StoreRepositoryInterface {
     for(int index=0; index<images.length; index++) {
       images0.add(MultipartBody('item_images[]', images[index]));
     }
+    if(!isVideoLink && video != null) {
+      images0.add(MultipartBody('video', video));
+      fields.addAll({'video_upload_type': 'file'});
+    }
+
+    final String trimmedVideoLink = videoLink?.trim() ?? '';
+    if(!isAdd) {
+      final bool hasReplacementVideo = video != null || (isVideoLink && trimmedVideoLink.isNotEmpty);
+      if(removeSavedVideo && !hasReplacementVideo) {
+        fields.addAll({'remove_video' : "1",});
+      }
+    }
+
+    if(isVideoLink) {
+      fields.addAll(<String, String>{
+        'video_link': trimmedVideoLink,
+        'video_upload_type': 'link',
+      });
+    }
 
     fields.addAll({'removedImageKeys': jsonEncode(Get.find<StoreController>().removeImageList)});
     if(!isAdd){
@@ -262,7 +288,6 @@ class StoreRepository implements StoreRepositoryInterface {
         isAdd ? AppConstants.addItemUri : AppConstants.updateItemUri,
         fields,
         images0,
-        handleError: false
     );
     return response;
   }
@@ -279,7 +304,9 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.vendorReviewUri}?store_id=$storeID&search=$searchText');
     if(response.statusCode == 200) {
       storeReviewList = [];
-      response.body.forEach((review) => storeReviewList!.add(ReviewModel.fromJson(review)));
+      for (final review in response.dataList) {
+        storeReviewList.add(ReviewModel.fromJson(review));
+      }
     }
     return storeReviewList;
   }
@@ -290,9 +317,9 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.itemReviewUri}/$itemID');
     if(response.statusCode == 200) {
       itemReviewList = [];
-      response.body['reviews'].forEach((review) {
-        itemReviewList!.add(ReviewModel.fromJson(review));
-      });
+      for (final review in response.dataList) {
+        itemReviewList.add(ReviewModel.fromJson(review));
+      }
     }
     return itemReviewList;
   }
@@ -308,7 +335,7 @@ class StoreRepository implements StoreRepositoryInterface {
     int? scheduleID;
     Response response = await apiClient.postData(AppConstants.addSchedule, schedule.toJson());
     if(response.statusCode == 200) {
-      scheduleID = int.parse(response.body['id'].toString());
+      scheduleID = int.parse(response.contentMap['id'].toString());
     }
     return scheduleID;
   }
@@ -330,7 +357,9 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.unitListUri);
     if(response.statusCode == 200) {
       unitList = [];
-      response.body.forEach((unit) => unitList!.add(UnitModel.fromJson(unit)));
+      for (final unit in response.dataList) {
+        unitList.add(UnitModel.fromJson(unit));
+      }
     }
     return unitList;
   }
@@ -367,12 +396,17 @@ class StoreRepository implements StoreRepositoryInterface {
   @override
   Future<List<BrandModel>?> getBrandList() async {
     List<BrandModel>? brands;
-    Response response = await apiClient.getData(AppConstants.getBrandsUri);
+    // moduleId is already sent in _mainHeaders automatically; also append as query param for explicitness
+    final int? moduleId = Get.find<ProfileController>().profileModel?.stores?.module?.id;
+    final String uri = moduleId != null
+        ? '${AppConstants.getBrandsUri}?module_id=$moduleId'
+        : AppConstants.getBrandsUri;
+    Response response = await apiClient.getData(uri);
     if(response.statusCode == 200) {
       brands = [];
-      response.body!.forEach((brand) {
-        brands!.add(BrandModel.fromJson(brand));
-      });
+      for (final brand in response.dataList) {
+        brands.add(BrandModel.fromJson(brand));
+      }
     }
     return brands;
   }
@@ -383,9 +417,9 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.suitableTagUri);
     if(response.statusCode == 200) {
       suitableTagList = [];
-      response.body.forEach((tag) {
-        suitableTagList!.add(SuitableTagModel.fromJson(tag));
-      });
+      for (final tag in response.dataList) {
+        suitableTagList.add(SuitableTagModel.fromJson(tag));
+      }
     }
     return suitableTagList;
   }
@@ -403,7 +437,9 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.getNutritionSuggestionUri);
     if(response.statusCode == 200) {
       nutritionSuggestionList = [];
-      response.body.forEach((nutrition) => nutritionSuggestionList?.add(nutrition));
+      for (final nutrition in response.dataList) {
+        nutritionSuggestionList.add(nutrition is Map ? nutrition['name']?.toString() : nutrition?.toString());
+      }
     }
     return nutritionSuggestionList;
   }
@@ -414,7 +450,9 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.getAllergicIngredientsSuggestionUri);
     if(response.statusCode == 200) {
       allergicIngredientsSuggestionList = [];
-      response.body.forEach((allergicIngredients) => allergicIngredientsSuggestionList?.add(allergicIngredients));
+      for (final allergicIngredients in response.dataList) {
+        allergicIngredientsSuggestionList.add(allergicIngredients is Map ? allergicIngredients['name']?.toString() : allergicIngredients?.toString());
+      }
     }
     return allergicIngredientsSuggestionList;
   }
@@ -425,7 +463,9 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.getGenericNameSuggestionUri);
     if(response.statusCode == 200) {
       genericNameSuggestionList = [];
-      response.body.forEach((genericName) => genericNameSuggestionList?.add(genericName));
+      for (final genericName in response.dataList) {
+        genericNameSuggestionList.add(genericName is Map ? genericName['name']?.toString() : genericName?.toString());
+      }
     }
     return genericNameSuggestionList;
   }
@@ -436,7 +476,9 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.vatTaxListUri);
     if(response.statusCode == 200) {
       vatTaxList = [];
-      response.body.forEach((vatTax) => vatTaxList!.add(VatTaxModel.fromJson(vatTax)));
+      for (final vatTax in response.dataList) {
+        vatTaxList.add(VatTaxModel.fromJson(vatTax));
+      }
     }
     return vatTaxList;
   }

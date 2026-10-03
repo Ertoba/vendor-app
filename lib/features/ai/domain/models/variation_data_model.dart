@@ -1,3 +1,5 @@
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
+
 class VariationDataModel {
   List<Data>? data;
   String? status;
@@ -43,7 +45,7 @@ class Data {
 
   Data.fromJson(Map<String, dynamic> json) {
     variationName = json['variation_name'];
-    required = json['required'];
+    required = DataParserHelper.parseBool(json['required']);
     selectionType = json['selection_type'];
     min = json['min'];
     max = json['max'];

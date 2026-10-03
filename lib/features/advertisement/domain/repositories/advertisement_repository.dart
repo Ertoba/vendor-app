@@ -4,6 +4,7 @@ import 'package:sixam_mart_store/features/advertisement/models/ads_details_model
 import 'package:sixam_mart_store/features/advertisement/models/advertisement_model.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class AdvertisementRepository implements AdvertisementRepositoryInterface {
   final ApiClient apiClient;
@@ -50,7 +51,7 @@ class AdvertisementRepository implements AdvertisementRepositoryInterface {
     AdsDetailsModel? adsDetailsModel;
     Response response = await apiClient.getData("${AppConstants.advertisementDetailsUri}/$id");
     if(response.statusCode == 200) {
-      adsDetailsModel = AdsDetailsModel.fromJson(response.body);
+      adsDetailsModel = AdsDetailsModel.fromJson(response.contentMap);
     }
     return adsDetailsModel;
   }
@@ -65,7 +66,7 @@ class AdvertisementRepository implements AdvertisementRepositoryInterface {
     AdvertisementModel? advertisementModel;
     Response response = await apiClient.getData('${AppConstants.getAdvertisementListUri}?offset=$offset&limit=10&ads_type=$type');
     if(response.statusCode == 200) {
-      advertisementModel = AdvertisementModel.fromJson(response.body);
+      advertisementModel = AdvertisementModel.fromJson(response.contentMap);
     }
     return advertisementModel;
   }

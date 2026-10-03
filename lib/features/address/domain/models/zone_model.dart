@@ -1,4 +1,3 @@
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class ZoneModel {
   int? id;
@@ -10,7 +9,6 @@ class ZoneModel {
   String? restaurantWiseTopic;
   String? customerWiseTopic;
   String? deliverymanWiseTopic;
-  double? minimumShippingCharge;
   double? perKmShippingCharge;
   List<FormatedCoordinates>? formatedCoordinates;
 
@@ -24,7 +22,6 @@ class ZoneModel {
     this.restaurantWiseTopic,
     this.customerWiseTopic,
     this.deliverymanWiseTopic,
-    this.minimumShippingCharge,
     this.perKmShippingCharge,
     this.formatedCoordinates,
   });
@@ -39,7 +36,6 @@ class ZoneModel {
     restaurantWiseTopic = json['restaurant_wise_topic'];
     customerWiseTopic = json['customer_wise_topic'];
     deliverymanWiseTopic = json['deliveryman_wise_topic'];
-    minimumShippingCharge = json['minimum_shipping_charge']?.toDouble();
     perKmShippingCharge = json['per_km_shipping_charge']?.toDouble();
     if (json['formated_coordinates'] != null) {
       formatedCoordinates = <FormatedCoordinates>[];
@@ -60,7 +56,6 @@ class ZoneModel {
     data['restaurant_wise_topic'] = restaurantWiseTopic;
     data['customer_wise_topic'] = customerWiseTopic;
     data['deliveryman_wise_topic'] = deliverymanWiseTopic;
-    data['minimum_shipping_charge'] = minimumShippingCharge;
     data['per_km_shipping_charge'] = perKmShippingCharge;
     if (formatedCoordinates != null) {
       data['formated_coordinates'] = formatedCoordinates!.map((v) => v.toJson()).toList();
@@ -71,26 +66,16 @@ class ZoneModel {
 
 class Coordinates {
   String? type;
-  List<LatLng>? coordinates;
 
-  Coordinates({this.type, this.coordinates});
+  Coordinates({this.type});
 
   Coordinates.fromJson(Map<String, dynamic> json) {
     type = json['type'];
-    if (json['coordinates'] != null) {
-      coordinates = <LatLng>[];
-      json['coordinates'][0].forEach((v) {
-        coordinates!.add(LatLng(double.parse(v[0].toString()), double.parse(v[1].toString())));
-      });
-    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['type'] = type;
-    if (coordinates != null) {
-      data['coordinates'] = coordinates!.map((v) => v.toJson()).toList();
-    }
     return data;
   }
 }

@@ -15,7 +15,7 @@ class LanguageRepository implements LanguageRepositoryInterface {
   void updateHeader(Locale locale) {
     apiClient.updateHeader(
       sharedPreferences.getString(AppConstants.token), locale.languageCode,
-      Get.find<ProfileController>().profileModel != null ? Get.find<ProfileController>().profileModel!.stores![0].module!.id : null,
+      Get.find<ProfileController>().profileModel?.stores?.module?.id,
       sharedPreferences.getString(AppConstants.type),
     );
   }

@@ -1,8 +1,10 @@
-import 'package:sixam_mart_store/common/models/config_model.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
+import 'package:sixam_mart_store/common/models/config_model.dart';
+import 'package:sixam_mart_store/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_store/features/splash/domain/services/splash_service_interface.dart';
+import 'package:sixam_mart_store/helper/route_helper.dart';
 
 class SplashController extends GetxController implements GetxService {
   final SplashServiceInterface splashServiceInterface;
@@ -23,14 +25,34 @@ class SplashController extends GetxController implements GetxService {
   String? _moduleType;
   String? get moduleType => _moduleType;
 
+  // Translated distance unit coming from config (`distance_unit`: km/mi).
+  // Falls back to km when the backend does not send the field.
+  String get distanceUnit =>
+      _configModel?.distanceUnit?.trim().toLowerCase() == 'mi' ? 'mi'.tr : 'km'.tr;
+
   Map<String, dynamic>? _data = {};
 
-  Future<bool> getConfigData() async {
+  Future<bool> getConfigData({bool handleMaintenanceMode = false, bool closeRoute = false}) async {
     Response response = await splashServiceInterface.getConfigData();
     bool isSuccess = false;
     if(response.statusCode == 200) {
-      _data = response.body;
-      _configModel = ConfigModel.fromJson(response.body);
+      _data = response.contentMap;
+      _configModel = ConfigModel.fromJson(_data!);
+
+      splashServiceInterface.handleInitialTopicSubscription();
+      if (closeRoute) return true;
+      bool isMaintenanceMode = _configModel!.maintenanceMode!;
+      String platform = 'vendor_app';
+      bool isInMaintenance = isMaintenanceMode && _configModel!.maintenanceModeData!.maintenanceSystemSetup!.contains(platform);
+
+      if(isInMaintenance) {
+        Get.offNamed(RouteHelper.getUpdateRoute(false));
+      } else if((!isInMaintenance && Get.find<AuthController>().isLoggedIn())){
+        Get.offAllNamed(RouteHelper.getInitialRoute());
+      } else {
+        Get.offAllNamed(RouteHelper.getSignInRoute());
+      }
+
       isSuccess = true;
     }else {
       isSuccess = false;
@@ -55,21 +77,6 @@ class SplashController extends GetxController implements GetxService {
     splashServiceInterface.setIntro(intro);
   }
 
-  bool isRestaurantClosed() {
-    DateTime open = DateFormat('hh:mm').parse('');
-    DateTime close = DateFormat('hh:mm').parse('');
-    DateTime openTime = DateTime(_currentTime.year, _currentTime.month, _currentTime.day, open.hour, open.minute);
-    DateTime closeTime = DateTime(_currentTime.year, _currentTime.month, _currentTime.day, close.hour, close.minute);
-    if(closeTime.isBefore(openTime)) {
-      closeTime = closeTime.add(const Duration(days: 1));
-    }
-    if(_currentTime.isAfter(openTime) && _currentTime.isBefore(closeTime)) {
-      return false;
-    }else {
-      return true;
-    }
-  }
-
   void setFirstTimeConnectionCheck(bool isChecked) {
     _firstTimeConnectionCheck = isChecked;
   }
@@ -90,8 +97,8 @@ class SplashController extends GetxController implements GetxService {
   }
 
   Module getStoreModuleConfig() {
-    Module module = Module.fromJson(_data!['module_config'][Get.find<ProfileController>().profileModel!.stores!.first.module!.moduleType]);
-    Get.find<ProfileController>().profileModel!.stores!.first.module!.moduleType == 'food' ? module.newVariation = true : module.newVariation = false;
+    Module module = Module.fromJson(_data!['module_config'][Get.find<ProfileController>().profileModel!.stores!.module!.moduleType]);
+    Get.find<ProfileController>().profileModel!.stores!.module!.moduleType == 'food' ? module.newVariation = true : module.newVariation = false;
     return module;
   }
 

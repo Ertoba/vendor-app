@@ -4,7 +4,7 @@ import 'package:sixam_mart_store/features/auth/controllers/auth_controller.dart'
 import 'package:sixam_mart_store/features/auth/domain/models/module_permission_model.dart';
 import 'package:sixam_mart_store/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_store/features/profile/domain/models/profile_model.dart';
-import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
+import 'package:sixam_mart_store/helper/date_converter_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
 import 'package:get/get.dart';
@@ -52,22 +52,10 @@ class ProfileController extends GetxController implements GetxService {
     ProfileModel? profileModel = await profileServiceInterface.getProfileInfo();
     if (profileModel != null) {
       _profileModel = profileModel;
-      final store = _profileModel?.stores?.isNotEmpty == true
-          ? _profileModel!.stores!.first
-          : null;
-      final module = store?.module;
-
-      if (module?.id != null && module?.moduleType != null) {
-        Get.find<SplashController>().setModule(module!.id, module.moduleType);
+      Module? module = profileModel.stores?.module;
+      if (module != null) {
+        Get.find<SplashController>().setModule(module.id, module.moduleType);
         profileServiceInterface.updateHeader(module.id);
-
-        if (module.moduleType == 'ecommerce' && Get.isRegistered<StoreController>()) {
-          try {
-            await Get.find<StoreController>().getBrandList(null);
-          } catch (error) {
-            debugPrint('Brand list preload failed: $error');
-          }
-        }
       }
       _allowModulePermission(_profileModel?.roles);
     }
@@ -133,6 +121,8 @@ class ProfileController extends GetxController implements GetxService {
         advertisementList: module.contains('advertisement_list'),
         deliveryman: module.contains('deliveryman'),
         deliverymanList: module.contains('deliveryman_list'),
+        serviceman: module.contains('serviceman'),
+        servicemanList: module.contains('serviceman_list'),
         wallet: module.contains('wallet'),
         walletMethod: module.contains('wallet_method'),
         role: module.contains('role'),
@@ -146,13 +136,15 @@ class ProfileController extends GetxController implements GetxService {
         businessPlan: module.contains('business_plan'),
         reviews: module.contains('reviews'),
         chat: module.contains('chat'),
+        reels: module.contains('reels'),
       );
     } else {
       _modulePermissionBody = ModulePermissionModel(
         dashboard: true, profile: true, order: true, pos: true, item: true, addon: true, category: true, campaign: true, coupon: true, banner: true,
-        advertisement: true, advertisementList: true, deliveryman: true, deliverymanList: true, wallet: true, walletMethod: true, role: true,
+        advertisement: true, advertisementList: true, deliveryman: true, deliverymanList: true, serviceman: true, servicemanList: true,
+        wallet: true, walletMethod: true, role: true,
         employee: true, expenseReport: true, disbursementReport: true, vatReport: true, storeSetup: true, notificationSetup: true,
-        myShop: true, businessPlan: true, reviews: true, chat: true,
+        myShop: true, businessPlan: true, reviews: true, chat: true, reels: true,
       );
     }
   }
@@ -179,6 +171,19 @@ class ProfileController extends GetxController implements GetxService {
   void setBackgroundNotificationActive(bool isActive) {
     _backgroundNotification = isActive;
     update();
+  }
+
+  bool get isTrialActive {
+    if (profileModel?.subscription == null) return false;
+
+    final sub = profileModel!.subscription!;
+    if (sub.isTrial != true || sub.status != 1 || sub.expiryDate == null) {
+      return false;
+    }
+
+    final expiry = DateTime.tryParse(sub.expiryDate!);
+    if (expiry == null) return false;
+    return DateConverterHelper.differenceInDaysIgnoringTime(expiry, null) > 0;
   }
 
 }

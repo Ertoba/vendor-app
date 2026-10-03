@@ -29,7 +29,8 @@ class SelectLocationAndModuleViewWidget extends StatefulWidget {
   final GoogleMapController? mapController;
   final TextEditingController? addressController;
   final FocusNode? addressFocus;
-  const SelectLocationAndModuleViewWidget({super.key, required this.fromView, this.mapController, this.addressController, this.addressFocus});
+  final List<Widget>? footer;
+  const SelectLocationAndModuleViewWidget({super.key, required this.fromView, this.mapController, this.addressController, this.addressFocus, this.footer});
 
   @override
   State<SelectLocationAndModuleViewWidget> createState() => _SelectLocationAndModuleViewWidgetState();
@@ -116,6 +117,8 @@ class _SelectLocationAndModuleViewWidgetState extends State<SelectLocationAndMod
                 required: true,
                 validator: (value) => ValidateCheck.validateEmptyText(value, "store_address_field_is_required".tr),
               ) : const SizedBox(),
+
+              if(widget.fromView && widget.footer != null) ...widget.footer!,
 
             ]),
           ),

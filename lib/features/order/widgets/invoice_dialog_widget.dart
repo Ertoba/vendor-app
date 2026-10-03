@@ -34,7 +34,7 @@ class InvoiceDialogWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     double fontSize = View.of(context).physicalSize.width > 1000 ? Dimensions.fontSizeExtraSmall : Dimensions.paddingSizeSmall;
     // ScreenshotController controller = ScreenshotController();
-    Store store = Get.find<ProfileController>().profileModel!.stores![0];
+    Store store = Get.find<ProfileController>().profileModel!.stores!;
 
     double itemsPrice = 0;
     double addOns = 0;
@@ -49,8 +49,12 @@ class InvoiceDialogWidget extends StatelessWidget {
       itemsPrice = (orderAmount + discount) - ((taxIncluded ? 0 : tax) + deliveryCharge + additionalCharge) - dmTips;
     }
     for(OrderDetailsModel orderDetails in orderDetails!) {
-      for(AddOn addOn in orderDetails.addOns!) {
-        addOns = addOns + (addOn.price! * addOn.quantity!);
+      /// A BOGO bundle line is priced as a unit — its add-ons are already inside
+      /// that price, so counting them again would inflate the invoice.
+      if(!orderDetails.isBogoItem) {
+        for(AddOn addOn in orderDetails.addOns!) {
+          addOns = addOns + (addOn.price! * addOn.quantity!);
+        }
       }
       if(!isPrescriptionOrder!) {
         itemsPrice = itemsPrice + (orderDetails.price! * orderDetails.quantity!);
@@ -149,8 +153,10 @@ class InvoiceDialogWidget extends StatelessWidget {
                   itemBuilder: (context, index) {
 
                     String addOnText = '';
-                    for (var addOn in orderDetails![index].addOns!) {
-                      addOnText = '$addOnText${(addOnText.isEmpty) ? '' : ',  '}${addOn.name} (${addOn.quantity})';
+                    if(!orderDetails![index].isBogoItem) {
+                      for (var addOn in orderDetails![index].addOns!) {
+                        addOnText = '$addOnText${(addOnText.isEmpty) ? '' : ',  '}${addOn.name} (${addOn.quantity})';
+                      }
                     }
 
                     String variationText = '';

@@ -5,6 +5,7 @@ import 'package:sixam_mart_store/features/chat/domain/models/conversation_model.
 import 'package:sixam_mart_store/features/chat/domain/models/message_model.dart';
 import 'package:sixam_mart_store/features/chat/domain/repositories/chat_repository_interface.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class ChatRepository implements ChatRepositoryInterface {
   final ApiClient apiClient;
@@ -16,7 +17,7 @@ class ChatRepository implements ChatRepositoryInterface {
     ConversationsModel? conversationModel;
     Response response = await apiClient.getData('${AppConstants.getConversationListUri}?offset=$offset&limit=10');
     if(response.statusCode == 200) {
-      conversationModel = ConversationsModel.fromJson(response.body);
+      conversationModel = ConversationsModel.fromJson(response.contentMap);
     }
     return conversationModel;
   }
@@ -26,7 +27,7 @@ class ChatRepository implements ChatRepositoryInterface {
     ConversationsModel? searchConversationModel;
     Response response = await apiClient.getData('${AppConstants.searchConversationListUri}?name=$name&limit=20&offset=1');
     if(response.statusCode == 200) {
-      searchConversationModel = ConversationsModel.fromJson(response.body);
+      searchConversationModel = ConversationsModel.fromJson(response.contentMap);
     }
     return searchConversationModel;
   }
@@ -36,8 +37,8 @@ class ChatRepository implements ChatRepositoryInterface {
     MessageModel? messageModel;
     Response response = await apiClient.getData('${AppConstants.getMessageListUri}?offset=$offset&limit=10&${conversationID != null ?
     'conversation_id' : userType == AppConstants.deliveryMan ? 'delivery_man_id' : 'user_id'}=${conversationID ?? userId}');
-    if(response.statusCode == 200 && response.body['messages'] != {}) {
-      messageModel = MessageModel.fromJson(response.body);
+    if(response.statusCode == 200 && response.contentMap['messages'] != {}) {
+      messageModel = MessageModel.fromJson(response.contentMap);
     }
     return messageModel;
   }
@@ -48,7 +49,7 @@ class ChatRepository implements ChatRepositoryInterface {
     Response response = await apiClient.postMultipartData(AppConstants.sendMessageUri,
       {'message': message, 'receiver_type': userType, conversationId != null ? 'conversation_id' : 'receiver_id': '${conversationId ?? userId}', 'offset': '1', 'limit': '10'}, images);
     if(response.statusCode == 200) {
-      messageModel = MessageModel.fromJson(response.body);
+      messageModel = MessageModel.fromJson(response.contentMap);
     }
     return messageModel;
   }

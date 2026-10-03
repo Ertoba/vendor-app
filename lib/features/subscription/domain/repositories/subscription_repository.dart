@@ -4,6 +4,7 @@ import 'package:sixam_mart_store/features/subscription/domain/models/subscriptio
 import 'package:sixam_mart_store/features/subscription/domain/repositories/subscription_repository_interface.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class SubscriptionRepository implements SubscriptionRepositoryInterface {
   final ApiClient apiClient;
@@ -19,7 +20,7 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface {
     SubscriptionTransactionModel? subscriptionTransactionModel;
     Response response = await apiClient.getData('${AppConstants.subscriptionTransactionUri}?limit=10&offset=$offset&restaurant_id=$restaurantId&from=$from&to=$to&search=${searchText ?? ''}');
     if(response.statusCode == 200){
-      subscriptionTransactionModel = SubscriptionTransactionModel.fromJson(response.body);
+      subscriptionTransactionModel = SubscriptionTransactionModel.fromJson(response.contentMap);
     }
     return subscriptionTransactionModel;
   }
@@ -34,7 +35,7 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface {
     CheckProductLimitModel? checkProductLimitModel;
     Response response = await apiClient.getData('${AppConstants.checkProductLimitsUri}?store_id=$storeId&package_id=$packageId');
     if(response.statusCode == 200){
-      checkProductLimitModel = CheckProductLimitModel.fromJson(response.body);
+      checkProductLimitModel = CheckProductLimitModel.fromJson(response.contentMap);
     }
     return checkProductLimitModel;
   }

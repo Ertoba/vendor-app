@@ -27,12 +27,28 @@ class _SubscriptionDetailsWidgetState extends State<SubscriptionDetailsWidget> {
 
   final JustTheController tooltipController = JustTheController();
 
+  double _getCommissionPercentage() {
+    final stores = widget.subscriptionController.profileModel?.stores;
+    final storeCommission = stores?.comission;
+
+    if(storeCommission != null && storeCommission > 0) {
+      return storeCommission;
+    }
+
+    return Get.find<SplashController>().configModel?.adminCommission ?? 0;
+  }
+
+  String _formatCommissionPercentage(double commission) {
+    return commission == commission.roundToDouble() ? commission.toStringAsFixed(0) : commission.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
 
-    bool businessIsCommission = widget.subscriptionController.profileModel!.stores![0].storeBusinessModel == 'commission';
+    bool businessIsCommission = widget.subscriptionController.profileModel!.stores!.storeBusinessModel == 'commission';
     int remainingDays = widget.subscriptionController.profileModel!.subscription != null ? DateConverterHelper.differenceInDaysIgnoringTime(DateTime.parse(widget.subscriptionController.profileModel!.subscription!.expiryDate!), null) : 0;
     bool isRental = Get.find<AuthController>().getModuleType() == 'rental';
+    final String commissionPercentageText = _formatCommissionPercentage(_getCommissionPercentage());
 
     return Column(children: [
 
@@ -75,7 +91,7 @@ class _SubscriptionDetailsWidgetState extends State<SubscriptionDetailsWidget> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '${widget.subscriptionController.profileModel!.stores![0].comission} %',
+                          '$commissionPercentageText %',
                           style: robotoBold.copyWith(color: const Color(0xff006161), fontSize: 24),
                         ),
                         const SizedBox(width: Dimensions.paddingSizeSmall),
@@ -90,7 +106,7 @@ class _SubscriptionDetailsWidgetState extends State<SubscriptionDetailsWidget> {
                   const SizedBox(height: Dimensions.paddingSizeDefault),
 
                   Text(
-                    "${'vendor_will_pay'.tr} ${widget.subscriptionController.profileModel!.stores![0].comission}% ${'commission_to'.tr} ${Get.find<SplashController>().configModel!.businessName} ${'from_each_order_You_will_get_access_of_all'.tr}",
+                    "${'vendor_will_pay'.tr} $commissionPercentageText% ${'commission_to'.tr} ${Get.find<SplashController>().configModel?.businessName ?? ''} ${'from_each_order_You_will_get_access_of_all'.tr}",
                     style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7), height: 2), textAlign: TextAlign.start,
                   )
                   
@@ -113,7 +129,7 @@ class _SubscriptionDetailsWidgetState extends State<SubscriptionDetailsWidget> {
                   child: Text('expired'.tr, style: robotoMedium.copyWith(color: Colors.white)),
                 ) : const SizedBox(),
 
-                widget.subscriptionController.profileModel!.subscription!.status == 0 ? widget.subscriptionController.profileModel!.subscription!.isCanceled == 1 ? Container(
+                widget.subscriptionController.profileModel!.subscription!.status == 0 ? widget.subscriptionController.profileModel!.subscription!.isCanceled == true ? Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.error,
                     borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
@@ -310,14 +326,14 @@ class _SubscriptionDetailsWidgetState extends State<SubscriptionDetailsWidget> {
           ),
           SizedBox(height: !businessIsCommission ? Dimensions.paddingSizeDefault : 0),
 
-          !businessIsCommission && widget.subscriptionController.profileModel!.subscription!.isCanceled == 0 ? InkWell(
+          !businessIsCommission && widget.subscriptionController.profileModel!.subscription!.isCanceled == false ? InkWell(
             onTap: () {
               Get.dialog(SubscriptionDialogWidget(
                 icon: Images.support,
                 title: 'are_you_sure'.tr,
                 description: '${'if_you_cancel_the_subscription_after'.tr} $remainingDays ${'days_you_will_no_longer_be_able_to_run_the_business_before_subscribe_to_a_new_plan'.tr}',
                 onYesPressed: () {
-                  widget.subscriptionController.cancelSubscription(widget.subscriptionController.profileModel!.stores![0].id!, widget.subscriptionController.profileModel!.subscription!.id!);
+                  widget.subscriptionController.cancelSubscription(widget.subscriptionController.profileModel!.stores!.id!, widget.subscriptionController.profileModel!.subscription!.id!);
                 },
               ), useSafeArea: false);
             },

@@ -1,3 +1,5 @@
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
+
 class SubscriptionTransactionModel {
   int? totalSize;
   int? limit;
@@ -12,12 +14,14 @@ class SubscriptionTransactionModel {
   });
 
   SubscriptionTransactionModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['transactions'] != null) {
+    final dynamic pageRaw = json['pagination'];
+    final Map<String, dynamic>? page = pageRaw is Map ? Map<String, dynamic>.from(pageRaw) : null;
+    totalSize = int.tryParse('${(page != null ? page['total'] : json['total_size'])}');
+    limit = int.tryParse('${(page != null ? page['per_page'] : json['limit'])}');
+    offset = (page != null ? page['current_page'] : json['offset'])?.toString();
+    if ((json['data'] ?? json['transactions']) != null) {
       transactions = <Transactions>[];
-      json['transactions'].forEach((v) {
+      (json['data'] ?? json['transactions']).forEach((v) {
         transactions!.add(Transactions.fromJson(v));
       });
     }
@@ -40,7 +44,7 @@ class Transactions {
   int? packageId;
   int? storeId;
   int? storeSubscriptionId;
-  double? price;
+  num? price;
   int? validity;
   String? paymentMethod;
   String? paymentStatus;
@@ -85,7 +89,7 @@ class Transactions {
     packageId = json['package_id'];
     storeId = json['store_id'];
     storeSubscriptionId = json['store_subscription_id'];
-    price = json['price'];
+    price = json['price']?.toDouble();
     validity = json['validity'];
     paymentMethod = json['payment_method'];
     paymentStatus = json['payment_status'];
@@ -195,7 +199,7 @@ class Store {
   Store.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
-    gstStatus = json['gst_status'];
+    gstStatus = DataParserHelper.parseBool(json['gst_status']);
     gstCode = json['gst_code'];
     if (json['translations'] != null) {
       translations = <Translations>[];

@@ -32,7 +32,9 @@ class _ChangeSubscriptionPlanBottomSheetState extends State<ChangeSubscriptionPl
   @override
   void initState() {
     super.initState();
-    _fetchPackages();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      _fetchPackages();
+    });
   }
 
   Future<void> _fetchPackages() async {
@@ -54,9 +56,9 @@ class _ChangeSubscriptionPlanBottomSheetState extends State<ChangeSubscriptionPl
   Widget build(BuildContext context) {
     return GetBuilder<SubscriptionController>(builder: (subscriptionController) {
 
-      bool businessIsCommission = subscriptionController.profileModel!.stores![0].storeBusinessModel == 'commission';
-      bool businessIsUnsubscribed = subscriptionController.profileModel!.stores![0].storeBusinessModel == 'unsubscribed';
-      bool businessIsNone = subscriptionController.profileModel!.stores![0].storeBusinessModel == 'none';
+      bool businessIsCommission = subscriptionController.profileModel!.stores!.storeBusinessModel == 'commission';
+      bool businessIsUnsubscribed = subscriptionController.profileModel!.stores!.storeBusinessModel == 'unsubscribed';
+      bool businessIsNone = subscriptionController.profileModel!.stores!.storeBusinessModel == 'none';
       bool isRentalModule = Get.find<AuthController>().getModuleType() == 'rental';
 
       if(subscriptionController.packageList != null){
@@ -139,7 +141,7 @@ class _ChangeSubscriptionPlanBottomSheetState extends State<ChangeSubscriptionPl
 
                            if(((subscriptionController.isActivePackage! && activePackageIndex != -1) && (businessIsUnsubscribed || businessIsNone))
                                || (businessIsUnsubscribed && (subscriptionController.profileModel!.subscription == null)
-                                   && (Get.find<SplashController>().configModel!.subscriptionBusinessModel != 0) && (Get.find<AuthController>().packageModel != null && Get.find<AuthController>().packageModel!.packages!.isNotEmpty)) || businessIsNone) {
+                                   && (Get.find<SplashController>().configModel!.subscriptionBusinessModel != 0) && (Get.find<AuthController>().packageModel != null && Get.find<AuthController>().packageModel!.data!.isNotEmpty)) || businessIsNone) {
                              showCustomBottomSheet(
                                child: RenewSubscriptionPlanBottomSheet(
                                  isRenew: true,
@@ -154,12 +156,12 @@ class _ChangeSubscriptionPlanBottomSheetState extends State<ChangeSubscriptionPl
                                title: 'are_you_sure'.tr,
                                description: 'you_want_to_migrate_to_commission'.tr,
                                onYesPressed: () {
-                                 subscriptionController.renewBusinessPlan(storeId: subscriptionController.profileModel!.stores![0].id.toString(), isCommission: true);
+                                 subscriptionController.renewBusinessPlan(storeId: subscriptionController.profileModel!.stores!.id.toString(), isCommission: true);
                                },
                              ), useSafeArea: false);
                            } else {
                              subscriptionController.getProductLimit(
-                               storeId: subscriptionController.profileModel!.stores![0].id!,
+                               storeId: subscriptionController.profileModel!.stores!.id!,
                                packageId: package.id!,
                                activePackage: subscriptionController.packageList![businessIsCommission ? subscriptionController.activeSubscriptionIndex : activePackageIndex],
                                package: package,

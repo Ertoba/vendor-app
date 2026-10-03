@@ -1,4 +1,5 @@
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
 
 class StoreBannerListModel {
   int? id;
@@ -38,13 +39,13 @@ class StoreBannerListModel {
     title = json['title'];
     type = json['type'];
     imageFullUrl = json['image_full_url'];
-    status = json['status'];
+    status = DataParserHelper.parseBool(json['status']);
     data = json['data'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     zoneId = json['zone_id'];
     moduleId = json['module_id'];
-    featured = json['featured'];
+    featured = DataParserHelper.parseBool(json['featured']);
     defaultLink = json['default_link'];
     createdBy = json['created_by'];
     if (json['translations'] != null) {

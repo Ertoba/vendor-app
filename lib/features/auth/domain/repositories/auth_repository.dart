@@ -8,6 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart_store/features/auth/domain/repositories/auth_repository_interface.dart';
+import 'package:sixam_mart_store/api/api_response.dart';
 
 class AuthRepository implements AuthRepositoryInterface {
   final ApiClient apiClient;
@@ -42,6 +43,7 @@ class AuthRepository implements AuthRepositoryInterface {
     if(!GetPlatform.isWeb) {
       FirebaseMessaging.instance.subscribeToTopic(AppConstants.topic);
       FirebaseMessaging.instance.subscribeToTopic(sharedPreferences.getString(AppConstants.zoneTopic)!);
+      FirebaseMessaging.instance.subscribeToTopic(AppConstants.maintenanceModeTopic);
     }
     return await apiClient.postData(AppConstants.tokenUri, {"_method": "put", "token": getUserToken(), "fcm_token": deviceToken}, handleError: false);
   }
@@ -161,7 +163,7 @@ class AuthRepository implements AuthRepositoryInterface {
     PackageModel? packageModel;
     Response response = await apiClient.getData('${AppConstants.restaurantPackagesUri}?module_id=$moduleId');
     if(response.statusCode == 200) {
-      packageModel = PackageModel.fromJson(response.body);
+      packageModel = PackageModel.fromJson(response.contentMap);
     }
     return packageModel;
   }
