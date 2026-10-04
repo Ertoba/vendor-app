@@ -2935,5 +2935,17 @@
   "your_takeaway_order_has_been_placed_successfully": "Your takeaway order has been placed successfully. We are preparing it and will be ready for pickup soon.",
   "insert_delivery_location": "Insert Delivery Location",
   "please_insert_delivery_location": "Please add your  delivery location so we can check whether the store delivers to your area.",
-  "module_is_not_available": "Module is not available"
+  "module_is_not_available": "Module is not available",
+  "product_video": "Видео товара",
+  "upload_video_file": "Загрузить видеофайл",
+  "use_video_link": "Использовать ссылку на видео",
+  "video_link": "Ссылка на видео",
+  "enter_video_link": "Введите ссылку YouTube, Vimeo или прямую ссылку на видео",
+  "preview_video": "Предпросмотр видео",
+  "remove_video": "Удалить видео",
+  "product_video_ready": "Видео товара готово",
+  "product_video_optional_hint": "Необязательно. Загрузите MP4, WEBM или OGG размером до @size МБ либо используйте ссылку YouTube, Vimeo или прямую ссылку на видео.",
+  "invalid_product_video_link": "Введите корректную ссылку http/https на видео.",
+  "unsupported_product_video_format": "Используйте видеофайл MP4, WEBM или OGG.",
+  "product_video_max_size": "Размер видео не должен превышать @size МБ."
 }

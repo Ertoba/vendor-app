@@ -110,6 +110,13 @@ class Item {
   String? metaImageFullUrl;
   String? videoFullUrl;
   String? videoLink;
+  String? videoPreviewType;
+  String? videoPreviewUrl;
+  String? videoEmbedUrl;
+  String? videoThumbnailUrl;
+  String? videoPreviewModalType;
+  String? videoPreviewModalUrl;
+  bool? hasVideoSource;
   double? videoSize;
   MetaSeoData? metaData;
   int? storeCategoryId;
@@ -175,6 +182,13 @@ class Item {
     this.metaImageFullUrl,
     this.videoFullUrl,
     this.videoLink,
+    this.videoPreviewType,
+    this.videoPreviewUrl,
+    this.videoEmbedUrl,
+    this.videoThumbnailUrl,
+    this.videoPreviewModalType,
+    this.videoPreviewModalUrl,
+    this.hasVideoSource,
     this.videoSize,
     this.metaData,
     this.storeCategoryId,
@@ -333,8 +347,19 @@ class Item {
     metaTitle = json['meta_title'];
     metaDescription = json['meta_description'];
     metaImageFullUrl = json['meta_image'];
-    videoFullUrl = json['video_full_url'];
-    videoLink = json['video_link'];
+    videoFullUrl = json['video_full_url']?.toString();
+    videoLink = json['video_link']?.toString();
+    videoPreviewType = json['video_preview_type']?.toString();
+    videoPreviewUrl = json['video_preview_url']?.toString();
+    videoEmbedUrl = json['video_embed_url']?.toString();
+    videoThumbnailUrl = json['video_thumbnail_url']?.toString();
+    videoPreviewModalType =
+        json['video_preview_modal_type']?.toString();
+    videoPreviewModalUrl =
+        json['video_preview_modal_url']?.toString();
+    hasVideoSource =
+        json['has_video_source'] == true ||
+        json['has_video_source']?.toString() == '1';
     videoSize = double.tryParse(json['video_size'].toString());
     metaData = json['meta_data'] != null ? MetaSeoData.fromJson(json['meta_data']) : null;
     storeCategoryId = json['store_category_id'];
@@ -431,6 +456,13 @@ class Item {
     data['meta_image'] = metaImageFullUrl;
     data['video_full_url'] = videoFullUrl;
     data['video_link'] = videoLink;
+    data['video_preview_type'] = videoPreviewType;
+    data['video_preview_url'] = videoPreviewUrl;
+    data['video_embed_url'] = videoEmbedUrl;
+    data['video_thumbnail_url'] = videoThumbnailUrl;
+    data['video_preview_modal_type'] = videoPreviewModalType;
+    data['video_preview_modal_url'] = videoPreviewModalUrl;
+    data['has_video_source'] = hasVideoSource;
     data['video_size'] = videoSize;
     if (metaData != null) {
       data['meta_data'] = metaData!.toJson();

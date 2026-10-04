@@ -1678,5 +1678,17 @@
   "book_now_button": "এখনই বুক করুন বাটন",
   "show_book_now_button_on_reel": "রিলে 'এখনই বুক করুন' বাটন দেখান",
   "no_vehicle_found": "কোনো গাড়ি পাওয়া যায়নি",
-  "Select_vehicle": "গাড়ি নির্বাচন করুন"
+  "Select_vehicle": "গাড়ি নির্বাচন করুন",
+  "product_video": "পণ্যের ভিডিও",
+  "upload_video_file": "ভিডিও ফাইল আপলোড করুন",
+  "use_video_link": "ভিডিও লিংক ব্যবহার করুন",
+  "video_link": "ভিডিও লিংক",
+  "enter_video_link": "YouTube, Vimeo বা সরাসরি ভিডিও লিংক লিখুন",
+  "preview_video": "ভিডিও প্রিভিউ",
+  "remove_video": "ভিডিও সরান",
+  "product_video_ready": "পণ্যের ভিডিও প্রস্তুত",
+  "product_video_optional_hint": "ঐচ্ছিক। সর্বোচ্চ @size এমবি পর্যন্ত MP4, WEBM বা OGG আপলোড করুন, অথবা YouTube, Vimeo বা সরাসরি ভিডিও লিংক ব্যবহার করুন।",
+  "invalid_product_video_link": "সঠিক http/https ভিডিও লিংক লিখুন।",
+  "unsupported_product_video_format": "MP4, WEBM বা OGG ভিডিও ফাইল ব্যবহার করুন।",
+  "product_video_max_size": "ভিডিওর আকার @size এমবি বা তার কম হতে হবে।"
 }

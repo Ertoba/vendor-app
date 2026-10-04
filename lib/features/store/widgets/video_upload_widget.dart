@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:sixam_mart_store/common/widgets/custom_video_player_widget.dart';
+import 'package:sixam_mart_store/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_store/features/ai/widgets/animated_border_container.dart';
 import 'package:sixam_mart_store/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart_store/features/store/domain/models/item_model.dart';
@@ -116,6 +118,87 @@ class _ProductVideoWidgetState extends State<ProductVideoWidget> {
     return limit % 1 == 0 ? limit.toInt().toString() : limit.toString();
   }
 
+  String _normalizeVideoLink(String value) {
+    String link = value.trim();
+
+    if (link.isEmpty) {
+      return '';
+    }
+
+    if (link.startsWith('//')) {
+      return 'https:$link';
+    }
+
+    if (!RegExp(r'^[a-zA-Z][a-zA-Z0-9+.-]*://').hasMatch(link) &&
+        RegExp(r'^(www\\.)?[\\w.-]+\\.[a-zA-Z]{2,}([/?#].*)?$')
+            .hasMatch(link)) {
+      link = 'https://$link';
+    }
+
+    return link;
+  }
+
+  bool _isValidVideoLink(String value) {
+    final String normalized = _normalizeVideoLink(value);
+    final Uri? uri = Uri.tryParse(normalized);
+
+    return uri != null &&
+        (uri.scheme == 'http' || uri.scheme == 'https') &&
+        uri.host.isNotEmpty;
+  }
+
+  bool _isDirectVideoLink(String value) {
+    final Uri? uri = Uri.tryParse(
+      _normalizeVideoLink(value),
+    );
+
+    final String path =
+        uri?.path.toLowerCase() ?? '';
+
+    return path.endsWith('.mp4') ||
+        path.endsWith('.webm') ||
+        path.endsWith('.ogg');
+  }
+
+  Future<void> _previewLinkedVideo(
+    StoreController storeController,
+  ) async {
+    final String link = _normalizeVideoLink(
+      _linkController.text,
+    );
+
+    if (!_isValidVideoLink(link)) {
+      showCustomSnackBar(
+        'invalid_product_video_link'.tr,
+      );
+      return;
+    }
+
+    storeController.setVideoLink(link);
+
+    if (_isDirectVideoLink(link)) {
+      Get.to(
+        () => CustomVideoPlayerPage(
+          filePath: link,
+          isNetwork: true,
+          title: link,
+        ),
+      );
+      return;
+    }
+
+    final bool launched = await launchUrl(
+      Uri.parse(link),
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!launched) {
+      showCustomSnackBar(
+        'invalid_product_video_link'.tr,
+      );
+    }
+  }
+
   void _openVideoPlayerPage(StoreController storeController) {
     final String? videoPath = storeController.rawVideo?.path;
     final String? remoteVideoUrl = _savedVideoFullUrl();
@@ -137,9 +220,17 @@ class _ProductVideoWidgetState extends State<ProductVideoWidget> {
       return null;
     }
 
-    final String? fullUrl = widget.item?.videoFullUrl?.trim();
-    if (fullUrl != null && fullUrl.isNotEmpty) {
-      return fullUrl;
+    final List<String?> candidates = [
+      widget.item?.videoFullUrl,
+      widget.item?.videoPreviewUrl,
+      widget.item?.videoPreviewModalUrl,
+    ];
+
+    for (final String? candidate in candidates) {
+      final String value = candidate?.trim() ?? '';
+      if (value.isNotEmpty) {
+        return value;
+      }
     }
 
     return null;
@@ -191,7 +282,7 @@ class _ProductVideoWidgetState extends State<ProductVideoWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Product Video',
+                'product_video'.tr,
                 style: robotoBold.copyWith(
                   fontSize: Dimensions.fontSizeDefault,
                   color: theme.textTheme.bodyLarge?.color,
@@ -255,14 +346,14 @@ class _ProductVideoWidgetState extends State<ProductVideoWidget> {
         children: [
           Expanded(
             child: _RadioOption(
-              label: 'Upload Video',
+              label: 'upload_video_file'.tr,
               selected: _isUploadMode,
               onTap: () => _setUploadMode(true),
             ),
           ),
           Expanded(
             child: _RadioOption(
-              label: 'Upload Video Link',
+              label: 'use_video_link'.tr,
               selected: !_isUploadMode,
               onTap: () => _setUploadMode(false),
             ),
@@ -354,7 +445,7 @@ class _ProductVideoWidgetState extends State<ProductVideoWidget> {
                     ),
                     const SizedBox(height: Dimensions.paddingSizeSmall - 2),
                     Text(
-                      'Add Video',
+                      'upload_video_file'.tr,
                       style: robotoMedium.copyWith(
                         color: theme.primaryColor,
                         fontSize: Dimensions.fontSizeSmall + 1,
@@ -393,7 +484,7 @@ class _ProductVideoWidgetState extends State<ProductVideoWidget> {
   Widget _buildUploadedPreview(StoreController storeController, {String? remoteVideoUrl}) {
     final theme = Theme.of(context);
     final bool isNetwork = storeController.rawVideo == null;
-    final String displayLabel = storeController.rawVideo?.name ?? 'Saved video preview';
+    final String displayLabel = storeController.rawVideo?.name ?? 'product_video_ready'.tr;
     final String? savedVideoSize = widget.item?.videoSize != null ? Functions.getSizeWithUnit(num.tryParse(widget.item?.videoSize?.toString() ?? '')?.toInt() ?? 0) : null;
 
     return Column(
@@ -489,7 +580,7 @@ class _ProductVideoWidgetState extends State<ProductVideoWidget> {
         const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
         Text(
-          'Tap preview to play',
+          'preview_video'.tr,
           style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: theme.primaryColor,),
         ),
         const SizedBox(height: Dimensions.paddingSizeExtraSmall - 1),
@@ -553,7 +644,7 @@ class _ProductVideoWidgetState extends State<ProductVideoWidget> {
         children: [
           Row(children: [
             Text(
-              'Provide Video Link',
+              'video_link'.tr,
               style: robotoSemiBold.copyWith(fontSize: Dimensions.fontSizeSmall + 1, color: theme.textTheme.bodyMedium?.color,),
             ),
           ]),
@@ -589,9 +680,26 @@ class _ProductVideoWidgetState extends State<ProductVideoWidget> {
               ),
             ),
           ),
-          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+          const SizedBox(height: Dimensions.paddingSizeSmall),
 
-          Text('Paste the video URL only. It will be saved with the product.',
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () =>
+                  _previewLinkedVideo(storeController),
+              icon: const Icon(
+                Icons.visibility_outlined,
+              ),
+              label: Text(
+                'preview_video'.tr,
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: Dimensions.paddingSizeExtraSmall,
+          ),
+
+          Text('enter_video_link'.tr,
             style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: theme.disabledColor,),
           ),
         ],

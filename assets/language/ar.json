@@ -1679,5 +1679,17 @@
   "book_now_button": "زر احجز الآن",
   "show_book_now_button_on_reel": "عرض زر 'احجز الآن' على الريل",
   "no_vehicle_found": "لم يتم العثور على أي مركبة",
-  "Select_vehicle": "اختر المركبة"
+  "Select_vehicle": "اختر المركبة",
+  "product_video": "فيديو المنتج",
+  "upload_video_file": "رفع ملف فيديو",
+  "use_video_link": "استخدام رابط فيديو",
+  "video_link": "رابط الفيديو",
+  "enter_video_link": "أدخل رابط YouTube أو Vimeo أو رابط فيديو مباشر",
+  "preview_video": "معاينة الفيديو",
+  "remove_video": "إزالة الفيديو",
+  "product_video_ready": "فيديو المنتج جاهز",
+  "product_video_optional_hint": "اختياري. ارفع ملف MP4 أو WEBM أو OGG حتى @size ميجابايت، أو استخدم رابط YouTube أو Vimeo أو رابط فيديو مباشر.",
+  "invalid_product_video_link": "أدخل رابط فيديو صالحًا يبدأ بـ http/https.",
+  "unsupported_product_video_format": "استخدم ملف فيديو MP4 أو WEBM أو OGG.",
+  "product_video_max_size": "يجب ألا يتجاوز حجم الفيديو @size ميجابايت."
 }

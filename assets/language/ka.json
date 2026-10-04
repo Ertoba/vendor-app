@@ -1842,5 +1842,17 @@
   "notification_loyalty_points_earned_prefix": "თქვენ დაგერიცხათ",
   "notification_loyalty_points_converted_prefix": "თქვენ გადაცვალეთ",
   "notification_loyalty_points_unit": "ქულა",
-  "banner_images_ratio_3:1": "ბანერის სურათის თანაფარდობა 3:1"
+  "banner_images_ratio_3:1": "ბანერის სურათის თანაფარდობა 3:1",
+  "product_video": "პროდუქტის ვიდეო",
+  "upload_video_file": "ვიდეო ფაილის ატვირთვა",
+  "use_video_link": "ვიდეო ბმულის გამოყენება",
+  "video_link": "ვიდეო ბმული",
+  "enter_video_link": "შეიყვანეთ YouTube, Vimeo ან პირდაპირი ვიდეო ბმული",
+  "preview_video": "ვიდეოს ნახვა",
+  "remove_video": "ვიდეოს წაშლა",
+  "product_video_ready": "პროდუქტის ვიდეო მზადაა",
+  "product_video_optional_hint": "არასავალდებულო. ატვირთეთ MP4, WEBM ან OGG ფაილი მაქსიმუმ @size მბ-მდე, ან გამოიყენეთ YouTube, Vimeo ან პირდაპირი ვიდეო ბმული.",
+  "invalid_product_video_link": "შეიყვანეთ სწორი http/https ვიდეო ბმული.",
+  "unsupported_product_video_format": "გამოიყენეთ MP4, WEBM ან OGG ვიდეო ფაილი.",
+  "product_video_max_size": "ვიდეოს ზომა არ უნდა აღემატებოდეს @size მბ-ს."
 }

@@ -1675,5 +1675,17 @@
   "book_now_button": "Botón Reservar ahora",
   "show_book_now_button_on_reel": "Mostrar el botón 'Reservar ahora' en el reel",
   "no_vehicle_found": "No se encontró ningún vehículo",
-  "Select_vehicle": "Seleccionar vehículo"
+  "Select_vehicle": "Seleccionar vehículo",
+  "product_video": "Vídeo del producto",
+  "upload_video_file": "Subir archivo de vídeo",
+  "use_video_link": "Usar enlace de vídeo",
+  "video_link": "Enlace de vídeo",
+  "enter_video_link": "Introduce un enlace de YouTube, Vimeo o un enlace directo de vídeo",
+  "preview_video": "Vista previa del vídeo",
+  "remove_video": "Eliminar vídeo",
+  "product_video_ready": "Vídeo del producto listo",
+  "product_video_optional_hint": "Opcional. Sube MP4, WEBM u OGG de hasta @size MB o usa un enlace de YouTube, Vimeo o un enlace directo de vídeo.",
+  "invalid_product_video_link": "Introduce un enlace http/https válido.",
+  "unsupported_product_video_format": "Usa un archivo de vídeo MP4, WEBM u OGG.",
+  "product_video_max_size": "El vídeo debe tener @size MB o menos."
 }
