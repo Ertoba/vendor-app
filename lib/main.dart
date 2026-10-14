@@ -28,7 +28,9 @@ Future<void> main() async {
   Map<String, Map<String, String>> languages = await di.init();
 
   try {
-    await Firebase.initializeApp().timeout(const Duration(seconds: 15));
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp().timeout(const Duration(seconds: 15));
+    }
   } catch (error, stackTrace) {
     debugPrint('Firebase init failed: $error');
     debugPrintStack(stackTrace: stackTrace);
