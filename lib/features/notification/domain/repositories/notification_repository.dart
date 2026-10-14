@@ -16,7 +16,13 @@ class NotificationRepository implements NotificationRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.notificationUri);
     if(response.statusCode == 200){
       notificationList = [];
-      response.body.forEach((notify) {
+      final dynamic payload = response.body;
+      final List<dynamic> notifications = payload is List
+          ? payload
+          : payload is Map && payload['data'] is List
+              ? List<dynamic>.from(payload['data'] as List)
+              : <dynamic>[];
+      notifications.forEach((notify) {
         NotificationModel notification = NotificationModel.fromJson(notify);
         notification.title = notify['data']['title'];
         notification.description = notify['data']['description'].toString();

@@ -30,9 +30,10 @@ class ItemModel {
     _totalSize = json['total_size'];
     _limit = json['limit'].toString();
     _offset = json['offset'];
-    if (json['items'] != null) {
+    final dynamic rawItems = json['items'] ?? json['data'];
+    if (rawItems is List) {
       _items = [];
-      json['items'].forEach((v) {
+      rawItems.forEach((v) {
         _items!.add(Item.fromJson(v));
       });
     }

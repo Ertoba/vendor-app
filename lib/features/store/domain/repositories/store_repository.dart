@@ -293,7 +293,7 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.vendorReviewUri}?store_id=$storeID&search=$searchText');
     if(response.statusCode == 200) {
       storeReviewList = [];
-      response.body.forEach((review) => storeReviewList!.add(ReviewModel.fromJson(review)));
+      _listPayload(response.body, 'reviews').forEach((review) => storeReviewList!.add(ReviewModel.fromJson(review)));
     }
     return storeReviewList;
   }
