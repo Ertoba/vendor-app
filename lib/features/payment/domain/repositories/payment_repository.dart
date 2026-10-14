@@ -26,7 +26,7 @@ class PaymentRepository implements PaymentRepositoryInterface {
     List<WithdrawModel>? withdrawList = [];
     Response response = await apiClient.getData(AppConstants.withdrawListUri);
     if (response.statusCode == 200) {
-      response.body.forEach((withdraw) {
+      _payloadList(response.body).forEach((withdraw) {
         WithdrawModel withdrawModel = WithdrawModel.fromJson(withdraw);
         withdrawList.add(withdrawModel);
       });
@@ -46,7 +46,7 @@ class PaymentRepository implements PaymentRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.withdrawRequestMethodUri);
     if(response.statusCode == 200) {
       widthDrawMethods = [];
-      response.body.forEach((method) {
+      _payloadList(response.body).forEach((method) {
         WidthDrawMethodModel withdrawMethod = WidthDrawMethodModel.fromJson(method);
         widthDrawMethods!.add(withdrawMethod);
       });
@@ -61,7 +61,7 @@ class PaymentRepository implements PaymentRepositoryInterface {
     if(response.statusCode == 200) {
       transactions = [];
       WalletPaymentModel walletPaymentModel = WalletPaymentModel.fromJson(response.body);
-      transactions.addAll(walletPaymentModel.transactions!);
+      transactions.addAll(walletPaymentModel.transactions ?? <Transactions>[]);
     }
     return transactions;
   }
@@ -113,4 +113,23 @@ class PaymentRepository implements PaymentRepositoryInterface {
     throw UnimplementedError();
   }
 
+}
+
+List<dynamic> _payloadList(dynamic payload) {
+  if (payload is List) {
+    return payload;
+  }
+  if (payload is Map) {
+    for (final String key in <String>[
+      'data',
+      'withdrawals',
+      'withdraw_methods',
+      'methods',
+    ]) {
+      if (payload[key] is List) {
+        return List<dynamic>.from(payload[key] as List);
+      }
+    }
+  }
+  return <dynamic>[];
 }

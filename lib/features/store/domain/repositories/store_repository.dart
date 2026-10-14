@@ -389,7 +389,7 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(uri);
     if(response.statusCode == 200) {
       brands = [];
-      response.body!.forEach((brand) {
+      _listPayload(response.body, 'brands').forEach((brand) {
         brands!.add(BrandModel.fromJson(brand));
       });
     }
@@ -460,4 +460,19 @@ class StoreRepository implements StoreRepositoryInterface {
     return vatTaxList;
   }
 
+}
+
+List<dynamic> _listPayload(dynamic payload, String key) {
+  if (payload is List) {
+    return payload;
+  }
+  if (payload is Map) {
+    if (payload[key] is List) {
+      return List<dynamic>.from(payload[key] as List);
+    }
+    if (payload['data'] is List) {
+      return List<dynamic>.from(payload['data'] as List);
+    }
+  }
+  return <dynamic>[];
 }

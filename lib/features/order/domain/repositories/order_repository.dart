@@ -23,7 +23,15 @@ class OrderRepository implements OrderRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.currentOrdersUri);
     if (response.statusCode == 200) {
       runningOrderList = [];
-      response.body.forEach((order) {
+      final dynamic payload = response.body;
+      final List<dynamic> orders = payload is List
+          ? payload
+          : payload is Map && payload['orders'] is List
+              ? List<dynamic>.from(payload['orders'] as List)
+              : payload is Map && payload['data'] is List
+                  ? List<dynamic>.from(payload['data'] as List)
+                  : <dynamic>[];
+      orders.forEach((order) {
         OrderModel orderModel = OrderModel.fromJson(order);
         runningOrderList!.add(orderModel);
       });
@@ -59,7 +67,13 @@ class OrderRepository implements OrderRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.orderDetailsUri}$orderID');
     if(response.statusCode == 200) {
       orderDetailsModel = [];
-      response.body.forEach((orderDetails) => orderDetailsModel!.add(OrderDetailsModel.fromJson(orderDetails)));
+      final dynamic payload = response.body;
+      final List<dynamic> details = payload is List
+          ? payload
+          : payload is Map && payload['data'] is List
+              ? List<dynamic>.from(payload['data'] as List)
+              : <dynamic>[];
+      details.forEach((orderDetails) => orderDetailsModel!.add(OrderDetailsModel.fromJson(orderDetails)));
       log( "Order details: ${orderDetailsModel.first.toJson()}");
     }
     return orderDetailsModel;
