@@ -112,11 +112,14 @@ class ProfileModel {
     todaysEarning = json['todays_earning']?.toDouble();
     thisWeekEarning = json['this_week_earning']?.toDouble();
     thisMonthEarning = json['this_month_earning']?.toDouble();
-    if (json['stores'] != null) {
-      stores = [];
-      json['stores'].forEach((v) {
-        stores!.add(Store.fromJson(v));
-      });
+    final dynamic storesPayload = json['stores'];
+    if (storesPayload is List) {
+      stores = storesPayload
+          .whereType<Map>()
+          .map((store) => Store.fromJson(Map<String, dynamic>.from(store)))
+          .toList();
+    } else if (storesPayload is Map) {
+      stores = [Store.fromJson(Map<String, dynamic>.from(storesPayload))];
     }
     if (json['roles'] != null) {
       roles = [];
