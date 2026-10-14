@@ -4,7 +4,7 @@ import 'package:sixam_mart_store/util/images.dart';
 
 class AppConstants {
   static const String appName = 'მილი ვენდორი';
-  static const double appVersion = 4.0;
+  static const double appVersion = 4.2;
 
   ///Flutter SDK: 3.44.2
 
