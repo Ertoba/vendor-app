@@ -147,23 +147,30 @@ class ApiClient extends GetxService {
     try {
       body = jsonDecode(response.body);
     }catch(_) {}
+    // Unwrap the new API envelope centrally, while retaining legacy responses.
+    final String? envelopeMessage = envelopeMessageOf(body, response.statusCode);
+    body = unwrapEnvelope(body, response.statusCode);
     Response response0 = Response(
-      body: body ?? response.body, bodyString: response.body.toString(),
-      headers: response.headers, statusCode: response.statusCode, statusText: response.reasonPhrase,
+      body: body ?? response.body, bodyString: response.body,
+      headers: response.headers, statusCode: response.statusCode,
+      statusText: envelopeMessage ?? response.reasonPhrase,
     );
-    if(response0.statusCode != 200 && response0.body != null && response0.body is !String) {
-      if(response0.body.toString().startsWith('{errors: [{code:')) {
+    if(!isSuccessCode(response0.statusCode) && response0.body != null && response0.body is !String) {
+      final String? envelopeError = envelopeErrorMessageOf(response0.body);
+      if(envelopeError != null) {
+        response0 = Response(statusCode: response0.statusCode, body: response0.body, statusText: envelopeError);
+      } else if(response0.body.toString().startsWith('{errors: [{code:')) {
         ErrorResponse errorResponse = ErrorResponse.fromJson(response0.body);
         response0 = Response(statusCode: response0.statusCode, body: response0.body, statusText: errorResponse.errors![0].message);
       }else if(response0.body.toString().startsWith('{message')) {
         response0 = Response(statusCode: response0.statusCode, body: response0.body, statusText: response0.body['message']);
       }
-    }else if(response0.statusCode != 200 && response0.body == null) {
+    }else if(!isSuccessCode(response0.statusCode) && response0.body == null) {
       response0 = const Response(statusCode: 0, statusText: noInternetMessage);
     }
     log('====> API Response: [${response0.statusCode}] $uri\n${response0.body}');
     if(handleError) {
-      if(response0.statusCode == 200) {
+      if(isSuccessCode(response0.statusCode)) {
         return response0;
       } else {
         ApiChecker.checkApi(response0);
@@ -172,6 +179,42 @@ class ApiClient extends GetxService {
     } else {
       return response0;
     }
+  }
+  /// Treat any successful 2xx HTTP status as success.
+  static bool isSuccessCode(int? statusCode) =>
+      statusCode != null && statusCode >= 200 && statusCode < 300;
+
+  /// Preserve legacy response bodies and error envelopes. Unwrap only a
+  /// successful new-format response with a non-null content payload.
+  static dynamic unwrapEnvelope(dynamic body, int? statusCode) {
+    if (!isSuccessCode(statusCode) || body is! Map) return body;
+    if (!body.containsKey('identical_code') || body['content'] == null) return body;
+    return body['content'];
+  }
+
+  static String? envelopeMessageOf(dynamic body, int? statusCode) {
+    if (!isSuccessCode(statusCode) || body is! Map) return null;
+    if (!body.containsKey('identical_code') || body['content'] == null) return null;
+    final dynamic message = body['message'];
+    return message is String ? message : null;
+  }
+
+  /// Surface useful validation errors without losing the raw error envelope.
+  static String? envelopeErrorMessageOf(dynamic body) {
+    if (body is! Map || !body.containsKey('identical_code')) return null;
+    final dynamic errors = body['errors'];
+    if (errors is List && errors.isNotEmpty) {
+      final dynamic first = errors.first;
+      if (first is Map && first['message'] is String) {
+        return first['message'] as String;
+      }
+    } else if (errors is Map && errors.isNotEmpty) {
+      final dynamic first = errors.values.first;
+      if (first is List && first.isNotEmpty) return first.first?.toString();
+      if (first != null && first is! List) return first.toString();
+    }
+    final dynamic message = body['message'];
+    return message is String ? message : null;
   }
 }
 
