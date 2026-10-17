@@ -2947,5 +2947,10 @@
   "product_video_optional_hint": "Необязательно. Загрузите MP4, WEBM или OGG размером до @size МБ либо используйте ссылку YouTube, Vimeo или прямую ссылку на видео.",
   "invalid_product_video_link": "Введите корректную ссылку http/https на видео.",
   "unsupported_product_video_format": "Используйте видеофайл MP4, WEBM или OGG.",
-  "product_video_max_size": "Размер видео не должен превышать @size МБ."
+  "product_video_max_size": "Размер видео не должен превышать @size МБ.",
+  "ago": "назад",
+  "failed_to_assign_items": "Не удалось назначить товары",
+  "search_by_category_name": "Поиск по названию категории",
+  "select_range": "Выберите диапазон",
+  "something_went_wrong": "Что-то пошло не так"
 }
