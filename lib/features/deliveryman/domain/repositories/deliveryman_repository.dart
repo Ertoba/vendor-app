@@ -16,7 +16,7 @@ class DeliverymanRepository implements DeliverymanRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.dmListUri);
     if(response.statusCode == 200) {
       deliveryManList = [];
-      response.body.forEach((deliveryMan) => deliveryManList!.add(DeliveryManModel.fromJson(deliveryMan)));
+      response.dataList.forEach((deliveryMan) => deliveryManList!.add(DeliveryManModel.fromJson(deliveryMan)));
     }
     return deliveryManList;
   }

@@ -27,7 +27,7 @@ class BannerRepository implements BannerRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.storeBannerUri);
     if(response.statusCode == 200) {
       storeBannerList = [];
-      response.body.forEach((item) => storeBannerList!.add(StoreBannerListModel.fromJson(item)));
+      response.dataList.forEach((item) => storeBannerList!.add(StoreBannerListModel.fromJson(item)));
     }
     return storeBannerList;
   }
@@ -56,7 +56,7 @@ class BannerRepository implements BannerRepositoryInterface {
     StoreBannerListModel? bannersDetails;
     Response response = await apiClient.getData('${AppConstants.storeBannerDetailsUri}/$id');
     if(response.statusCode == 200) {
-      bannersDetails = StoreBannerListModel.fromJson(response.body);
+      bannersDetails = StoreBannerListModel.fromJson(response.contentMap);
     }
     return bannersDetails;
   }

@@ -40,7 +40,7 @@ class CouponRepository implements CouponRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.couponListUri}?limit=50&offset=$offset');
     if(response.statusCode == 200) {
       coupons = [];
-      response.body.forEach((coupon){
+      response.dataList.forEach((coupon){
         coupons!.add(CouponBodyModel.fromJson(coupon));
       });
     }
@@ -52,7 +52,7 @@ class CouponRepository implements CouponRepositoryInterface {
     CouponBodyModel? couponDetails;
     Response response = await apiClient.getData('${AppConstants.couponDetailsUri}?coupon_id=$id');
     if(response.statusCode == 200) {
-      couponDetails = CouponBodyModel.fromJson(response.body[0]);
+      couponDetails = CouponBodyModel.fromJson(response.contentMap);
     }
     return couponDetails;
   }

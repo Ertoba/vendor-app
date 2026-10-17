@@ -26,18 +26,19 @@ class DisbursementReportModel {
   });
 
   DisbursementReportModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
+    totalSize = _toInt(json['pagination']?['total'] ?? json['total_size']);
+    limit = (json['pagination']?['per_page'] ?? json['limit'])?.toString();
+    offset = (json['pagination']?['current_page'] ?? json['offset'])?.toString();
     pending = json['pending']?.toDouble();
     completed = json['completed']?.toDouble();
     canceled = json['canceled']?.toDouble();
     keepzTotalSize = _toInt(json['keepz_total_size']);
     keepzCompleted = _toDouble(json['keepz_completed']);
     completeDay = json['complete_day'];
-    if (json['disbursements'] != null) {
+    final dynamic disbursementList = json['data'] ?? json['disbursements'];
+    if (disbursementList is List) {
       disbursements = <Disbursements>[];
-      json['disbursements'].forEach((v) {
+      disbursementList.forEach((v) {
         disbursements!.add(Disbursements.fromJson(v));
       });
     }

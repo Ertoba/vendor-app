@@ -81,7 +81,7 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.attributeUri);
     if(response.statusCode == 200) {
       attributeList = [];
-      response.body.forEach((attribute) {
+      response.dataList.forEach((attribute) {
         if(item != null) {
           bool active = item.attributes!.contains(Attr.fromJson(attribute).id);
           List<String> options = [];
@@ -344,7 +344,7 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.unitListUri);
     if(response.statusCode == 200) {
       unitList = [];
-      response.body.forEach((unit) => unitList!.add(UnitModel.fromJson(unit)));
+      response.dataList.forEach((unit) => unitList!.add(UnitModel.fromJson(unit)));
     }
     return unitList;
   }
@@ -402,7 +402,7 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.suitableTagUri);
     if(response.statusCode == 200) {
       suitableTagList = [];
-      response.body.forEach((tag) {
+      response.dataList.forEach((tag) {
         suitableTagList!.add(SuitableTagModel.fromJson(tag));
       });
     }
@@ -422,7 +422,7 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.getNutritionSuggestionUri);
     if(response.statusCode == 200) {
       nutritionSuggestionList = [];
-      response.body.forEach((nutrition) => nutritionSuggestionList?.add(nutrition));
+      response.dataList.forEach((nutrition) => nutritionSuggestionList?.add(nutrition));
     }
     return nutritionSuggestionList;
   }
@@ -433,7 +433,7 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.getAllergicIngredientsSuggestionUri);
     if(response.statusCode == 200) {
       allergicIngredientsSuggestionList = [];
-      response.body.forEach((allergicIngredients) => allergicIngredientsSuggestionList?.add(allergicIngredients));
+      response.dataList.forEach((allergicIngredients) => allergicIngredientsSuggestionList?.add(allergicIngredients));
     }
     return allergicIngredientsSuggestionList;
   }
@@ -444,7 +444,7 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.getGenericNameSuggestionUri);
     if(response.statusCode == 200) {
       genericNameSuggestionList = [];
-      response.body.forEach((genericName) => genericNameSuggestionList?.add(genericName));
+      response.dataList.forEach((genericName) => genericNameSuggestionList?.add(genericName));
     }
     return genericNameSuggestionList;
   }
@@ -455,7 +455,7 @@ class StoreRepository implements StoreRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.vatTaxListUri);
     if(response.statusCode == 200) {
       vatTaxList = [];
-      response.body.forEach((vatTax) => vatTaxList!.add(VatTaxModel.fromJson(vatTax)));
+      response.dataList.forEach((vatTax) => vatTaxList!.add(VatTaxModel.fromJson(vatTax)));
     }
     return vatTaxList;
   }

@@ -62,7 +62,7 @@ class AddonRepository implements AddonRepositoryInterface<AddOns> {
     Response response = await apiClient.getData(AppConstants.addonUri);
     if(response.statusCode == 200) {
       addonList = [];
-      response.body.forEach((addon) {
+      response.dataList.forEach((addon) {
         addonList!.add(AddOns.fromJson(addon));
       });
     }
@@ -76,7 +76,7 @@ class AddonRepository implements AddonRepositoryInterface<AddOns> {
 
     if(response.statusCode == 200){
       addonCategoryList = [];
-      response.body.forEach((addon) {
+      response.dataList.forEach((addon) {
         addonCategoryList!.add(AddonCategoryModel.fromJson(addon));
       });
     }

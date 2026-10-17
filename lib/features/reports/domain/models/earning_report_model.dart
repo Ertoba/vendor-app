@@ -12,11 +12,22 @@ class EarningReportModel {
   });
 
   factory EarningReportModel.fromJson(Map<String, dynamic> json) {
+    final dynamic pageRaw = json['pagination'];
+    final Map<String, dynamic>? page = pageRaw is Map
+        ? Map<String, dynamic>.from(pageRaw)
+        : null;
+    final dynamic transactionPayload = json['transactions'] ??
+        (json['data'] is List
+            ? <String, dynamic>{
+                'data': json['data'],
+                'pagination': page,
+              }
+            : null);
     return EarningReportModel(
       summary: json['summary'] != null ? SummaryModel.fromJson(Map<String, dynamic>.from(json['summary'])) : null,
       trends: json['trends'] != null ? TrendsModel.fromJson(Map<String, dynamic>.from(json['trends'])) : null,
-      transactions: json['transactions'] != null ? TransactionContainer.fromJson(json['transactions']) : null,
-      totalSize: _toInt(json['total_size']),
+      transactions: transactionPayload != null ? TransactionContainer.fromJson(transactionPayload) : null,
+      totalSize: _toInt(page != null ? page['total'] : json['total_size']),
     );
   }
 

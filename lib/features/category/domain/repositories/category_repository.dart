@@ -21,7 +21,7 @@ class CategoryRepository implements CategoryRepositoryInterface {
     Response response = await apiClient.getData(uri);
     if (response.statusCode == 200) {
       categoryList = [];
-      response.body.forEach((category) => categoryList!.add(CategoryModel.fromJson(category)));
+      response.dataList.forEach((category) => categoryList!.add(CategoryModel.fromJson(category)));
     }
     return categoryList;
   }
@@ -32,7 +32,7 @@ class CategoryRepository implements CategoryRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.subCategoryUri}$parentID');
     if (response.statusCode == 200) {
       subCategoryList = [];
-      response.body.forEach((subCategory) => subCategoryList!.add(CategoryModel.fromJson(subCategory)));
+      response.dataList.forEach((subCategory) => subCategoryList!.add(CategoryModel.fromJson(subCategory)));
     }
     return subCategoryList;
   }
@@ -42,7 +42,7 @@ class CategoryRepository implements CategoryRepositoryInterface {
     ItemModel? itemModel;
     Response response = await apiClient.getData('${AppConstants.categoryWiseProducts}/$id?offset=$offset&limit=10&sub_category=$isSubCategory');
     if (response.statusCode == 200) {
-      itemModel = ItemModel.fromJson(response.body);
+      itemModel = ItemModel.fromJson(response.contentMap);
     }
     return itemModel;
   }
@@ -57,7 +57,7 @@ class CategoryRepository implements CategoryRepositoryInterface {
     if (response.statusCode == 200) {
       list = [];
       final body = response.body;
-      final Iterable items = (body is List) ? body : (body['categories'] ?? body['data'] ?? []);
+      final Iterable items = response.dataList;
       for (final item in items) {
         list.add(CategoryModel.fromJson(item));
       }
@@ -69,7 +69,7 @@ class CategoryRepository implements CategoryRepositoryInterface {
   Future<CategoryModel?> getStoreCategoryDetails(int id) async {
     final Response response = await apiClient.getData('${AppConstants.storeCategoryDetailsUri}/$id');
     if (response.statusCode == 200) {
-      return CategoryModel.fromJson(response.body);
+      return CategoryModel.fromJson(response.contentMap);
     }
     return null;
   }
@@ -130,7 +130,7 @@ class CategoryRepository implements CategoryRepositoryInterface {
   Future<ItemModel?> getStoreCategoryItems(int id, {required String offset}) async {
     final Response response = await apiClient.getData('${AppConstants.storeCategoryItemsUri}/$id?offset=$offset&limit=10');
     if (response.statusCode == 200) {
-      final body = Map<String, dynamic>.from(response.body as Map);
+      final body = response.contentMap;
       body['items'] ??= body['products'];
       return ItemModel.fromJson(body);
     }
@@ -143,7 +143,7 @@ class CategoryRepository implements CategoryRepositoryInterface {
       '${AppConstants.assignFoodToCategoryUri}/$categoryId?offset=$offset&limit=25&search=${Uri.encodeQueryComponent(search)}',
     );
     if (response.statusCode == 200) {
-      return AssignableFoodModel.fromJson(response.body);
+      return AssignableFoodModel.fromJson(response.contentMap);
     }
     return null;
   }

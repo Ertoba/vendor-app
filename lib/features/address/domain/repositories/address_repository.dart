@@ -20,7 +20,7 @@ class AddressRepository implements AddressRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.zoneListUri);
     if (response.statusCode == 200) {
       zoneList = [];
-      response.body.forEach((zone) => zoneList!.add(ZoneModel.fromJson(zone)));
+      response.dataList.forEach((zone) => zoneList!.add(ZoneModel.fromJson(zone)));
     }
     return zoneList;
   }
@@ -82,7 +82,7 @@ class AddressRepository implements AddressRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.modulesUri}?zone_id=$zoneId');
     if (response.statusCode == 200) {
       moduleList = [];
-      response.body.forEach((storeCategory) => moduleList!.add(ModuleModel.fromJson(storeCategory)));
+      response.dataList.forEach((storeCategory) => moduleList!.add(ModuleModel.fromJson(storeCategory)));
     }
     return moduleList;
   }

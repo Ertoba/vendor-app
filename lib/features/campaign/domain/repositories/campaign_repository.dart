@@ -14,7 +14,7 @@ class CampaignRepository implements CampaignRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.basicCampaignUri);
     if (response.statusCode == 200) {
       campaignList = [];
-      response.body.forEach((campaign) {
+      response.dataList.forEach((campaign) {
         campaignList!.add(CampaignModel.fromJson(campaign));
       });
     }
