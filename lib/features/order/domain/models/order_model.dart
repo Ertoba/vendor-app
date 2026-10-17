@@ -9,14 +9,27 @@ class PaginatedOrderModel {
   PaginatedOrderModel({this.totalSize, this.limit, this.offset, this.orders});
 
   PaginatedOrderModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'].toString();
-    offset = json['offset'].toString();
-    if (json['orders'] != null) {
-      orders = [];
-      json['orders'].forEach((v) {
-        orders!.add(OrderModel.fromJson(v));
-      });
+    final dynamic paginationRaw = json['pagination'];
+    final Map<String, dynamic>? pagination = paginationRaw is Map
+        ? Map<String, dynamic>.from(paginationRaw)
+        : null;
+    totalSize = int.tryParse(
+      '${pagination != null ? pagination['total'] : json['total_size']}',
+    );
+    limit = (pagination != null ? pagination['per_page'] : json['limit'])
+        ?.toString();
+    offset =
+        (pagination != null ? pagination['current_page'] : json['offset'])
+            ?.toString();
+
+    final dynamic ordersRaw = json['data'] ?? json['orders'];
+    if (ordersRaw is List) {
+      orders = ordersRaw
+          .whereType<Map>()
+          .map((order) => OrderModel.fromJson(
+                Map<String, dynamic>.from(order),
+              ))
+          .toList();
     }
   }
 
