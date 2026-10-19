@@ -12,21 +12,22 @@ class EarningReportModel {
   });
 
   factory EarningReportModel.fromJson(Map<String, dynamic> json) {
-    final dynamic pageRaw = json['pagination'];
-    final Map<String, dynamic>? page = pageRaw is Map
-        ? Map<String, dynamic>.from(pageRaw)
+    final Map<String, dynamic>? page = json['pagination'] is Map
+        ? Map<String, dynamic>.from(json['pagination'])
         : null;
-    final dynamic transactionPayload = json['transactions'] ??
-        (json['data'] is List
-            ? <String, dynamic>{
-                'data': json['data'],
-                'pagination': page,
-              }
-            : null);
+    final dynamic transactionPayload =
+        json['transactions'] ??
+        (json['data'] is List ? <String, dynamic>{...json, ...?page} : null);
     return EarningReportModel(
-      summary: json['summary'] != null ? SummaryModel.fromJson(Map<String, dynamic>.from(json['summary'])) : null,
-      trends: json['trends'] != null ? TrendsModel.fromJson(Map<String, dynamic>.from(json['trends'])) : null,
-      transactions: transactionPayload != null ? TransactionContainer.fromJson(transactionPayload) : null,
+      summary: json['summary'] != null
+          ? SummaryModel.fromJson(Map<String, dynamic>.from(json['summary']))
+          : null,
+      trends: json['trends'] != null
+          ? TrendsModel.fromJson(Map<String, dynamic>.from(json['trends']))
+          : null,
+      transactions: transactionPayload != null
+          ? TransactionContainer.fromJson(transactionPayload)
+          : null,
       totalSize: _toInt(page != null ? page['total'] : json['total_size']),
     );
   }
@@ -73,9 +74,12 @@ class TransactionContainer {
       return TransactionContainer(
         data: rawData is List
             ? rawData
-                .whereType<Map>()
-                .map((e) => TransactionModel.fromJson(Map<String, dynamic>.from(e)))
-                .toList()
+                  .whereType<Map>()
+                  .map(
+                    (e) =>
+                        TransactionModel.fromJson(Map<String, dynamic>.from(e)),
+                  )
+                  .toList()
             : <TransactionModel>[],
         pagination: PaginationModel.fromJson(map),
         totalSize: _toInt(map['total_size']) ?? _toInt(map['total']),
@@ -128,26 +132,32 @@ class TransactionModel {
   });
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
-    final bool hasEarningReference = json.containsKey('earning_from') || json.containsKey('earning_source');
+    final bool hasEarningReference =
+        json.containsKey('earning_from') || json.containsKey('earning_source');
     final bool hasExpenseReference = json.containsKey('expense_source');
 
     return TransactionModel(
       transactionId: json['transaction_id']?.toString(),
       transactionType: json['transaction_type']?.toString(),
       date: json['date']?.toString(),
-      source: json['source']?.toString() ?? json['earning_source']?.toString() ?? json['expense_source']?.toString(),
+      source:
+          json['source']?.toString() ??
+          json['earning_source']?.toString() ??
+          json['expense_source']?.toString(),
       sourceType: json['source_type']?.toString(),
-      reference: json['reference']?.toString()
-          ?? json['earning_from']?.toString()
-          ?? json['expense_source']?.toString()
-          ?? json['earning_source']?.toString()
-          ?? json['order_id']?.toString(),
-      referenceType: json['reference_type']?.toString()
-          ?? (hasExpenseReference
+      reference:
+          json['reference']?.toString() ??
+          json['earning_from']?.toString() ??
+          json['expense_source']?.toString() ??
+          json['earning_source']?.toString() ??
+          json['order_id']?.toString(),
+      referenceType:
+          json['reference_type']?.toString() ??
+          (hasExpenseReference
               ? 'expense'
               : hasEarningReference
-                  ? 'earning'
-                  : json['type']?.toString()),
+              ? 'earning'
+              : json['type']?.toString()),
       badge: json['expense_source_badge']?.toString(),
       orderId: json['order_id']?.toString(),
       amount: _toDouble(json['amount']),
@@ -286,11 +296,13 @@ class SummaryModel {
   });
 
   factory SummaryModel.fromJson(Map<String, dynamic> json) {
-    print("----> ${(json['total_earnings'])}");
-    print("----> ${_toDouble(json['total_earnings']) ?? _toDouble(json['total_earnings_with_admin_commission'])}");
     return SummaryModel(
-      totalEarnings: _toDouble(json['total_earnings']) ?? _toDouble(json['total_earnings_with_admin_commission']),
-      totalEarningsWithAdminCommission: _toDouble(json['total_earnings_with_admin_commission']) ?? _toDouble(json['total_earnings']),
+      totalEarnings:
+          _toDouble(json['total_earnings']) ??
+          _toDouble(json['total_earnings_with_admin_commission']),
+      totalEarningsWithAdminCommission:
+          _toDouble(json['total_earnings_with_admin_commission']) ??
+          _toDouble(json['total_earnings']),
       totalEarningsPercentage: _toDouble(json['total_earnings_percentage']),
       totalEarningsPositive: json['total_earnings_positive'] as bool?,
       totalExpenses: _toDouble(json['total_expenses']),
@@ -300,18 +312,39 @@ class SummaryModel {
       netProfitPercentage: _toDouble(json['net_profit_percentage']),
       netProfitPositive: json['net_profit_positive'] as bool?,
       totalTransaction: _toInt(json['total_transaction']),
-      totalTransactionPercentage: _toDouble(json['total_transaction_percentage']),
+      totalTransactionPercentage: _toDouble(
+        json['total_transaction_percentage'],
+      ),
       totalTransactionPositive: json['total_transaction_positive'] as bool?,
-      totalTransactionExpenseCount: _toInt(json['total_transaction_expense_count']),
-      totalTransactionExpensePercentage: _toDouble(json['total_transaction_expense_percentage']),
-      totalTransactionExpensePositive: json['total_transaction_expense_positive'] as bool?,
-      totalTransactionEarningCount: _toInt(json['total_transaction_earning_count']),
-      totalTransactionEarningPercentage: _toDouble(json['total_transaction_earning_percentage']),
-      totalTransactionEarningPositive: json['total_transaction_earning_positive'] as bool?,
-      totalTransactionSubscriptionCount: _toInt(json['total_transaction_subscription_count']),
-      totalTransactionSubscriptionPercentage: _toDouble(json['total_transaction_subscription_percentage']),
-      totalTransactionSubscriptionPositive: json['total_transaction_subscription_positive'] as bool?,
-      breakdown: json['breakdown'] != null ? BreakdownSummaryModel.fromJson(Map<String, dynamic>.from(json['breakdown'])) : null,
+      totalTransactionExpenseCount: _toInt(
+        json['total_transaction_expense_count'],
+      ),
+      totalTransactionExpensePercentage: _toDouble(
+        json['total_transaction_expense_percentage'],
+      ),
+      totalTransactionExpensePositive:
+          json['total_transaction_expense_positive'] as bool?,
+      totalTransactionEarningCount: _toInt(
+        json['total_transaction_earning_count'],
+      ),
+      totalTransactionEarningPercentage: _toDouble(
+        json['total_transaction_earning_percentage'],
+      ),
+      totalTransactionEarningPositive:
+          json['total_transaction_earning_positive'] as bool?,
+      totalTransactionSubscriptionCount: _toInt(
+        json['total_transaction_subscription_count'],
+      ),
+      totalTransactionSubscriptionPercentage: _toDouble(
+        json['total_transaction_subscription_percentage'],
+      ),
+      totalTransactionSubscriptionPositive:
+          json['total_transaction_subscription_positive'] as bool?,
+      breakdown: json['breakdown'] != null
+          ? BreakdownSummaryModel.fromJson(
+              Map<String, dynamic>.from(json['breakdown']),
+            )
+          : null,
     );
   }
 
@@ -337,8 +370,10 @@ class SummaryModel {
       'total_transaction_earning_percentage': totalTransactionEarningPercentage,
       'total_transaction_earning_positive': totalTransactionEarningPositive,
       'total_transaction_subscription_count': totalTransactionSubscriptionCount,
-      'total_transaction_subscription_percentage': totalTransactionSubscriptionPercentage,
-      'total_transaction_subscription_positive': totalTransactionSubscriptionPositive,
+      'total_transaction_subscription_percentage':
+          totalTransactionSubscriptionPercentage,
+      'total_transaction_subscription_positive':
+          totalTransactionSubscriptionPositive,
       'breakdown': breakdown?.toJson(),
     };
   }
@@ -378,7 +413,9 @@ class BreakdownSummaryModel {
       orderSales: _toDouble(json['order_sales']),
       taxCollected: _toDouble(json['tax_collected']),
       serviceChargeCollected: _toDouble(json['service_charge_collected']),
-      packagingFeeCollected: _toDouble(json['packaging_fee_collected']) ?? _toDouble(json['extra_packaging_charge']),
+      packagingFeeCollected:
+          _toDouble(json['packaging_fee_collected']) ??
+          _toDouble(json['extra_packaging_charge']),
       adminCommission: _toDouble(json['admin_commission']),
       restaurantExpense: _toDouble(json['restaurant_expense']),
       discountOnItem: _toDouble(json['discount_on_item']),
@@ -421,9 +458,15 @@ class TrendsModel {
 
   factory TrendsModel.fromJson(Map<String, dynamic> json) {
     return TrendsModel(
-      categories: (json['categories'] as List? ?? []).map((e) => e.toString()).toList(),
-      earningSeries: (json['earning_series'] as List? ?? []).map((e) => _toDouble(e) ?? 0.0).toList(),
-      expenseSeries: (json['expense_series'] as List? ?? []).map((e) => _toDouble(e) ?? 0.0).toList(),
+      categories: (json['categories'] as List? ?? [])
+          .map((e) => e.toString())
+          .toList(),
+      earningSeries: (json['earning_series'] as List? ?? [])
+          .map((e) => _toDouble(e) ?? 0.0)
+          .toList(),
+      expenseSeries: (json['expense_series'] as List? ?? [])
+          .map((e) => _toDouble(e) ?? 0.0)
+          .toList(),
     );
   }
 

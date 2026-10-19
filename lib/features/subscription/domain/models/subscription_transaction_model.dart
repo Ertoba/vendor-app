@@ -1,3 +1,5 @@
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
+
 class SubscriptionTransactionModel {
   int? totalSize;
   int? limit;
@@ -12,14 +14,21 @@ class SubscriptionTransactionModel {
   });
 
   SubscriptionTransactionModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['transactions'] != null) {
+    final dynamic pageRaw = json['pagination'];
+    final Map<String, dynamic>? page = pageRaw is Map
+        ? Map<String, dynamic>.from(pageRaw)
+        : null;
+    totalSize = int.tryParse(
+      '${page != null ? page['total'] : json['total_size']}',
+    );
+    limit = int.tryParse('${page != null ? page['per_page'] : json['limit']}');
+    offset = (page != null ? page['current_page'] : json['offset'])?.toString();
+    final dynamic rows = json['data'] ?? json['transactions'];
+    if (rows is List) {
       transactions = <Transactions>[];
-      json['transactions'].forEach((v) {
+      for (final dynamic v in rows) {
         transactions!.add(Transactions.fromJson(v));
-      });
+      }
     }
   }
 
@@ -92,7 +101,9 @@ class Transactions {
     reference = json['reference'];
     paidAmount = json['paid_amount']?.toDouble();
     discount = json['discount']?.toDouble();
-    packageDetails = json['package_details'] != null ? PackageDetails.fromJson(json['package_details']) : null;
+    packageDetails = json['package_details'] != null
+        ? PackageDetails.fromJson(json['package_details'])
+        : null;
     createdBy = json['created_by'];
     isTrial = json['is_trial'];
     transactionStatus = json['transaction_status'];
@@ -100,7 +111,9 @@ class Transactions {
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     store = json['store'] != null ? Store.fromJson(json['store']) : null;
-    package = json['package'] != null ? Package.fromJson(json['package']) : null;
+    package = json['package'] != null
+        ? Package.fromJson(json['package'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -184,18 +197,12 @@ class Store {
   String? gstCode;
   List<Translations>? translations;
 
-  Store({
-    this.id,
-    this.name,
-    this.gstStatus,
-    this.gstCode,
-    this.translations,
-  });
+  Store({this.id, this.name, this.gstStatus, this.gstCode, this.translations});
 
   Store.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
-    gstStatus = json['gst_status'];
+    gstStatus = DataParserHelper.parseBool(json['gst_status']);
     gstCode = json['gst_code'];
     if (json['translations'] != null) {
       translations = <Translations>[];
@@ -269,11 +276,7 @@ class Package {
   String? packageName;
   List<Translations>? translations;
 
-  Package({
-    this.id,
-    this.packageName,
-    this.translations,
-  });
+  Package({this.id, this.packageName, this.translations});
 
   Package.fromJson(Map<String, dynamic> json) {
     id = json['id'];

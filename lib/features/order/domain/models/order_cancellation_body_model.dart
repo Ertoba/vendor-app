@@ -4,17 +4,29 @@ class OrderCancellationBodyModel {
   String? offset;
   List<Data>? data;
 
-  OrderCancellationBodyModel({this.totalSize, this.limit, this.offset, this.data});
+  OrderCancellationBodyModel({
+    this.totalSize,
+    this.limit,
+    this.offset,
+    this.data,
+  });
 
   OrderCancellationBodyModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['data'] != null) {
+    final dynamic pageRaw = json['pagination'];
+    final Map<String, dynamic>? page = pageRaw is Map
+        ? Map<String, dynamic>.from(pageRaw)
+        : null;
+    totalSize = int.tryParse(
+      '${page != null ? page['total'] : json['total_size']}',
+    );
+    limit = (page != null ? page['per_page'] : json['limit'])?.toString();
+    offset = (page != null ? page['current_page'] : json['offset'])?.toString();
+    final dynamic rows = json['data'];
+    if (rows is List) {
       data = <Data>[];
-      json['data'].forEach((v) {
+      for (final dynamic v in rows) {
         data!.add(Data.fromJson(v));
-      });
+      }
     }
   }
 

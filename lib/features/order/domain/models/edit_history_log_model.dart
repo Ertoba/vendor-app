@@ -5,16 +5,31 @@ class EditHistoryLogModel {
   String? offset;
   List<EditLog>? editLogs;
 
-  EditHistoryLogModel({this.orderId, this.totalSize, this.limit, this.offset, this.editLogs});
+  EditHistoryLogModel({
+    this.orderId,
+    this.totalSize,
+    this.limit,
+    this.offset,
+    this.editLogs,
+  });
 
   EditHistoryLogModel.fromJson(Map<String, dynamic> json) {
+    final dynamic pageRaw = json['pagination'];
+    final Map<String, dynamic>? page = pageRaw is Map
+        ? Map<String, dynamic>.from(pageRaw)
+        : null;
     orderId = json['order_id'];
-    totalSize = json['total_size'] != null ? int.tryParse(json['total_size'].toString()) : null;
-    limit = json['limit']?.toString();
-    offset = json['offset']?.toString();
-    if (json['edit_logs'] != null) {
+    totalSize = int.tryParse(
+      '${page != null ? page['total'] : json['total_size']}',
+    );
+    limit = (page != null ? page['per_page'] : json['limit'])?.toString();
+    offset = (page != null ? page['current_page'] : json['offset'])?.toString();
+    final dynamic rows = json['data'] ?? json['edit_logs'];
+    if (rows is List) {
       editLogs = [];
-      json['edit_logs'].forEach((v) => editLogs!.add(EditLog.fromJson(v)));
+      for (final dynamic v in rows) {
+        editLogs!.add(EditLog.fromJson(v));
+      }
     }
   }
 }
@@ -27,7 +42,14 @@ class EditLog {
   String? editedByLabel;
   String? createdAt;
 
-  EditLog({this.id, this.log, this.remark, this.editedBy, this.editedByLabel, this.createdAt});
+  EditLog({
+    this.id,
+    this.log,
+    this.remark,
+    this.editedBy,
+    this.editedByLabel,
+    this.createdAt,
+  });
 
   EditLog.fromJson(Map<String, dynamic> json) {
     id = json['id'];

@@ -1,25 +1,29 @@
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
+
 class ReelsModel {
   int? totalSize;
   String? limit;
   String? offset;
   List<Reel>? reels;
 
-  ReelsModel({
-    this.totalSize,
-    this.limit,
-    this.offset,
-    this.reels,
-  });
+  ReelsModel({this.totalSize, this.limit, this.offset, this.reels});
 
   ReelsModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit']?.toString();
-    offset = json['offset']?.toString();
-    if (json['reels'] != null) {
+    final dynamic pageRaw = json['pagination'];
+    final Map<String, dynamic>? page = pageRaw is Map
+        ? Map<String, dynamic>.from(pageRaw)
+        : null;
+    totalSize = int.tryParse(
+      '${page != null ? page['total'] : json['total_size']}',
+    );
+    limit = (page != null ? page['per_page'] : json['limit'])?.toString();
+    offset = (page != null ? page['current_page'] : json['offset'])?.toString();
+    final dynamic rows = json['data'] ?? json['reels'];
+    if (rows is List) {
       reels = <Reel>[];
-      json['reels'].forEach((v) {
+      for (final dynamic v in rows) {
         reels!.add(Reel.fromJson(v));
-      });
+      }
     }
   }
 
@@ -93,19 +97,25 @@ class Reel {
     description = json['description'];
     thumbnail = json['thumbnail'];
     video = json['video'];
-    isAlwaysVisible = json['is_always_visible'];
+    isAlwaysVisible = DataParserHelper.parseBool(json['is_always_visible']);
     startDate = json['start_date'];
     endDate = json['end_date'];
-    status = json['status'];
-    totalViews = json['total_views'] != null ? int.parse(json['total_views'].toString()) : 0;
-    totalLikes = json['total_likes'] != null ? int.parse(json['total_likes'].toString()) : 0;
-    totalStoreVisits = json['total_store_visits'] != null ? int.parse(json['total_store_visits'].toString()) : 0;
+    status = DataParserHelper.parseBool(json['status']);
+    totalViews = json['total_views'] != null
+        ? int.parse(json['total_views'].toString())
+        : 0;
+    totalLikes = json['total_likes'] != null
+        ? int.parse(json['total_likes'].toString())
+        : 0;
+    totalStoreVisits = json['total_store_visits'] != null
+        ? int.parse(json['total_store_visits'].toString())
+        : 0;
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     thumbnailFullUrl = json['thumbnail_full_url'];
     videoFullUrl = json['video_full_url'];
     reelStatusLabel = json['reel_status_label'];
-    orderNowButton = json['order_now_button'] == true || json['order_now_button'] == 1 || json['order_now_button'] == '1';
+    orderNowButton = DataParserHelper.parseBool(json['order_now_button']);
     itemId = json['item_id'] ?? json['food_id'];
     productId = json['product_id'];
     if (json['translations'] != null) {
@@ -141,12 +151,7 @@ class Reel {
     data['item_id'] = itemId;
     data['product_id'] = productId;
     if (translations != null) {
-      data['translations'] = translations!.map((v) {
-        if (v != null) {
-          return v.toJson();
-        }
-        return null;
-      }).toList();
+      data['translations'] = translations!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -158,12 +163,7 @@ class ReelTranslation {
   String? value;
   String? locale;
 
-  ReelTranslation({
-    this.id,
-    this.key,
-    this.value,
-    this.locale,
-  });
+  ReelTranslation({this.id, this.key, this.value, this.locale});
 
   ReelTranslation.fromJson(Map<String, dynamic> json) {
     id = json['id'];

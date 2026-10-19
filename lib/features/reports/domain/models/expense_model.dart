@@ -7,14 +7,21 @@ class ExpenseBodyModel {
   ExpenseBodyModel({this.totalSize, this.limit, this.offset, this.expense});
 
   ExpenseBodyModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['expense'] != null) {
+    final dynamic pageRaw = json['pagination'];
+    final Map<String, dynamic>? page = pageRaw is Map
+        ? Map<String, dynamic>.from(pageRaw)
+        : null;
+    totalSize = int.tryParse(
+      '${page != null ? page['total'] : json['total_size']}',
+    );
+    limit = int.tryParse('${page != null ? page['per_page'] : json['limit']}');
+    offset = (page != null ? page['current_page'] : json['offset'])?.toString();
+    final dynamic rows = json['data'] ?? json['expense'];
+    if (rows is List) {
       expense = <Expense>[];
-      json['expense'].forEach((v) {
+      for (final dynamic v in rows) {
         expense!.add(Expense.fromJson(v));
-      });
+      }
     }
   }
 

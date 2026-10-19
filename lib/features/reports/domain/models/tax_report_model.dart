@@ -20,23 +20,32 @@ class TaxReportModel {
   });
 
   TaxReportModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['taxSummary'] != null) {
+    final dynamic pageRaw = json['pagination'];
+    final Map<String, dynamic>? page = pageRaw is Map
+        ? Map<String, dynamic>.from(pageRaw)
+        : null;
+    totalSize = int.tryParse(
+      '${page != null ? page['total'] : json['total_size']}',
+    );
+    limit = int.tryParse('${page != null ? page['per_page'] : json['limit']}');
+    offset = (page != null ? page['current_page'] : json['offset'])?.toString();
+    final dynamic summaries = json['tax_summary'] ?? json['taxSummary'];
+    if (summaries is List) {
       taxSummary = <TaxSummary>[];
-      json['taxSummary'].forEach((v) {
+      for (final dynamic v in summaries) {
         taxSummary!.add(TaxSummary.fromJson(v));
-      });
+      }
     }
-    totalOrders = json['totalOrders'];
-    totalOrderAmount = json['totalOrderAmount']?.toDouble();
-    totalTax = json['totalTax']?.toDouble();
-    if (json['orders'] != null) {
+    totalOrders = json['total_orders'] ?? json['totalOrders'];
+    totalOrderAmount = (json['total_order_amount'] ?? json['totalOrderAmount'])
+        ?.toDouble();
+    totalTax = (json['total_tax'] ?? json['totalTax'])?.toDouble();
+    final dynamic rows = json['data'] ?? json['orders'];
+    if (rows is List) {
       orders = <Orders>[];
-      json['orders'].forEach((v) {
+      for (final dynamic v in rows) {
         orders!.add(Orders.fromJson(v));
-      });
+      }
     }
   }
 

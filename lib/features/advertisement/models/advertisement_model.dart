@@ -1,3 +1,5 @@
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
+
 class AdvertisementModel {
   int? totalSize;
   int? limit;
@@ -26,21 +28,34 @@ class AdvertisementModel {
   });
 
   AdvertisementModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'] != null ? int.parse(json['limit'].toString()) : null;
-    offset = json['offset'] != null ? int.parse(json['offset'].toString()) : null;
-    all = json['all'] != null ? int.parse(json['all'].toString()) : 0;
-    running = json['running'] != null ? int.parse(json['running'].toString()) : 0;
-    pending = json['pending'] != null ? int.parse(json['pending'].toString()) : 0;
-    denied = json['denied'] != null ? int.parse(json['denied'].toString()) : 0;
-    approved = json['approved'] != null ? int.parse(json['approved'].toString()) : 0;
-    expired = json['expired'] != null ? int.parse(json['expired'].toString()) : 0;
-    paused = json['paused'] != null ? int.parse(json['paused'].toString()) : 0;
-    if (json['adds'] != null) {
+    final dynamic pageRaw = json['pagination'];
+    final Map<String, dynamic>? page = pageRaw is Map
+        ? Map<String, dynamic>.from(pageRaw)
+        : null;
+    totalSize = int.tryParse(
+      '${page != null ? page['total'] : json['total_size']}',
+    );
+    limit = int.tryParse('${page != null ? page['per_page'] : json['limit']}');
+    offset = int.tryParse(
+      '${page != null ? page['current_page'] : json['offset']}',
+    );
+    final dynamic statsRaw = json['statistics'];
+    final Map<String, dynamic> stats = statsRaw is Map
+        ? Map<String, dynamic>.from(statsRaw)
+        : json;
+    all = DataParserHelper.parseInt(stats['all']);
+    running = DataParserHelper.parseInt(stats['running']);
+    pending = DataParserHelper.parseInt(stats['pending']);
+    denied = DataParserHelper.parseInt(stats['denied']);
+    approved = DataParserHelper.parseInt(stats['approved']);
+    expired = DataParserHelper.parseInt(stats['expired']);
+    paused = DataParserHelper.parseInt(stats['paused']);
+    final dynamic rows = json['data'] ?? json['adds'];
+    if (rows is List) {
       adds = <Adds>[];
-      json['adds'].forEach((v) {
+      for (final dynamic v in rows) {
         adds!.add(Adds.fromJson(v));
-      });
+      }
     }
   }
 
@@ -145,7 +160,9 @@ class Adds {
     createdById = json['created_by_id'];
     createdByType = json['created_by_type'];
     status = json['status'];
-    active = json['active'] != null ? int.parse(json['active'].toString()) : null;
+    active = json['active'] != null
+        ? int.parse(json['active'].toString())
+        : null;
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     coverImageFullUrl = json['cover_image_full_url'];
