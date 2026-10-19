@@ -41,6 +41,21 @@ import 'package:sixam_mart_store/features/campaign/domain/repositories/campaign_
 import 'package:sixam_mart_store/features/campaign/domain/repositories/campaign_repository_interface.dart';
 import 'package:sixam_mart_store/features/campaign/domain/services/campaign_service.dart';
 import 'package:sixam_mart_store/features/campaign/domain/services/campaign_service_interface.dart';
+import 'package:sixam_mart_store/features/bogo_offer/controllers/bogo_offer_controller.dart';
+import 'package:sixam_mart_store/features/bogo_offer/domain/repositories/bogo_offer_repository.dart';
+import 'package:sixam_mart_store/features/bogo_offer/domain/repositories/bogo_offer_repository_interface.dart';
+import 'package:sixam_mart_store/features/bogo_offer/domain/services/bogo_offer_service.dart';
+import 'package:sixam_mart_store/features/bogo_offer/domain/services/bogo_offer_service_interface.dart';
+import 'package:sixam_mart_store/features/bundle_item/controllers/bundle_item_controller.dart';
+import 'package:sixam_mart_store/features/bundle_item/domain/repositories/bundle_item_repository.dart';
+import 'package:sixam_mart_store/features/bundle_item/domain/repositories/bundle_item_repository_interface.dart';
+import 'package:sixam_mart_store/features/bundle_item/domain/services/bundle_item_service.dart';
+import 'package:sixam_mart_store/features/bundle_item/domain/services/bundle_item_service_interface.dart';
+import 'package:sixam_mart_store/features/happy_hour/controllers/happy_hour_controller.dart';
+import 'package:sixam_mart_store/features/happy_hour/domain/repositories/happy_hour_repository.dart';
+import 'package:sixam_mart_store/features/happy_hour/domain/repositories/happy_hour_repository_interface.dart';
+import 'package:sixam_mart_store/features/happy_hour/domain/services/happy_hour_service.dart';
+import 'package:sixam_mart_store/features/happy_hour/domain/services/happy_hour_service_interface.dart';
 import 'package:sixam_mart_store/features/category/controllers/category_controller.dart';
 import 'package:sixam_mart_store/features/category/domain/repositories/category_repository.dart';
 import 'package:sixam_mart_store/features/category/domain/repositories/category_repository_interface.dart';
@@ -200,6 +215,15 @@ Future<Map<String, Map<String, String>>> init() async {
   CampaignRepositoryInterface campaignRepositoryInterface = CampaignRepository(apiClient: Get.find());
   Get.lazyPut(() => campaignRepositoryInterface);
 
+  HappyHourRepositoryInterface happyHourRepositoryInterface = HappyHourRepository(apiClient: Get.find());
+  Get.lazyPut(() => happyHourRepositoryInterface);
+
+  BogoOfferRepositoryInterface bogoOfferRepositoryInterface = BogoOfferRepository(apiClient: Get.find());
+  Get.lazyPut(() => bogoOfferRepositoryInterface, fenix: true);
+
+  BundleItemRepositoryInterface bundleItemRepositoryInterface = BundleItemRepository(apiClient: Get.find());
+  Get.lazyPut(() => bundleItemRepositoryInterface, fenix: true);
+
   CategoryRepositoryInterface categoryRepositoryInterface = CategoryRepository(apiClient: Get.find());
   Get.lazyPut(() => categoryRepositoryInterface);
 
@@ -304,6 +328,15 @@ Future<Map<String, Map<String, String>>> init() async {
   CampaignServiceInterface campaignServiceInterface = CampaignService(campaignRepositoryInterface: Get.find());
   Get.lazyPut(() => campaignServiceInterface);
 
+  HappyHourServiceInterface happyHourServiceInterface = HappyHourService(happyHourRepositoryInterface: Get.find());
+  Get.lazyPut(() => happyHourServiceInterface);
+
+  BogoOfferServiceInterface bogoOfferServiceInterface = BogoOfferService(bogoOfferRepositoryInterface: Get.find());
+  Get.lazyPut(() => bogoOfferServiceInterface, fenix: true);
+
+  BundleItemServiceInterface bundleItemServiceInterface = BundleItemService(bundleItemRepositoryInterface: Get.find());
+  Get.lazyPut(() => bundleItemServiceInterface, fenix: true);
+
   CategoryServiceInterface categoryServiceInterface = CategoryService(categoryRepositoryInterface: Get.find());
   Get.lazyPut(() => categoryServiceInterface);
 
@@ -398,6 +431,9 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => AddonController(addonServiceInterface: Get.find()));
   Get.lazyPut(() => BannerController(bannerServiceInterface: Get.find()));
   Get.lazyPut(() => CampaignController(campaignServiceInterface: Get.find()));
+  Get.lazyPut(() => HappyHourController(happyHourServiceInterface: Get.find()));
+  Get.lazyPut(() => BogoOfferController(bogoOfferServiceInterface: Get.find()), fenix: true);
+  Get.lazyPut(() => BundleItemController(bundleItemServiceInterface: Get.find()), fenix: true);
   Get.lazyPut(() => CategoryController(categoryServiceInterface: Get.find()));
   Get.lazyPut(() => SplashController(splashServiceInterface: Get.find()));
   Get.lazyPut(() => HtmlController(htmlServiceInterface: Get.find()));

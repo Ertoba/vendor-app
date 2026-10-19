@@ -31,6 +31,11 @@ import 'package:sixam_mart_store/features/banner/screens/add_banner_screen.dart'
 import 'package:sixam_mart_store/features/banner/screens/banner_list_screen.dart';
 import 'package:sixam_mart_store/features/campaign/screens/campaign_details_screen.dart';
 import 'package:sixam_mart_store/features/campaign/screens/campaign_screen.dart';
+import 'package:sixam_mart_store/features/bogo_offer/screens/bogo_campaign_list_screen.dart';
+import 'package:sixam_mart_store/features/bogo_offer/screens/bogo_offer_setup_screen.dart';
+import 'package:sixam_mart_store/features/bundle_item/screens/bundle_item_details_screen.dart';
+import 'package:sixam_mart_store/features/bundle_item/screens/bundle_package_list_screen.dart';
+import 'package:sixam_mart_store/features/bundle_item/screens/create_bundle_package_screen.dart';
 import 'package:sixam_mart_store/features/category/screens/category_screen.dart';
 import 'package:sixam_mart_store/features/chat/screens/chat_screen.dart';
 import 'package:sixam_mart_store/features/chat/screens/conversation_screen.dart';
@@ -47,6 +52,8 @@ import 'package:sixam_mart_store/features/forgot_password/screens/forget_pass_sc
 import 'package:sixam_mart_store/features/forgot_password/screens/new_pass_screen.dart';
 import 'package:sixam_mart_store/features/forgot_password/screens/verification_screen.dart';
 import 'package:sixam_mart_store/features/html/screens/html_viewer_screen.dart';
+import 'package:sixam_mart_store/features/happy_hour/screens/happy_hour_details_screen.dart';
+import 'package:sixam_mart_store/features/happy_hour/screens/happy_hour_list_screen.dart';
 import 'package:sixam_mart_store/features/language/screens/language_screen.dart';
 import 'package:sixam_mart_store/features/notification/screens/notification_screen.dart';
 import 'package:sixam_mart_store/features/order/screens/order_details_screen.dart';
@@ -96,6 +103,13 @@ class RouteHelper {
   static const String store = '/store';
   static const String campaign = '/campaign';
   static const String campaignDetails = '/campaign-details';
+  static const String happyHour = '/happy-hour';
+  static const String happyHourDetails = '/happy-hour-details';
+  static const String bogoOffer = '/bogo-offer';
+  static const String bogoOfferDetails = '/bogo-offer-details';
+  static const String bundlePackageList = '/bundle-package-list';
+  static const String createBundlePackage = '/create-bundle-package';
+  static const String bundleItemDetails = '/bundle-item-details';
   static const String item = '/item';
   static const String addItem = '/add-item';
   static const String categories = '/categories';
@@ -179,6 +193,13 @@ class RouteHelper {
   static String getStoreRoute() => store;
   static String getCampaignRoute() => campaign;
   static String getCampaignDetailsRoute({int? id, bool fromNotification = false}) => '$campaignDetails?id=$id&from_notification=$fromNotification';
+  static String getHappyHourRoute() => happyHour;
+  static String getHappyHourDetailsRoute({required int id, bool fromNotification = false}) => '$happyHourDetails?id=$id&from_notification=$fromNotification';
+  static String getBogoOfferRoute({bool fromNotification = false}) => '$bogoOffer?from_notification=$fromNotification';
+  static String getBogoOfferDetailsRoute({required int id, bool fromNotification = false}) => '$bogoOfferDetails?id=$id&from_notification=$fromNotification';
+  static String getBundlePackageListRoute() => bundlePackageList;
+  static String getCreateBundlePackageRoute({int? id}) => '$createBundlePackage?id=${id ?? ''}';
+  static String getBundleItemDetailsRoute({required int id}) => '$bundleItemDetails?id=$id';
   static String getUpdateRoute(bool isUpdate) => '$update?update=${isUpdate.toString()}';
   static String getAddItemRoute(Item? itemModel) {
     if(itemModel == null) {
@@ -347,6 +368,13 @@ class RouteHelper {
     GetPage(name: store, page: () => const StoreScreen()),
     GetPage(name: campaign, page: () => const CampaignScreen()),
     GetPage(name: campaignDetails, page: () => CampaignDetailsScreen(id: int.parse(Get.parameters['id']!), fromNotification: Get.parameters['from_notification'] == 'true')),
+    GetPage(name: bogoOffer, page: () => BogoCampaignListScreen(fromNotification: Get.parameters['from_notification'] == 'true')),
+    GetPage(name: bogoOfferDetails, page: () => BogoOfferSetupScreen(offerId: int.parse(Get.parameters['id']!), fromNotification: Get.parameters['from_notification'] == 'true')),
+    GetPage(name: bundlePackageList, page: () => const BundlePackageListScreen()),
+    GetPage(name: createBundlePackage, page: () => CreateBundlePackageScreen(bundleId: int.tryParse(Get.parameters['id'] ?? ''))),
+    GetPage(name: bundleItemDetails, page: () => BundleItemDetailsScreen(bundleId: int.parse(Get.parameters['id']!))),
+    GetPage(name: happyHour, page: () => const HappyHourListScreen()),
+    GetPage(name: happyHourDetails, page: () => HappyHourDetailsScreen(happyHourId: int.parse(Get.parameters['id']!), fromNotification: Get.parameters['from_notification'] == 'true')),
     GetPage(name: addItem, page: () {
       if(Get.parameters['data'] == 'null') {
         return const AddItemScreen(item: null);

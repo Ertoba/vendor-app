@@ -172,6 +172,12 @@ class Images {
   static const String view = 'assets/image/view.png';
   static const String delete = 'assets/image/delete.png';
 
+  /// 4.2 promotion assets
+  static const String happyHour = 'assets/image/happy_hour.png';
+  static const String bogo = 'assets/image/bogo.png';
+  static const String bogoOfferIcon = 'assets/image/bogo_offer.png';
+  static const String bundleIcon = 'assets/image/sell-together.png';
+
   /// SVG Images
   static const String shopIcon = 'assets/image/shop_icon.svg';
   static const String vatTaxIcon = 'assets/image/vat_tax_icon.svg';
