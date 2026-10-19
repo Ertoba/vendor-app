@@ -1,4 +1,5 @@
 class Dimensions {
+  static const double webMaxWidth = 1170.0;
   static const double fontSizeExtraSmall = 10.0;
   static const double fontSizeSmall = 12.0;
   static const double fontSizeDefault = 14.0;

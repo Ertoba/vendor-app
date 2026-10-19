@@ -33,6 +33,28 @@ class AppConstants {
   static const String basicCampaignUri = '/api/v1/vendor/get-basic-campaigns';
   static const String joinCampaignUri = '/api/v1/vendor/campaign-join';
   static const String leaveCampaignUri = '/api/v1/vendor/campaign-leave';
+
+  /// V4.2 promotions
+  static const String happyHourListUri = '/api/v1/vendor/happy-hour/list';
+  static const String happyHourDetailsUri = '/api/v1/vendor/happy-hour/details';
+  static const String happyHourJoinUri = '/api/v1/vendor/happy-hour/join';
+  static const String happyHourRespondUri = '/api/v1/vendor/happy-hour/respond';
+  static const String happyHourLeaveUri = '/api/v1/vendor/happy-hour/leave';
+  static const String bogoOfferListUri = '/api/v1/vendor/bogo-offer/list';
+  static const String bogoOfferDetailsUri = '/api/v1/vendor/bogo-offer/details/';
+  static const String bogoOfferJoinUri = '/api/v1/vendor/bogo-offer/join/';
+  static const String bogoOfferResubmitUri = '/api/v1/vendor/bogo-offer/resubmit/';
+  static const String bogoOfferLeaveUri = '/api/v1/vendor/bogo-offer/leave/';
+  static const String bogoOfferRespondUri = '/api/v1/vendor/bogo-offer/respond/';
+  static const String bogoOfferItemsUri = '/api/v1/vendor/bogo-offer/items';
+  static const String bundleListUri = '/api/v1/vendor/bundle/list';
+  static const String bundleDetailsUri = '/api/v1/vendor/bundle/details/';
+  static const String bundleStoreUri = '/api/v1/vendor/bundle/store';
+  static const String bundleUpdateUri = '/api/v1/vendor/bundle/update/';
+  static const String bundleDeleteUri = '/api/v1/vendor/bundle/delete/';
+  static const String bundleStatusUri = '/api/v1/vendor/bundle/status/';
+  static const String bundleItemsUri = '/api/v1/vendor/bundle/items';
+  static const String service = 'service';
   static const String withdrawListUri = '/api/v1/vendor/get-withdraw-list';
   static const String itemListUri = '/api/v1/vendor/get-items-list';
   static const String updateBankInfoUri = '/api/v1/vendor/update-bank-info';

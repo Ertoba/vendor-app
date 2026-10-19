@@ -704,18 +704,21 @@ class FoodVariation {
 class VariationValue {
   String? level;
   String? optionPrice;
+  String? optionId;
 
-  VariationValue({this.level, this.optionPrice});
+  VariationValue({this.level, this.optionPrice, this.optionId});
 
   VariationValue.fromJson(Map<String, dynamic> json) {
     level = json['label'];
     optionPrice = json['optionPrice'];
+    optionId = json['option_id']?.toString() ?? json['optionId']?.toString();
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['label'] = level;
     data['optionPrice'] = optionPrice;
+    data['option_id'] = optionId;
     return data;
   }
 }

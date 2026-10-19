@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:sixam_mart_store/api/api_client.dart';
-import 'package:sixam_mart_store/api/api_response.dart';
 import 'package:sixam_mart_store/common/models/response_model.dart';
 import 'package:sixam_mart_store/features/bogo_offer/domain/models/bogo_offer_model.dart';
 import 'package:sixam_mart_store/features/bogo_offer/domain/repositories/bogo_offer_repository_interface.dart';

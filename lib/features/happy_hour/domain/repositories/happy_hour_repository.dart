@@ -1,6 +1,5 @@
 import 'package:sixam_mart_store/api/api_checker.dart';
 import 'package:sixam_mart_store/api/api_client.dart';
-import 'package:sixam_mart_store/api/api_response.dart';
 import 'package:sixam_mart_store/common/models/response_model.dart';
 import 'package:sixam_mart_store/features/happy_hour/domain/models/happy_hour_model.dart';
 import 'package:sixam_mart_store/features/happy_hour/domain/repositories/happy_hour_repository_interface.dart';

@@ -20,6 +20,7 @@ class CustomButtonWidget extends StatelessWidget {
   final Color? iconColor;
   final bool isLoading;
   final bool isBorder;
+  final bool takeMinimumWidth;
   final Color? borderColor;
   const CustomButtonWidget({
     super.key,
@@ -39,6 +40,7 @@ class CustomButtonWidget extends StatelessWidget {
     this.isViewReply = false,
     this.textColor,
     this.isBorder = false,
+    this.takeMinimumWidth = false,
     this.borderColor,
   });
 
@@ -50,7 +52,7 @@ class CustomButtonWidget extends StatelessWidget {
           : transparent
           ? Colors.transparent
           : color ?? Theme.of(context).primaryColor,
-      minimumSize: Size(width ?? 1170, height ?? 50),
+      minimumSize: Size(width ?? (takeMinimumWidth ? 10 : 1170), height ?? 50),
       padding: const EdgeInsets.symmetric(
         horizontal: Dimensions.paddingSizeDefault,
         vertical: Dimensions.paddingSizeExtraSmall,
