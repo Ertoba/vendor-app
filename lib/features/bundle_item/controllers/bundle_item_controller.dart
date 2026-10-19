@@ -297,7 +297,7 @@ class BundleItemController extends GetxController implements GetxService {
     update();
 
     final Map<String, String> body = buildBundleRequestBody(
-      storeId: '${Get.find<ProfileController>().profileModel?.stores?.id ?? ''}',
+      storeId: '${Get.find<ProfileController>().profileModel?.stores?.isNotEmpty == true ? Get.find<ProfileController>().profileModel!.stores!.first.id : ''}',
       startDate: _apiDate(_startDateTime),
       endDate: _apiDate(_endDateTime),
       discountPercentage: _trimZeros(_discount),

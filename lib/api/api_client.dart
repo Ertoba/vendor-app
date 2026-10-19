@@ -232,6 +232,15 @@ class MultipartDocument {
 }
 
 extension ApiResponsePayload on Response {
+  dynamic get content => body is Map && (body as Map).containsKey('content') ? body['content'] : body;
+
+  String? get apiMessage => body is Map ? body['message']?.toString() : null;
+
+  PaginationModel? get pagination {
+    final dynamic value = content is Map ? content['pagination'] : null;
+    return value is Map ? PaginationModel.fromJson(Map<String, dynamic>.from(value)) : null;
+  }
+
   List<dynamic> get dataList {
     final dynamic payload = body;
     if (payload is List) return payload;
@@ -256,4 +265,18 @@ extension ApiResponsePayload on Response {
     }
     return <String, dynamic>{};
   }
+}
+
+class PaginationModel {
+  final int? currentPage;
+  final int? lastPage;
+  final int? total;
+
+  const PaginationModel({this.currentPage, this.lastPage, this.total});
+
+  factory PaginationModel.fromJson(Map<String, dynamic> json) => PaginationModel(
+    currentPage: int.tryParse('${json['current_page'] ?? ''}'),
+    lastPage: int.tryParse('${json['last_page'] ?? ''}'),
+    total: int.tryParse('${json['total'] ?? json['total_size'] ?? ''}'),
+  );
 }

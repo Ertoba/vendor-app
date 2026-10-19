@@ -21,6 +21,7 @@ class CustomButtonWidget extends StatelessWidget {
   final bool isLoading;
   final bool isBorder;
   final bool takeMinimumWidth;
+  final EdgeInsets padding;
   final Color? borderColor;
   const CustomButtonWidget({
     super.key,
@@ -41,6 +42,7 @@ class CustomButtonWidget extends StatelessWidget {
     this.textColor,
     this.isBorder = false,
     this.takeMinimumWidth = false,
+    this.padding = EdgeInsets.zero,
     this.borderColor,
   });
 
@@ -53,10 +55,10 @@ class CustomButtonWidget extends StatelessWidget {
           ? Colors.transparent
           : color ?? Theme.of(context).primaryColor,
       minimumSize: Size(width ?? (takeMinimumWidth ? 10 : 1170), height ?? 50),
-      padding: const EdgeInsets.symmetric(
+      padding: padding == EdgeInsets.zero ? const EdgeInsets.symmetric(
         horizontal: Dimensions.paddingSizeDefault,
         vertical: Dimensions.paddingSizeExtraSmall,
-      ),
+      ) : padding,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radius),
         side: isBorder
