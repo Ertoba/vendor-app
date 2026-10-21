@@ -15,7 +15,11 @@ import 'package:sixam_mart_store/common/widgets/order_shimmer_widget.dart';
 import 'package:sixam_mart_store/common/widgets/order_widget.dart';
 import 'package:sixam_mart_store/features/home/widgets/order_button_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:sixam_mart_store/common/widgets/custom_ink_well_widget.dart';
+import 'package:sixam_mart_store/common/widgets/custom_asset_image_widget.dart';
 import 'package:get/get.dart';
+
+part '../widgets/bogo_offer_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

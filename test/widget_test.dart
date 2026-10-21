@@ -1,30 +1,49 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sixam_mart_store/features/order/domain/models/order_model.dart';
+import 'package:sixam_mart_store/features/order/domain/models/order_details_model.dart';
 
-import 'package:sixam_mart_store/main.dart';
-
+// The default Flutter counter-template test never matched the MILI vendor app.
+// These regression tests exercise actual V4.2 payloads used by Vendor screens.
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp(languages: null, body: null));
+  test('V4.2 vendor order ETA round-trips with order status', () {
+    final order = OrderModel.fromJson(<String, dynamic>{
+      'id': 100275,
+      'order_type': 'delivery',
+      'order_status': 'pending',
+      'eta': <String, dynamic>{
+        'overdue': false,
+        'from_at': '2026-10-21T13:00:00',
+        'window': '13:00–13:30',
+      },
+    });
+    expect(order.id, 100275);
+    expect(order.eta?.window, '13:00–13:30');
+    expect(order.eta?.overdue, isFalse);
+    expect((order.toJson()['eta'] as Map<String, dynamic>)['from_at'],
+        '2026-10-21T13:00:00');
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  test('BOGO and bundle details round-trip through V4.2 models', () {
+    final bogo = OrderDetailsModel.fromJson(<String, dynamic>{
+      'id': 12,
+      'bogo_offer_id': 8,
+      'bogo_group_id': 'bogo-8',
+      'is_free_item': 1,
+    });
+    expect(bogo.isBogoItem, isTrue);
+    expect(bogo.isFree, isTrue);
+    expect(bogo.isBundleItem, isFalse);
+    expect(bogo.toJson()['bogo_group_id'], 'bogo-8');
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    final bundle = OrderDetailsModel.fromJson(<String, dynamic>{
+      'id': 13,
+      'bundle_id': '27',
+      'bundle_group_id': 'bundle-27',
+      'bundle_name': 'MILI offer',
+    });
+    expect(bundle.isBogoItem, isFalse);
+    expect(bundle.isBundleItem, isTrue);
+    expect(bundle.bundleId, 27);
+    expect(bundle.toJson()['bundle_name'], 'MILI offer');
   });
 }
