@@ -19,6 +19,7 @@ import 'package:sixam_mart_store/features/rental_module/trips/domain/models/trip
 import 'package:sixam_mart_store/features/rental_module/trips/domain/services/trip_service_interface.dart';
 import 'package:sixam_mart_store/util/images.dart';
 import 'package:sixam_mart_store/api/api_response.dart';
+import 'package:sixam_mart_store/api/api_client.dart';
 
 class TripController extends GetxController implements GetxService {
   final TripServiceInterface tripServiceInterface;

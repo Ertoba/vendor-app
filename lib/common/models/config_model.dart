@@ -11,6 +11,7 @@ class ConfigModel {
   DefaultLocation? defaultLocation;
   String? currencySymbol;
   String? currencySymbolDirection;
+  String? distanceUnit;
   double? appMinimumVersionAndroid;
   String? appUrlAndroid;
   double? appMinimumVersionIos;
@@ -72,6 +73,7 @@ class ConfigModel {
     this.defaultLocation,
     this.currencySymbol,
     this.currencySymbolDirection,
+    this.distanceUnit,
     this.appMinimumVersionAndroid,
     this.appUrlAndroid,
     this.appMinimumVersionIos,
@@ -136,6 +138,7 @@ class ConfigModel {
         : null;
     currencySymbol = json['currency_symbol'];
     currencySymbolDirection = json['currency_symbol_direction'];
+    distanceUnit = json['distance_unit'];
     appMinimumVersionAndroid = json['app_minimum_version_android_store'] != null
         ? json['app_minimum_version_android_store']?.toDouble()
         : 0.0;
