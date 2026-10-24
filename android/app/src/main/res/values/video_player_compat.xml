@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="androidx_core_ripple_material_light">#1F000000</color>
+    <dimen name="compat_button_inset_horizontal_material">4dp</dimen>
+    <dimen name="compat_button_inset_vertical_material">4dp</dimen>
+    <dimen name="compat_control_corner_material">2dp</dimen>
+    <dimen name="compat_button_padding_horizontal_material">8dp</dimen>
+    <dimen name="compat_button_padding_vertical_material">4dp</dimen>
+</resources>
