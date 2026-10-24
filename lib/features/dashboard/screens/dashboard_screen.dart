@@ -19,8 +19,13 @@ import 'package:sixam_mart_store/features/rental_module/home/screens/taxi_home_s
 import 'package:sixam_mart_store/features/rental_module/menu/screens/taxi_menu_screen.dart';
 import 'package:sixam_mart_store/features/rental_module/provider/screens/provider_screen.dart';
 import 'package:sixam_mart_store/features/rental_module/trips/screens/trip_history_screen.dart';
+import 'package:sixam_mart_store/features/service_module/home/screens/service_home_screen.dart';
+import 'package:sixam_mart_store/features/service_module/menu/screens/service_menu_screen.dart';
+import 'package:sixam_mart_store/features/service_module/order/screens/service_booking_history_screen.dart';
+import 'package:sixam_mart_store/features/service_module/store/screens/service_store_screen.dart';
 import 'package:sixam_mart_store/features/store/screens/store_screen.dart';
 import 'package:sixam_mart_store/features/subscription/controllers/subscription_controller.dart';
+import 'package:sixam_mart_store/util/app_constants.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
 
@@ -48,10 +53,11 @@ class DashboardScreenState extends State<DashboardScreen> {
     _pageIndex = widget.pageIndex;
     _pageController = PageController(initialPage: widget.pageIndex);
 
+    final moduleType = authController.getModuleType();
     _screens = [
-      authController.getModuleType() == 'rental' ? const TaxiHomeScreen() : const HomeScreen(),
-      authController.getModuleType() == 'rental' ? const TripHistoryScreen() : const OrderHistoryScreen(),
-      authController.getModuleType() == 'rental' ? const ProviderScreen() : const StoreScreen(),
+      _homeScreen(moduleType),
+      _orderScreen(moduleType),
+      _storeScreen(moduleType),
       const WalletScreen(),
       Container(),
     ];
@@ -62,23 +68,70 @@ class DashboardScreenState extends State<DashboardScreen> {
 
     showDisbursementWarningMessage();
 
-    if(Get.find<SubscriptionController>().isTrialEndModalShown){
+    if (Get.find<SubscriptionController>().isTrialEndModalShown) {
       Get.find<SubscriptionController>().trialEndBottomSheet();
     }
 
     outOfStockBottomSheet();
-
   }
 
-  Future<void> showDisbursementWarningMessage() async{
+  Widget _homeScreen(String moduleType) {
+    switch (moduleType) {
+      case 'rental':
+        return const TaxiHomeScreen();
+      case AppConstants.service:
+        return const ServiceHomeScreen();
+      default:
+        return const HomeScreen();
+    }
+  }
+
+  Widget _orderScreen(String moduleType) {
+    switch (moduleType) {
+      case 'rental':
+        return const TripHistoryScreen();
+      case AppConstants.service:
+        return const ServiceOrderHistoryScreen();
+      default:
+        return const OrderHistoryScreen();
+    }
+  }
+
+  Widget _storeScreen(String moduleType) {
+    switch (moduleType) {
+      case 'rental':
+        return const ProviderScreen();
+      case AppConstants.service:
+        return const ServiceStoreScreen();
+      default:
+        return const StoreScreen();
+    }
+  }
+
+  Widget _menuScreen(String moduleType) {
+    switch (moduleType) {
+      case 'rental':
+        return const TaxiMenuScreen();
+      case AppConstants.service:
+        return const ServiceMenuScreen();
+      default:
+        return const MenuScreen();
+    }
+  }
+
+  Future<void> showDisbursementWarningMessage() async {
     disbursementHelper.enableDisbursementWarningMessage(true);
   }
 
   Future<void> outOfStockBottomSheet() async {
     Future.delayed(const Duration(seconds: 1), () {
-      if(Get.find<ProfileController>().profileModel != null && Get.find<ProfileController>().profileModel!.outOfStockCount! > 0 && Get.find<ProfileController>().showLowStockWarning) {
+      if (Get.find<ProfileController>().profileModel != null &&
+          Get.find<ProfileController>().profileModel!.outOfStockCount! > 0 &&
+          Get.find<ProfileController>().showLowStockWarning) {
         showModalBottomSheet(
-          context: Get.context!, isScrollControlled: true, backgroundColor: Colors.transparent,
+          context: Get.context!,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
           builder: (con) => const OutOfStockWarningBottomSheet(),
         ).then((v) {
           Get.find<ProfileController>().hideLowStockWarning();
@@ -87,33 +140,35 @@ class DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-
     bool keyboardVisible = MediaQuery.of(context).viewInsets.bottom != 0;
 
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) async{
-        if(_pageIndex != 0) {
+      onPopInvokedWithResult: (didPop, result) async {
+        if (_pageIndex != 0) {
           _setPage(0);
-        }else {
-          if(_canExit) {
+        } else {
+          if (_canExit) {
             if (GetPlatform.isAndroid) {
               SystemNavigator.pop();
             } else if (GetPlatform.isIOS) {
               exit(0);
             }
           }
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('back_press_again_to_exit'.tr, style: const TextStyle(color: Colors.white)),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 2),
-            margin: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-          ));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'back_press_again_to_exit'.tr,
+                style: const TextStyle(color: Colors.white),
+              ),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
+              margin: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+            ),
+          );
           _canExit = true;
 
           Timer(const Duration(seconds: 2), () {
@@ -125,82 +180,148 @@ class DashboardScreenState extends State<DashboardScreen> {
         top: false,
         bottom: false,
         child: Scaffold(
+          floatingActionButton: !GetPlatform.isMobile || keyboardVisible
+              ? null
+              : GetBuilder<ProfileController>(
+                  builder: (profileController) {
+                    bool isDisabled =
+                        profileController.profileModel == null ||
+                        profileController.modulePermission == null;
+                    return Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Theme.of(context).cardColor,
+                          width: 5,
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 5,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                      child: Opacity(
+                        opacity: isDisabled ? 0.5 : 1.0,
+                        child: FloatingActionButton(
+                          backgroundColor: isDisabled
+                              ? Theme.of(context).disabledColor
+                              : Theme.of(context).primaryColor,
+                          onPressed: isDisabled
+                              ? null
+                              : () {
+                                  _setPage(2);
+                                },
+                          child: Image.asset(
+                            Get.find<AuthController>().getModuleType() ==
+                                    'rental'
+                                ? Images.taxiHome
+                                : Images.restaurant,
+                            height: 20,
+                            width: 20,
+                            color: Theme.of(context).cardColor,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+          floatingActionButtonLocation: !GetPlatform.isMobile
+              ? null
+              : FloatingActionButtonLocation.centerDocked,
 
-          floatingActionButton: !GetPlatform.isMobile || keyboardVisible ? null : GetBuilder<ProfileController>(
-            builder: (profileController) {
-              bool isDisabled = profileController.profileModel == null || profileController.modulePermission == null;
-              return Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).cardColor, width: 5),
-                  shape: BoxShape.circle,
-                  boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+          bottomNavigationBar: !GetPlatform.isMobile
+              ? const SizedBox()
+              : GetBuilder<ProfileController>(
+                  builder: (profileController) {
+                    return BottomNavigationSurface(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(Dimensions.radiusLarge),
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 5,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(
+                          Dimensions.paddingSizeExtraSmall,
+                        ),
+                        child: Row(
+                          children: [
+                            BottomNavItemWidget(
+                              title: 'home'.tr,
+                              selectedIcon: Images.homeSelect,
+                              unSelectedIcon: Images.homeUnselect,
+                              isSelected: _pageIndex == 0,
+                              onTap: () => _setPage(0),
+                            ),
+                            BottomNavItemWidget(
+                              title:
+                                  Get.find<AuthController>().getModuleType() ==
+                                      'rental'
+                                  ? 'trips'.tr
+                                  : Get.find<AuthController>()
+                                            .getModuleType() ==
+                                        AppConstants.service
+                                  ? 'bookings'.tr
+                                  : 'orders'.tr,
+                              selectedIcon: Images.orderSelect,
+                              unSelectedIcon: Images.orderUnselect,
+                              isSelected: _pageIndex == 1,
+                              onTap:
+                                  (profileController.profileModel == null ||
+                                      profileController.modulePermission ==
+                                          null)
+                                  ? null
+                                  : () => _setPage(1),
+                            ),
+                            const Expanded(child: SizedBox()),
+                            BottomNavItemWidget(
+                              title: 'wallet'.tr,
+                              selectedIcon: Images.walletSelect,
+                              unSelectedIcon: Images.walletUnSelect,
+                              isSelected: _pageIndex == 3,
+                              onTap:
+                                  (profileController.profileModel == null ||
+                                      profileController.modulePermission ==
+                                          null)
+                                  ? null
+                                  : () => _setPage(3),
+                            ),
+                            BottomNavItemWidget(
+                              title: 'menu'.tr,
+                              selectedIcon: Images.menu,
+                              unSelectedIcon: Images.menu,
+                              isSelected: _pageIndex == 4,
+                              onTap:
+                                  (profileController.profileModel == null ||
+                                      profileController.modulePermission ==
+                                          null)
+                                  ? null
+                                  : () {
+                                      Get.bottomSheet(
+                                        _menuScreen(
+                                          Get.find<AuthController>()
+                                              .getModuleType(),
+                                        ),
+                                        backgroundColor: Colors.transparent,
+                                        isScrollControlled: true,
+                                      );
+                                    },
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
-                child: Opacity(
-                  opacity: isDisabled ? 0.5 : 1.0,
-                  child: FloatingActionButton(
-                    backgroundColor: isDisabled ? Theme.of(context).disabledColor : Theme.of(context).primaryColor,
-                    onPressed: isDisabled ? null : () {
-                      _setPage(2);
-                    },
-                    child: Image.asset(
-                      Get.find<AuthController>().getModuleType() == 'rental' ? Images.taxiHome : Images.restaurant,
-                      height: 20, width: 20,
-                      color: Theme.of(context).cardColor,
-                    ),
-                  ),
-                ),
-              );
-            }
-          ),
-          floatingActionButtonLocation: !GetPlatform.isMobile ? null : FloatingActionButtonLocation.centerDocked,
-
-          bottomNavigationBar: !GetPlatform.isMobile ? const SizedBox() : GetBuilder<ProfileController>(
-            builder: (profileController) {
-              return BottomNavigationSurface(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(Dimensions.radiusLarge)),
-                  boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-                  child: Row(children: [
-                    BottomNavItemWidget(
-                      title: 'home'.tr,
-                      selectedIcon: Images.homeSelect,
-                      unSelectedIcon: Images.homeUnselect,
-                      isSelected: _pageIndex == 0,
-                      onTap: () => _setPage(0),
-                    ),
-                    BottomNavItemWidget(
-                      title: Get.find<AuthController>().getModuleType() == 'rental' ? 'trips'.tr : 'orders'.tr,
-                      selectedIcon: Images.orderSelect,
-                      unSelectedIcon: Images.orderUnselect,
-                      isSelected: _pageIndex == 1,
-                      onTap: (profileController.profileModel == null || profileController.modulePermission == null) ? null : () => _setPage(1),
-                    ),
-                    const Expanded(child: SizedBox()),
-                    BottomNavItemWidget(
-                      title: 'wallet'.tr,
-                      selectedIcon: Images.walletSelect,
-                      unSelectedIcon: Images.walletUnSelect,
-                      isSelected: _pageIndex == 3,
-                      onTap: (profileController.profileModel == null || profileController.modulePermission == null) ? null : () => _setPage(3),
-                    ),
-                    BottomNavItemWidget(
-                      title: 'menu'.tr,
-                      selectedIcon: Images.menu,
-                      unSelectedIcon: Images.menu,
-                      isSelected: _pageIndex == 4,
-                      onTap: (profileController.profileModel == null || profileController.modulePermission == null) ? null : () {
-                        Get.bottomSheet(Get.find<AuthController>().getModuleType() == 'rental' ? const TaxiMenuScreen() : const MenuScreen(), backgroundColor: Colors.transparent, isScrollControlled: true);
-                      }
-                    ),
-                  ]),
-                ),
-              );
-            }
-          ),
           body: PageView.builder(
             controller: _pageController,
             itemCount: _screens.length,

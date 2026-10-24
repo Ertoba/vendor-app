@@ -12,6 +12,7 @@ class SplashController extends GetxController implements GetxService {
 
   ConfigModel? _configModel;
   ConfigModel? get configModel => _configModel;
+  String get distanceUnit => _configModel?.distanceUnit ?? 'km';
 
   final DateTime _currentTime = DateTime.now();
   DateTime get currentTime => _currentTime;

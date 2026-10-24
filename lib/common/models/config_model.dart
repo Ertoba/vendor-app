@@ -1,3 +1,5 @@
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
+
 class ConfigModel {
   String? businessName;
   String? footerText;
@@ -57,6 +59,7 @@ class ConfigModel {
   ValidationConfig? validationConfig;
   MaintenanceModeData? maintenanceModeData;
   bool? storeCategoryStatus;
+  ServiceModule? serviceModule;
 
   ConfigModel({
     this.businessName,
@@ -117,6 +120,7 @@ class ConfigModel {
     this.validationConfig,
     this.maintenanceModeData,
     this.storeCategoryStatus,
+    this.serviceModule,
   });
 
   ConfigModel.fromJson(Map<String, dynamic> json) {
@@ -127,12 +131,18 @@ class ConfigModel {
     phone = json['phone'];
     email = json['email'];
     country = json['country'];
-    defaultLocation = json['default_location'] != null ? DefaultLocation.fromJson(json['default_location']) : null;
+    defaultLocation = json['default_location'] != null
+        ? DefaultLocation.fromJson(json['default_location'])
+        : null;
     currencySymbol = json['currency_symbol'];
     currencySymbolDirection = json['currency_symbol_direction'];
-    appMinimumVersionAndroid = json['app_minimum_version_android_store'] != null ? json['app_minimum_version_android_store']?.toDouble() : 0.0;
+    appMinimumVersionAndroid = json['app_minimum_version_android_store'] != null
+        ? json['app_minimum_version_android_store']?.toDouble()
+        : 0.0;
     appUrlAndroid = json['app_url_android_store'];
-    appMinimumVersionIos = json['app_minimum_version_ios_store'] != null ? json['app_minimum_version_ios_store']?.toDouble() : 0.0;
+    appMinimumVersionIos = json['app_minimum_version_ios_store'] != null
+        ? json['app_minimum_version_ios_store']?.toDouble()
+        : 0.0;
     appUrlIos = json['app_url_ios_store'];
     customerVerification = json['customer_verification'];
     scheduleOrder = json['schedule_order'];
@@ -157,12 +167,18 @@ class ConfigModel {
     toggleVegNonVeg = json['toggle_veg_non_veg'];
     toggleDmRegistration = json['toggle_dm_registration'];
     toggleStoreRegistration = json['toggle_store_registration'];
-    scheduleOrderSlotDuration = json['schedule_order_slot_duration'] == 0 ? 30 : json['schedule_order_slot_duration'];
+    scheduleOrderSlotDuration = json['schedule_order_slot_duration'] == 0
+        ? 30
+        : json['schedule_order_slot_duration'];
     digitAfterDecimalPoint = json['digit_after_decimal_point'];
     canceledByStore = json['canceled_by_store'];
-    moduleConfig = json['module_config'] != null ? ModuleConfig.fromJson(json['module_config']) : null;
+    moduleConfig = json['module_config'] != null
+        ? ModuleConfig.fromJson(json['module_config'])
+        : null;
     prescriptionOrderStatus = json['prescription_order_status'];
-    dmPictureUploadStatus = json['dm_picture_upload_status'] == 1 ? true : false;
+    dmPictureUploadStatus = json['dm_picture_upload_status'] == 1
+        ? true
+        : false;
     additionalChargeName = json['additional_charge_name'];
     disbursementType = json['disbursement_type'];
     if (json['active_payment_method_list'] != null) {
@@ -173,21 +189,46 @@ class ConfigModel {
     }
     minAmountToPayStore = json['min_amount_to_pay_store']?.toDouble();
     storeReviewReply = json['store_review_reply'] == 1 ? true : false;
-    adminCommission = json['admin_commission'] != null ? double.tryParse(json['admin_commission'].toString()) : null;
-    subscriptionDeadlineWarningDays = json['subscription_deadline_warning_days'];
-    subscriptionDeadlineWarningMessage = json['subscription_deadline_warning_message'];
+    adminCommission = json['admin_commission'] != null
+        ? double.tryParse(json['admin_commission'].toString())
+        : null;
+    subscriptionDeadlineWarningDays =
+        json['subscription_deadline_warning_days'];
+    subscriptionDeadlineWarningMessage =
+        json['subscription_deadline_warning_message'];
     subscriptionFreeTrialDays = json['subscription_free_trial_days'];
-    subscriptionFreeTrialStatus = json['subscription_free_trial_status'] == 1 ? true : false;
+    subscriptionFreeTrialStatus = json['subscription_free_trial_status'] == 1
+        ? true
+        : false;
     subscriptionBusinessModel = json['subscription_business_model'];
     commissionBusinessModel = json['commission_business_model'];
     subscriptionFreeTrialType = json['subscription_free_trial_type'];
     systemTaxType = json['system_tax_type'];
     systemTaxIncludeStatus = json['system_tax_include_status'];
     openAiStatus = json['open_ai_status'] == 1 ? true : false;
-    reelsModule = json['reels_module'] != null ? ReelsModule.fromJson(json['reels_module']) : null;
-    validationConfig = json['validation_config'] != null ? ValidationConfig.fromJson(json['validation_config']) : ValidationConfig(videoFormat: "mp4,webm,ogg", videoExtension: ".mp4,.webm,.ogg", productVideoMaxFileSize: 20, maxFileSize: 2, maxUploadFileCount: 5);
-    maintenanceModeData = json['maintenance_mode_data'] != null ? MaintenanceModeData.fromJson(json['maintenance_mode_data']) : null;
-    storeCategoryStatus = json['store_category_status'] == true || json['store_category_status'] == 1 ? true : false;
+    reelsModule = json['reels_module'] != null
+        ? ReelsModule.fromJson(json['reels_module'])
+        : null;
+    validationConfig = json['validation_config'] != null
+        ? ValidationConfig.fromJson(json['validation_config'])
+        : ValidationConfig(
+            videoFormat: "mp4,webm,ogg",
+            videoExtension: ".mp4,.webm,.ogg",
+            productVideoMaxFileSize: 20,
+            maxFileSize: 2,
+            maxUploadFileCount: 5,
+          );
+    maintenanceModeData = json['maintenance_mode_data'] != null
+        ? MaintenanceModeData.fromJson(json['maintenance_mode_data'])
+        : null;
+    storeCategoryStatus =
+        json['store_category_status'] == true ||
+            json['store_category_status'] == 1
+        ? true
+        : false;
+    serviceModule = json['service_module'] != null
+        ? ServiceModule.fromJson(json['service_module'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -238,13 +279,17 @@ class ConfigModel {
     data['additional_charge_name'] = additionalChargeName;
     data['disbursement_type'] = disbursementType;
     if (activePaymentMethodList != null) {
-      data['active_payment_method_list'] = activePaymentMethodList!.map((v) => v.toJson()).toList();
+      data['active_payment_method_list'] = activePaymentMethodList!
+          .map((v) => v.toJson())
+          .toList();
     }
     data['min_amount_to_pay_store'] = minAmountToPayStore;
     data['store_review_reply'] = storeReviewReply;
     data['admin_commission'] = adminCommission;
-    data['subscription_deadline_warning_days'] = subscriptionDeadlineWarningDays;
-    data['subscription_deadline_warning_message'] = subscriptionDeadlineWarningMessage;
+    data['subscription_deadline_warning_days'] =
+        subscriptionDeadlineWarningDays;
+    data['subscription_deadline_warning_message'] =
+        subscriptionDeadlineWarningMessage;
     data['subscription_free_trial_days'] = subscriptionFreeTrialDays;
     data['subscription_free_trial_status'] = subscriptionFreeTrialStatus;
     data['subscription_business_model'] = subscriptionBusinessModel;
@@ -261,6 +306,9 @@ class ConfigModel {
       data['maintenance_mode_data'] = maintenanceModeData!.toJson();
     }
     data['store_category_status'] = storeCategoryStatus;
+    if (serviceModule != null) {
+      data['service_module'] = serviceModule!.toJson();
+    }
     return data;
   }
 }
@@ -311,7 +359,9 @@ class ModuleConfig {
 
   ModuleConfig.fromJson(Map<String, dynamic> json) {
     moduleType = json['module_type'].cast<String>();
-    module = json[moduleType![0]] != null ? Module.fromJson(json[moduleType![0]]) : null;
+    module = json[moduleType![0]] != null
+        ? Module.fromJson(json[moduleType![0]])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -356,7 +406,9 @@ class Module {
   });
 
   Module.fromJson(Map<String, dynamic> json) {
-    orderStatus = json['order_status'] != null ? OrderStatus.fromJson(json['order_status']) : null;
+    orderStatus = json['order_status'] != null
+        ? OrderStatus.fromJson(json['order_status'])
+        : null;
     orderPlaceToScheduleInterval = json['order_place_to_schedule_interval'];
     addOn = json['add_on'];
     stock = json['stock'];
@@ -459,11 +511,17 @@ class ReelsModule {
 
   ReelsModule.fromJson(Map<String, dynamic> json) {
     vendorCanUploadReels = json['vendor_can_upload_reels'] == 1;
-    reelsMaxUploadSizeMb = json['reels_max_upload_size_mb'] != null ? int.parse(json['reels_max_upload_size_mb'].toString()) : null;
-    reelsMaxDuration = json['reels_max_duration'] != null ? int.parse(json['reels_max_duration'].toString()) : null;
+    reelsMaxUploadSizeMb = json['reels_max_upload_size_mb'] != null
+        ? int.parse(json['reels_max_upload_size_mb'].toString())
+        : null;
+    reelsMaxDuration = json['reels_max_duration'] != null
+        ? int.parse(json['reels_max_duration'].toString())
+        : null;
     reelsMaxDurationUnit = json['reels_max_duration_unit'];
     reelsUploadLimitUnlimited = json['reels_upload_limit_unlimited'] == 1;
-    reelsUploadLimit = json['reels_upload_limit'] != null ? int.parse(json['reels_upload_limit'].toString()) : null;
+    reelsUploadLimit = json['reels_upload_limit'] != null
+        ? int.parse(json['reels_upload_limit'].toString())
+        : null;
     reelsUploadLimitType = json['reels_upload_limit_type'];
   }
 
@@ -473,11 +531,154 @@ class ReelsModule {
     data['reels_max_upload_size_mb'] = reelsMaxUploadSizeMb;
     data['reels_max_duration'] = reelsMaxDuration;
     data['reels_max_duration_unit'] = reelsMaxDurationUnit;
-    data['reels_upload_limit_unlimited'] = reelsUploadLimitUnlimited == true ? 1 : 0;
+    data['reels_upload_limit_unlimited'] = reelsUploadLimitUnlimited == true
+        ? 1
+        : 0;
     data['reels_upload_limit'] = reelsUploadLimit;
     data['reels_upload_limit_type'] = reelsUploadLimitType;
     return data;
   }
+}
+
+class ServiceModule {
+  bool? instantBooking;
+  bool? repeatBooking;
+  bool? scheduleBooking;
+  bool? scheduleTimeRestrictionStatus;
+  int? scheduleTimeRestrictionValue;
+  String? scheduleTimeRestrictionUnit;
+  bool? biddingSystem;
+  bool? seeOtherProvidersOffers;
+  int? postValidationDays;
+  bool? otpForCompleteService;
+  bool? completePhotoEvidence;
+  bool? providerCanCancelBooking;
+  bool? providerCanEditBooking;
+  bool? providerCanReplyReview;
+  bool? providerCategoryStatus;
+  bool? serviceGallery;
+  bool? accessAllServices;
+  bool? servicemanCancelBookingReq;
+  bool? atProviderPlace;
+  bool? reviewSection;
+  ServiceModuleTax? tax;
+
+  ServiceModule({
+    this.instantBooking,
+    this.repeatBooking,
+    this.scheduleBooking,
+    this.scheduleTimeRestrictionStatus,
+    this.scheduleTimeRestrictionValue,
+    this.scheduleTimeRestrictionUnit,
+    this.biddingSystem,
+    this.seeOtherProvidersOffers,
+    this.postValidationDays,
+    this.otpForCompleteService,
+    this.completePhotoEvidence,
+    this.providerCanCancelBooking,
+    this.providerCanEditBooking,
+    this.providerCanReplyReview,
+    this.providerCategoryStatus,
+    this.serviceGallery,
+    this.accessAllServices,
+    this.servicemanCancelBookingReq,
+    this.atProviderPlace,
+    this.reviewSection,
+    this.tax,
+  });
+
+  ServiceModule.fromJson(Map<String, dynamic> json) {
+    instantBooking = DataParserHelper.parseBool(json['instant_booking']);
+    repeatBooking = DataParserHelper.parseBool(json['repeat_booking']);
+    scheduleBooking = DataParserHelper.parseBool(json['schedule_booking']);
+    scheduleTimeRestrictionStatus = DataParserHelper.parseBool(
+      json['schedule_time_restriction_status'],
+    );
+    scheduleTimeRestrictionValue = json['schedule_time_restriction_value'];
+    scheduleTimeRestrictionUnit = json['schedule_time_restriction_unit'];
+    biddingSystem = DataParserHelper.parseBool(json['bidding_system']);
+    seeOtherProvidersOffers = DataParserHelper.parseBool(
+      json['see_other_providers_offers'],
+    );
+    postValidationDays = json['post_validation_days'];
+    otpForCompleteService = DataParserHelper.parseBool(
+      json['otp_for_complete_service'],
+    );
+    completePhotoEvidence = DataParserHelper.parseBool(
+      json['complete_photo_evidence'],
+    );
+    providerCanCancelBooking = DataParserHelper.parseBool(
+      json['provider_can_cancel_booking'],
+    );
+    providerCanEditBooking = DataParserHelper.parseBool(
+      json['provider_can_edit_booking'],
+    );
+    providerCanReplyReview = DataParserHelper.parseBool(
+      json['provider_can_reply_review'],
+    );
+    providerCategoryStatus = DataParserHelper.parseBool(
+      json['provider_category_status'],
+    );
+    serviceGallery = DataParserHelper.parseBool(json['service_gallery']);
+    accessAllServices = DataParserHelper.parseBool(json['access_all_services']);
+    servicemanCancelBookingReq = DataParserHelper.parseBool(
+      json['serviceman_cancel_booking_req'],
+    );
+    atProviderPlace = DataParserHelper.parseBool(json['at_provider_place']);
+    reviewSection = DataParserHelper.parseBool(json['review_section'] ?? true);
+    tax = json['tax'] != null ? ServiceModuleTax.fromJson(json['tax']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{
+      'instant_booking': instantBooking,
+      'repeat_booking': repeatBooking,
+      'schedule_booking': scheduleBooking,
+      'schedule_time_restriction_status': scheduleTimeRestrictionStatus,
+      'schedule_time_restriction_value': scheduleTimeRestrictionValue,
+      'schedule_time_restriction_unit': scheduleTimeRestrictionUnit,
+      'bidding_system': biddingSystem,
+      'see_other_providers_offers': seeOtherProvidersOffers,
+      'post_validation_days': postValidationDays,
+      'otp_for_complete_service': otpForCompleteService,
+      'complete_photo_evidence': completePhotoEvidence,
+      'provider_can_cancel_booking': providerCanCancelBooking,
+      'provider_can_edit_booking': providerCanEditBooking,
+      'provider_can_reply_review': providerCanReplyReview,
+      'provider_category_status': providerCategoryStatus,
+      'service_gallery': serviceGallery,
+      'access_all_services': accessAllServices,
+      'serviceman_cancel_booking_req': servicemanCancelBookingReq,
+      'at_provider_place': atProviderPlace,
+      'review_section': reviewSection,
+    };
+    if (tax != null) {
+      data['tax'] = tax!.toJson();
+    }
+    return data;
+  }
+}
+
+class ServiceModuleTax {
+  String? taxType;
+  String? taxStatus;
+  double? taxPercentage;
+
+  ServiceModuleTax({this.taxType, this.taxStatus, this.taxPercentage});
+
+  ServiceModuleTax.fromJson(Map<String, dynamic> json) {
+    taxType = json['tax_type'];
+    taxStatus = json['tax_status'];
+    taxPercentage = json['tax_percentage'] != null
+        ? double.tryParse(json['tax_percentage'].toString())
+        : null;
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'tax_type': taxType,
+    'tax_status': taxStatus,
+    'tax_percentage': taxPercentage,
+  };
 }
 
 class ValidationConfig {
@@ -498,11 +699,17 @@ class ValidationConfig {
 
   factory ValidationConfig.fromJson(Map<String, dynamic> json) {
     return ValidationConfig(
-      videoFormat : json['video_format'] ?? '',
-      videoExtension : json['video_extension'] ?? '',
-      productVideoMaxFileSize : num.tryParse(json['product_video_max_file_size'].toString())?.toDouble() ?? 20,
-      maxFileSize : num.tryParse(json['max_file_size'].toString())?.toDouble() ?? 2,
-      maxUploadFileCount : num.tryParse(json['max_upload_file_count'].toString())?.toInt() ?? 5,
+      videoFormat: json['video_format'] ?? '',
+      videoExtension: json['video_extension'] ?? '',
+      productVideoMaxFileSize:
+          num.tryParse(
+            json['product_video_max_file_size'].toString(),
+          )?.toDouble() ??
+          20,
+      maxFileSize:
+          num.tryParse(json['max_file_size'].toString())?.toDouble() ?? 2,
+      maxUploadFileCount:
+          num.tryParse(json['max_upload_file_count'].toString())?.toInt() ?? 5,
     );
   }
 
@@ -530,8 +737,12 @@ class MaintenanceModeData {
 
   MaintenanceModeData.fromJson(Map<String, dynamic> json) {
     maintenanceSystemSetup = json['maintenance_system_setup'].cast<String>();
-    maintenanceDurationSetup = json['maintenance_duration_setup'] != null ? MaintenanceDurationSetup.fromJson(json['maintenance_duration_setup']) : null;
-    maintenanceMessageSetup = json['maintenance_message_setup'] != null ? MaintenanceMessageSetup.fromJson(json['maintenance_message_setup']) : null;
+    maintenanceDurationSetup = json['maintenance_duration_setup'] != null
+        ? MaintenanceDurationSetup.fromJson(json['maintenance_duration_setup'])
+        : null;
+    maintenanceMessageSetup = json['maintenance_message_setup'] != null
+        ? MaintenanceMessageSetup.fromJson(json['maintenance_message_setup'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -579,7 +790,12 @@ class MaintenanceMessageSetup {
   String? maintenanceMessage;
   String? messageBody;
 
-  MaintenanceMessageSetup({this.businessNumber, this.businessEmail, this.maintenanceMessage, this.messageBody});
+  MaintenanceMessageSetup({
+    this.businessNumber,
+    this.businessEmail,
+    this.maintenanceMessage,
+    this.messageBody,
+  });
 
   MaintenanceMessageSetup.fromJson(Map<String, dynamic> json) {
     businessNumber = json['business_number'];

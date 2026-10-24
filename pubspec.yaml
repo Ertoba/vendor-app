@@ -49,6 +49,7 @@ dependencies:
   flutter_svg: ^2.2.3
   card_swiper: ^3.0.1
   file_picker: ^10.3.7
+  open_file: ^4.0.0
   video_player: ^2.10.1
   youtube_player_flutter: ^9.1.3
   chewie: ^1.13.0
@@ -83,6 +84,7 @@ flutter:
   assets:
     - assets/image/
     - assets/image/taxi_image/
+    - assets/image/service_module/
     - assets/language/
     - assets/notification.mp3
     - assets/json/

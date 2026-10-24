@@ -27,6 +27,24 @@ class AppConstants {
       '/api/v1/vendor/order-details?order_id=';
   static const String updatedOrderStatusUri =
       '/api/v1/vendor/update-order-status';
+  static const String bookingListUri = '/api/v1/vendor/booking/list';
+  static const String bookingDetailsUri = '/api/v1/vendor/booking/details/';
+  static const String bookingStatusUri = '/api/v1/vendor/booking/status/';
+  static const String bookingAssignableServicemenUri =
+      '/api/v1/vendor/booking/assignable-servicemen/';
+  static const String bookingAssignServicemanUri =
+      '/api/v1/vendor/booking/assign-serviceman/';
+  static const String bookingInvoiceUri = '/api/v1/vendor/booking/invoice/';
+  static const String bookingEditCatalogUri =
+      '/api/v1/vendor/booking/edit-catalog/';
+  static const String bookingEditPreviewUri =
+      '/api/v1/vendor/booking/edit-preview/';
+  static const String bookingEditUpdateUri =
+      '/api/v1/vendor/booking/edit-update/';
+  static const String bookingUpdateLocationUri =
+      '/api/v1/vendor/booking/update-location/';
+  static const String bookingRescheduleUri =
+      '/api/v1/vendor/booking/reschedule/';
   static const String notificationUri = '/api/v1/vendor/notifications';
   static const String profileUri = '/api/v1/vendor/profile';
   static const String updateProfileUri = '/api/v1/vendor/update-profile';
@@ -41,11 +59,14 @@ class AppConstants {
   static const String happyHourRespondUri = '/api/v1/vendor/happy-hour/respond';
   static const String happyHourLeaveUri = '/api/v1/vendor/happy-hour/leave';
   static const String bogoOfferListUri = '/api/v1/vendor/bogo-offer/list';
-  static const String bogoOfferDetailsUri = '/api/v1/vendor/bogo-offer/details/';
+  static const String bogoOfferDetailsUri =
+      '/api/v1/vendor/bogo-offer/details/';
   static const String bogoOfferJoinUri = '/api/v1/vendor/bogo-offer/join/';
-  static const String bogoOfferResubmitUri = '/api/v1/vendor/bogo-offer/resubmit/';
+  static const String bogoOfferResubmitUri =
+      '/api/v1/vendor/bogo-offer/resubmit/';
   static const String bogoOfferLeaveUri = '/api/v1/vendor/bogo-offer/leave/';
-  static const String bogoOfferRespondUri = '/api/v1/vendor/bogo-offer/respond/';
+  static const String bogoOfferRespondUri =
+      '/api/v1/vendor/bogo-offer/respond/';
   static const String bogoOfferItemsUri = '/api/v1/vendor/bogo-offer/items';
   static const String bundleListUri = '/api/v1/vendor/bundle/list';
   static const String bundleDetailsUri = '/api/v1/vendor/bundle/details/';
@@ -77,6 +98,12 @@ class AppConstants {
       '/api/v1/vendor/store-category/assignable-items';
   static const String assignFoodsUri =
       '/api/v1/vendor/store-category/assign-items';
+  static const String serviceAssignableItemsUri =
+      '/api/v1/vendor/service/store-category/assignable-items';
+  static const String serviceAssignItemsUri =
+      '/api/v1/vendor/service/store-category/assign-items';
+  static const String serviceStoreCategoryItemsUri =
+      '/api/v1/vendor/service/store-category/items';
   static const String addonUri = '/api/v1/vendor/addon';
   static const String addAddonUri = '/api/v1/vendor/addon/store';
   static const String updateAddonUri = '/api/v1/vendor/addon/update';
@@ -104,6 +131,13 @@ class AppConstants {
   static const String deleteDmUri = '/api/v1/vendor/delivery-man/delete';
   static const String updateDmStatusUri = '/api/v1/vendor/delivery-man/status';
   static const String dmReviewUri = '/api/v1/vendor/delivery-man/preview';
+  static const String smListUri = '/api/v1/vendor/serviceman/list';
+  static const String smDetailsUri = '/api/v1/vendor/serviceman/details/';
+  static const String addSmUri = '/api/v1/vendor/serviceman/store';
+  static const String updateSmUri = '/api/v1/vendor/serviceman/update/';
+  static const String deleteSmUri = '/api/v1/vendor/serviceman/delete/';
+  static const String updateSmStatusUri = '/api/v1/vendor/serviceman/status/';
+  static const String smServicesUri = '/api/v1/vendor/serviceman/services/';
   static const String addSchedule = '/api/v1/vendor/schedule/store';
   static const String deleteSchedule = '/api/v1/vendor/schedule/';
   static const String unitListUri = '/api/v1/vendor/unit';
@@ -186,6 +220,19 @@ class AppConstants {
   static const String getTaxReportUri = '/api/v1/vendor/get-tax-report';
   static const String categoryWiseProducts =
       '/api/v1/vendor/categories/category-wise-products';
+  static const String categoryWiseServices =
+      '/api/v1/vendor/service/categories/category-wise-services';
+
+  static const String serviceEarningReportUri =
+      '/api/v1/vendor/service/get-earning-report';
+  static const String serviceTaxReportUri =
+      '/api/v1/vendor/service/get-tax-report';
+  static const String serviceExpenseListUri =
+      '/api/v1/vendor/service/get-expense';
+  static const String serviceDisbursementReportUri =
+      '/api/v1/vendor/service/get-disbursement-report';
+  static const String serviceBookingReportUri =
+      '/api/v1/vendor/service/get-booking-report';
 
   /// Subscription url
   static const String restaurantPackagesUri = '/api/v1/vendor/package-view';
@@ -340,6 +387,56 @@ class AppConstants {
 
   static const String storeCategoryDetailsUri =
       '/api/v1/vendor/store-category/details';
+
+  static const String addServiceUri = '/api/v1/vendor/service/store';
+  static const String updateServiceUri = '/api/v1/vendor/service/update';
+  static const String serviceDetailsUri = '/api/v1/vendor/service/details';
+  static const String deleteServiceUri = '/api/v1/vendor/service/delete';
+  static const String updateServiceStatusUri = '/api/v1/vendor/service/status';
+  static const String serviceAiTitleUri = '/api/v1/vendor/service/ai/title';
+  static const String serviceAiDescriptionUri =
+      '/api/v1/vendor/service/ai/description';
+  static const String serviceAiSeoUri = '/api/v1/vendor/service/ai/seo';
+  static const String serviceAiGeneralSetupUri =
+      '/api/v1/vendor/service/ai/general-setup';
+  static const String serviceAiPriceVariationUri =
+      '/api/v1/vendor/service/ai/price-variation';
+  static const String serviceAiTagsUri = '/api/v1/vendor/service/ai/tags';
+  static const String serviceAiTitleSuggestionsUri =
+      '/api/v1/vendor/service/ai/generate-title-suggestions';
+  static const String serviceAiAnalyzeImageUri =
+      '/api/v1/vendor/service/ai/analyze-image';
+  static const String pendingServiceListUri =
+      '/api/v1/vendor/service/pending-list';
+  static const String pendingServiceDetailsUri =
+      '/api/v1/vendor/service/pending-details';
+  static const String deletePendingServiceUri =
+      '/api/v1/vendor/service/pending-delete';
+  static const String serviceListUri = '/api/v1/vendor/service/list';
+  static const String serviceStoreSetupUri =
+      '/api/v1/vendor/service/store-setup';
+  static const String vendorServiceReviewListUri =
+      '/api/v1/vendor/service/reviews';
+  static const String vendorServiceReviewReplyUri =
+      '/api/v1/vendor/service/reviews/reply';
+  static const String vendorServiceReviewStatusUri =
+      '/api/v1/vendor/service/reviews/status';
+  static const String serviceFaqListUri = '/api/v1/vendor/service/faq/list';
+  static const String serviceFaqStoreUri = '/api/v1/vendor/service/faq/store';
+  static const String serviceFaqUpdateUri = '/api/v1/vendor/service/faq/update';
+  static const String serviceFaqStatusUri = '/api/v1/vendor/service/faq/status';
+  static const String serviceFaqDeleteUri = '/api/v1/vendor/service/faq/delete';
+  static const String customServiceRequestListUri =
+      '/api/v1/vendor/service/custom-requests';
+  static const String customServiceBidUri = '/api/v1/vendor/service/bids';
+  static const String serviceCampaignListUri =
+      '/api/v1/vendor/service/basic-campaigns/list';
+  static const String serviceCampaignDetailsUri =
+      '/api/v1/vendor/service/basic-campaigns/details';
+  static const String serviceCampaignJoinUri =
+      '/api/v1/vendor/service/basic-campaigns/join';
+  static const String serviceCampaignLeaveUri =
+      '/api/v1/vendor/service/basic-campaigns/leave';
 
   /// Shared Key
   static const String theme = '6am_mart_store_theme';

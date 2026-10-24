@@ -18,7 +18,8 @@ import 'package:flutter/foundation.dart' as foundation;
 class ApiClient extends GetxService {
   final String appBaseUrl;
   final SharedPreferences sharedPreferences;
-  static const String noInternetMessage = 'Connection to API server failed due to internet connection';
+  static const String noInternetMessage =
+      'Connection to API server failed due to internet connection';
   final int timeoutInSeconds = 30;
 
   String? token;
@@ -30,42 +31,66 @@ class ApiClient extends GetxService {
     type = sharedPreferences.getString(AppConstants.type);
     debugPrint('Token: $token');
     debugPrint('Type: $type');
-    updateHeader(token, sharedPreferences.getString(AppConstants.languageCode), null, type);
+    updateHeader(
+      token,
+      sharedPreferences.getString(AppConstants.languageCode),
+      null,
+      type,
+    );
   }
 
-  void updateHeader(String? token, String? languageCode, int? moduleID, String? type) {
+  void updateHeader(
+    String? token,
+    String? languageCode,
+    int? moduleID,
+    String? type,
+  ) {
     _mainHeaders = {
       'Content-Type': 'application/json; charset=UTF-8',
-      AppConstants.localizationKey: languageCode ?? AppConstants.languages[0].languageCode!,
+      AppConstants.localizationKey:
+          languageCode ?? AppConstants.languages[0].languageCode!,
       AppConstants.moduleId: moduleID != null ? moduleID.toString() : '',
       'Authorization': 'Bearer $token',
-      'vendorType': type??'',
+      'vendorType': type ?? '',
     };
   }
 
-  Future<Response> getData(String uri, {Map<String, dynamic>? query, Map<String, String>? headers, bool handleError = true}) async {
+  Map<String, String> getHeader() => _mainHeaders;
+
+  Future<Response> getData(
+    String uri, {
+    Map<String, dynamic>? query,
+    Map<String, String>? headers,
+    bool handleError = true,
+  }) async {
     try {
       debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
-      http.Response response = await http.get(
-        Uri.parse(appBaseUrl+uri),
-        headers: headers ?? _mainHeaders,
-      ).timeout(Duration(seconds: timeoutInSeconds));
+      http.Response response = await http
+          .get(Uri.parse(appBaseUrl + uri), headers: headers ?? _mainHeaders)
+          .timeout(Duration(seconds: timeoutInSeconds));
       return handleResponse(response, uri, handleError);
     } catch (e) {
       return const Response(statusCode: 1, statusText: noInternetMessage);
     }
   }
 
-  Future<Response> postData(String uri, dynamic body, {Map<String, String>? headers, bool handleError = true}) async {
+  Future<Response> postData(
+    String uri,
+    dynamic body, {
+    Map<String, String>? headers,
+    bool handleError = true,
+  }) async {
     try {
       debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
       debugPrint('====> API Body: $body');
       debugPrint('===check=> API Body: ${body.runtimeType}');
-      http.Response response = await http.post(
-        Uri.parse(appBaseUrl+uri),
-        body: jsonEncode(body),
-        headers: headers ?? _mainHeaders,
-      ).timeout(Duration(seconds: timeoutInSeconds));
+      http.Response response = await http
+          .post(
+            Uri.parse(appBaseUrl + uri),
+            body: jsonEncode(body),
+            headers: headers ?? _mainHeaders,
+          )
+          .timeout(Duration(seconds: timeoutInSeconds));
       print("=1p;l.===> API Response: $response");
       return handleResponse(response, uri, handleError);
     } catch (e) {
@@ -73,104 +98,166 @@ class ApiClient extends GetxService {
     }
   }
 
-  Future<Response> postMultipartData(String uri, Map<String, String> body, List<MultipartBody> multipartBody, {List<MultipartDocument>? multipartDocument, Map<String, String>? headers, bool handleError = true}) async {
+  Future<Response> postMultipartData(
+    String uri,
+    Map<String, String> body,
+    List<MultipartBody> multipartBody, {
+    List<MultipartDocument>? multipartDocument,
+    Map<String, String>? headers,
+    bool handleError = true,
+  }) async {
     try {
       debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
-      debugPrint('====> API Body: $body with ${multipartBody.length} and multipart ${multipartDocument?.length}');
-      http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(appBaseUrl+uri));
+      debugPrint(
+        '====> API Body: $body with ${multipartBody.length} and multipart ${multipartDocument?.length}',
+      );
+      http.MultipartRequest request = http.MultipartRequest(
+        'POST',
+        Uri.parse(appBaseUrl + uri),
+      );
       request.headers.addAll(headers ?? _mainHeaders);
-      for(MultipartBody multipart in multipartBody) {
-        if(multipart.file != null) {
-          if(foundation.kIsWeb) {
+      for (MultipartBody multipart in multipartBody) {
+        if (multipart.file != null) {
+          if (foundation.kIsWeb) {
             Uint8List list = await multipart.file!.readAsBytes();
             http.MultipartFile part = http.MultipartFile(
-              multipart.key, multipart.file!.readAsBytes().asStream(), list.length,
-              filename: basename(multipart.file!.path), contentType: MediaType('image', 'jpg'),
+              multipart.key,
+              multipart.file!.readAsBytes().asStream(),
+              list.length,
+              filename: basename(multipart.file!.path),
+              contentType: MediaType('image', 'jpg'),
             );
             request.files.add(part);
-          }else {
+          } else {
             File file = File(multipart.file!.path);
-            request.files.add(http.MultipartFile(
-              multipart.key, file.readAsBytes().asStream(), file.lengthSync(), filename: file.path.split('/').last,
-            ));
+            request.files.add(
+              http.MultipartFile(
+                multipart.key,
+                file.readAsBytes().asStream(),
+                file.lengthSync(),
+                filename: file.path.split('/').last,
+              ),
+            );
           }
         }
       }
 
-      if(multipartDocument != null && multipartDocument.isNotEmpty){
-        for(MultipartDocument file in multipartDocument){
+      if (multipartDocument != null && multipartDocument.isNotEmpty) {
+        for (MultipartDocument file in multipartDocument) {
           File other = File(file.file!.files.single.path!);
           Uint8List list0 = await other.readAsBytes();
-          var part = http.MultipartFile(file.key, other.readAsBytes().asStream(), list0.length, filename: basename(other.path));
+          var part = http.MultipartFile(
+            file.key,
+            other.readAsBytes().asStream(),
+            list0.length,
+            filename: basename(other.path),
+          );
           request.files.add(part);
         }
       }
 
       request.fields.addAll(body);
-      http.Response response = await http.Response.fromStream(await request.send());
+      http.Response response = await http.Response.fromStream(
+        await request.send(),
+      );
       return handleResponse(response, uri, handleError);
     } catch (e) {
       return const Response(statusCode: 1, statusText: noInternetMessage);
     }
   }
 
-  Future<Response> putData(String uri, dynamic body, {Map<String, String>? headers, bool handleError = true}) async {
+  Future<Response> putData(
+    String uri,
+    dynamic body, {
+    Map<String, String>? headers,
+    bool handleError = true,
+  }) async {
     try {
       debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
       debugPrint('====> API Body: $body');
-      http.Response response = await http.put(
-        Uri.parse(appBaseUrl+uri),
-        body: jsonEncode(body),
-        headers: headers ?? _mainHeaders,
-      ).timeout(Duration(seconds: timeoutInSeconds));
+      http.Response response = await http
+          .put(
+            Uri.parse(appBaseUrl + uri),
+            body: jsonEncode(body),
+            headers: headers ?? _mainHeaders,
+          )
+          .timeout(Duration(seconds: timeoutInSeconds));
       return handleResponse(response, uri, handleError);
     } catch (e) {
       return const Response(statusCode: 1, statusText: noInternetMessage);
     }
   }
 
-  Future<Response> deleteData(String uri, {Map<String, String>? headers, bool handleError = true}) async {
+  Future<Response> deleteData(
+    String uri, {
+    Map<String, String>? headers,
+    bool handleError = true,
+  }) async {
     try {
       debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
-      http.Response response = await http.delete(
-        Uri.parse(appBaseUrl+uri),
-        headers: headers ?? _mainHeaders,
-      ).timeout(Duration(seconds: timeoutInSeconds));
+      http.Response response = await http
+          .delete(Uri.parse(appBaseUrl + uri), headers: headers ?? _mainHeaders)
+          .timeout(Duration(seconds: timeoutInSeconds));
       return handleResponse(response, uri, handleError);
     } catch (e) {
       return const Response(statusCode: 1, statusText: noInternetMessage);
     }
   }
 
-  Response handleResponse(http.Response response, String uri, bool handleError) {
+  Response handleResponse(
+    http.Response response,
+    String uri,
+    bool handleError,
+  ) {
     dynamic body;
     try {
       body = jsonDecode(response.body);
-    }catch(_) {}
+    } catch (_) {}
     // Unwrap the new API envelope centrally, while retaining legacy responses.
-    final String? envelopeMessage = envelopeMessageOf(body, response.statusCode);
+    final String? envelopeMessage = envelopeMessageOf(
+      body,
+      response.statusCode,
+    );
     body = unwrapEnvelope(body, response.statusCode);
     Response response0 = Response(
-      body: body ?? response.body, bodyString: response.body,
-      headers: response.headers, statusCode: response.statusCode,
+      body: body ?? response.body,
+      bodyString: response.body,
+      headers: response.headers,
+      statusCode: response.statusCode,
       statusText: envelopeMessage ?? response.reasonPhrase,
     );
-    if(!isSuccessCode(response0.statusCode) && response0.body != null && response0.body is !String) {
+    if (!isSuccessCode(response0.statusCode) &&
+        response0.body != null &&
+        response0.body is! String) {
       final String? envelopeError = envelopeErrorMessageOf(response0.body);
-      if(envelopeError != null) {
-        response0 = Response(statusCode: response0.statusCode, body: response0.body, statusText: envelopeError);
-      } else if(response0.body.toString().startsWith('{errors: [{code:')) {
+      if (envelopeError != null) {
+        response0 = Response(
+          statusCode: response0.statusCode,
+          body: response0.body,
+          statusText: envelopeError,
+        );
+      } else if (response0.body.toString().startsWith('{errors: [{code:')) {
         ErrorResponse errorResponse = ErrorResponse.fromJson(response0.body);
-        response0 = Response(statusCode: response0.statusCode, body: response0.body, statusText: errorResponse.errors![0].message);
-      }else if(response0.body.toString().startsWith('{message')) {
-        response0 = Response(statusCode: response0.statusCode, body: response0.body, statusText: response0.body['message']);
+        response0 = Response(
+          statusCode: response0.statusCode,
+          body: response0.body,
+          statusText: errorResponse.errors![0].message,
+        );
+      } else if (response0.body.toString().startsWith('{message')) {
+        response0 = Response(
+          statusCode: response0.statusCode,
+          body: response0.body,
+          statusText: response0.body['message'],
+        );
       }
-    }else if(!isSuccessCode(response0.statusCode) && response0.body == null) {
+    } else if (!isSuccessCode(response0.statusCode) && response0.body == null) {
       response0 = const Response(statusCode: 0, statusText: noInternetMessage);
     }
-    log('====> API Response: [${response0.statusCode}] $uri\n${response0.body}');
-    if(handleError) {
-      if(isSuccessCode(response0.statusCode)) {
+    log(
+      '====> API Response: [${response0.statusCode}] $uri\n${response0.body}',
+    );
+    if (handleError) {
+      if (isSuccessCode(response0.statusCode)) {
         return response0;
       } else {
         ApiChecker.checkApi(response0);
@@ -180,6 +267,7 @@ class ApiClient extends GetxService {
       return response0;
     }
   }
+
   /// Treat any successful 2xx HTTP status as success.
   static bool isSuccessCode(int? statusCode) =>
       statusCode != null && statusCode >= 200 && statusCode < 300;
@@ -188,13 +276,15 @@ class ApiClient extends GetxService {
   /// successful new-format response with a non-null content payload.
   static dynamic unwrapEnvelope(dynamic body, int? statusCode) {
     if (!isSuccessCode(statusCode) || body is! Map) return body;
-    if (!body.containsKey('identical_code') || body['content'] == null) return body;
+    if (!body.containsKey('identical_code') || body['content'] == null)
+      return body;
     return body['content'];
   }
 
   static String? envelopeMessageOf(dynamic body, int? statusCode) {
     if (!isSuccessCode(statusCode) || body is! Map) return null;
-    if (!body.containsKey('identical_code') || body['content'] == null) return null;
+    if (!body.containsKey('identical_code') || body['content'] == null)
+      return null;
     final dynamic message = body['message'];
     return message is String ? message : null;
   }
@@ -232,13 +322,17 @@ class MultipartDocument {
 }
 
 extension ApiResponsePayload on Response {
-  dynamic get content => body is Map && (body as Map).containsKey('content') ? body['content'] : body;
+  dynamic get content => body is Map && (body as Map).containsKey('content')
+      ? body['content']
+      : body;
 
   String? get apiMessage => body is Map ? body['message']?.toString() : null;
 
   PaginationModel? get pagination {
     final dynamic value = content is Map ? content['pagination'] : null;
-    return value is Map ? PaginationModel.fromJson(Map<String, dynamic>.from(value)) : null;
+    return value is Map
+        ? PaginationModel.fromJson(Map<String, dynamic>.from(value))
+        : null;
   }
 
   List<dynamic> get dataList {
@@ -246,9 +340,21 @@ extension ApiResponsePayload on Response {
     if (payload is List) return payload;
     if (payload is Map) {
       for (final String key in const [
-        'data', 'items', 'orders', 'categories', 'banners', 'campaigns',
-        'coupons', 'addons', 'methods', 'transactions', 'disbursements',
-        'reviews', 'zones', 'vehicles', 'withdrawals',
+        'data',
+        'items',
+        'orders',
+        'categories',
+        'banners',
+        'campaigns',
+        'coupons',
+        'addons',
+        'methods',
+        'transactions',
+        'disbursements',
+        'reviews',
+        'zones',
+        'vehicles',
+        'withdrawals',
       ]) {
         final dynamic value = payload[key];
         if (value is List) return value;
@@ -274,9 +380,10 @@ class PaginationModel {
 
   const PaginationModel({this.currentPage, this.lastPage, this.total});
 
-  factory PaginationModel.fromJson(Map<String, dynamic> json) => PaginationModel(
-    currentPage: int.tryParse('${json['current_page'] ?? ''}'),
-    lastPage: int.tryParse('${json['last_page'] ?? ''}'),
-    total: int.tryParse('${json['total'] ?? json['total_size'] ?? ''}'),
-  );
+  factory PaginationModel.fromJson(Map<String, dynamic> json) =>
+      PaginationModel(
+        currentPage: int.tryParse('${json['current_page'] ?? ''}'),
+        lastPage: int.tryParse('${json['last_page'] ?? ''}'),
+        total: int.tryParse('${json['total'] ?? json['total_size'] ?? ''}'),
+      );
 }

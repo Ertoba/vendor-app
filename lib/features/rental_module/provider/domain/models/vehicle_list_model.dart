@@ -1,3 +1,5 @@
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
+
 class VehicleListModel {
   int? totalSize;
   int? limit;
@@ -7,12 +9,14 @@ class VehicleListModel {
   VehicleListModel({this.totalSize, this.limit, this.offset, this.vehicles});
 
   VehicleListModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['vehicles'] != null) {
+    final dynamic pageRaw = json['pagination'];
+    final Map<String, dynamic>? page = pageRaw is Map ? Map<String, dynamic>.from(pageRaw) : null;
+    totalSize = int.tryParse('${(page != null ? page['total'] : json['total_size'])}');
+    limit = int.tryParse('${(page != null ? page['per_page'] : json['limit'])}');
+    offset = int.tryParse('${(page != null ? page['current_page'] : json['offset'])}');
+    if ((json['data'] ?? json['vehicles']) != null) {
       vehicles = <Vehicles>[];
-      json['vehicles'].forEach((v) {
+      (json['data'] ?? json['vehicles']).forEach((v) {
         vehicles!.add(Vehicles.fromJson(v));
       });
     }
@@ -168,7 +172,14 @@ class Vehicles {
         }
       });
     }
-    documentsFullUrl = json['documents_full_url'].cast<String>();
+    if (json['documents_full_url'] != null) {
+      documentsFullUrl = <String>[];
+      json['documents_full_url'].forEach((v) {
+        if (v != null) {
+          documentsFullUrl!.add(v.toString());
+        }
+      });
+    }
     if (json['translations'] != null && json['translations'].isNotEmpty) {
       translations = [];
       json['translations'].forEach((v) {
@@ -360,24 +371,24 @@ class Provider {
     address = json['address'];
     footerText = json['footer_text'];
     minimumOrder = json['minimum_order'];
-    scheduleOrder = json['schedule_order'];
+    scheduleOrder = DataParserHelper.parseBool(json['schedule_order']);
     status = json['status'];
     vendorId = json['vendor_id'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    freeDelivery = json['free_delivery'];
+    freeDelivery = DataParserHelper.parseBool(json['free_delivery']);
     rating = json['rating'].cast<int>();
     coverPhoto = json['cover_photo'];
-    delivery = json['delivery'];
-    takeAway = json['take_away'];
-    itemSection = json['item_section'];
+    delivery = DataParserHelper.parseBool(json['delivery']);
+    takeAway = DataParserHelper.parseBool(json['take_away']);
+    itemSection = DataParserHelper.parseBool(json['item_section']);
     tax = json['tax'].toDouble();
     zoneId = json['zone_id'];
-    reviewsSection = json['reviews_section'];
-    active = json['active'];
+    reviewsSection = DataParserHelper.parseBool(json['reviews_section']);
+    active = DataParserHelper.parseBool(json['active']);
     offDay = json['off_day'];
     selfDeliverySystem = json['self_delivery_system'];
-    posSystem = json['pos_system'];
+    posSystem = DataParserHelper.parseBool(json['pos_system']);
     minimumShippingCharge = json['minimum_shipping_charge'];
     deliveryTime = json['delivery_time'];
     veg = json['veg'];
@@ -388,13 +399,13 @@ class Provider {
     orderPlaceToScheduleInterval = json['order_place_to_schedule_interval'];
     featured = json['featured'];
     perKmShippingCharge = json['per_km_shipping_charge'];
-    prescriptionOrder = json['prescription_order'];
+    prescriptionOrder = DataParserHelper.parseBool(json['prescription_order']);
     slug = json['slug'];
     announcement = json['announcement'];
     announcementMessage = json['announcement_message'];
     storeBusinessModel = json['store_business_model'];
     packageId = json['package_id'];
-    gstStatus = json['gst_status'];
+    gstStatus = DataParserHelper.parseBool(json['gst_status']);
     gstCode = json['gst_code'];
     logoFullUrl = json['logo_full_url'];
     coverPhotoFullUrl = json['cover_photo_full_url'];
