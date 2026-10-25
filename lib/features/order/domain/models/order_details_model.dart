@@ -20,6 +20,12 @@ class OrderDetailsModel {
   int? itemCampaignId;
   double? totalAddOnPrice;
   bool? isEditable;
+  int? bogoOfferId;
+  String? bogoGroupId;
+  int? isFreeItem;
+  int? bundleId;
+  String? bundleGroupId;
+  String? bundleName;
 
   OrderDetailsModel({
     this.id,
@@ -40,7 +46,17 @@ class OrderDetailsModel {
     this.itemCampaignId,
     this.totalAddOnPrice,
     this.isEditable,
+    this.bogoOfferId,
+    this.bogoGroupId,
+    this.isFreeItem,
+    this.bundleId,
+    this.bundleGroupId,
+    this.bundleName,
   });
+
+  bool get isBogoItem => bogoGroupId != null;
+  bool get isFree => isFreeItem == 1;
+  bool get isBundleItem => bundleGroupId != null;
 
   OrderDetailsModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -92,6 +108,12 @@ class OrderDetailsModel {
     itemCampaignId = json['item_campaign_id'];
     totalAddOnPrice = json['total_add_on_price']?.toDouble();
     isEditable = TypeConverter.getBool(json['is_editable']);
+    bogoOfferId = json['bogo_offer_id'];
+    bogoGroupId = json['bogo_group_id'];
+    isFreeItem = json['is_free_item'];
+    bundleId = json['bundle_id'];
+    bundleGroupId = json['bundle_group_id'];
+    bundleName = json['bundle_name'];
   }
 
   Map<String, dynamic> toJson() {
@@ -121,6 +143,12 @@ class OrderDetailsModel {
     data['item_campaign_id'] = itemCampaignId;
     data['total_add_on_price'] = totalAddOnPrice;
     data['is_editable'] = isEditable;
+    data['bogo_offer_id'] = bogoOfferId;
+    data['bogo_group_id'] = bogoGroupId;
+    data['is_free_item'] = isFreeItem;
+    data['bundle_id'] = bundleId;
+    data['bundle_group_id'] = bundleGroupId;
+    data['bundle_name'] = bundleName;
     return data;
   }
 }
