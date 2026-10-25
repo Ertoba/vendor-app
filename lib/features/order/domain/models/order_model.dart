@@ -1,4 +1,5 @@
 import 'package:sixam_mart_store/helper/type_converter.dart';
+import 'package:sixam_mart_store/helper/data_parser_helper.dart';
 
 class PaginatedOrderModel {
   int? totalSize;
@@ -109,6 +110,7 @@ class OrderModel {
   String? benefitType;
   String? deliveryOfferType;
   double? deliveryFeeReductionAmount;
+  Eta? eta;
 
   OrderModel({
     this.id,
@@ -174,6 +176,7 @@ class OrderModel {
     this.benefitType,
     this.deliveryOfferType,
     this.deliveryFeeReductionAmount,
+    this.eta,
   });
 
   OrderModel.fromJson(Map<String, dynamic> json) {
@@ -259,6 +262,7 @@ class OrderModel {
     benefitType = json['benefit_type'];
     deliveryOfferType = json['delivery_offer_type'];
     deliveryFeeReductionAmount = json['delivery_fee_reduction_amount']?.toDouble();
+    eta = json['eta'] is Map ? Eta.fromJson(Map<String, dynamic>.from(json['eta'])) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -331,8 +335,70 @@ class OrderModel {
     data['benefit_type'] = benefitType;
     data['delivery_offer_type'] = deliveryOfferType;
     data['delivery_fee_reduction_amount'] = deliveryFeeReductionAmount;
+    if (eta != null) data['eta'] = eta!.toJson();
     return data;
   }
+}
+
+/** V4.2 delivery-time snapshot from the vendor order API. */
+class Eta {
+  int? min;
+  int? max;
+  String? unit;
+  String? text;
+  bool? overdue;
+  String? from;
+  String? to;
+  String? window;
+  String? fromAt;
+  String? toAt;
+  String? timezone;
+  String? stage;
+
+  Eta({
+    this.min,
+    this.max,
+    this.unit,
+    this.text,
+    this.overdue,
+    this.from,
+    this.to,
+    this.window,
+    this.fromAt,
+    this.toAt,
+    this.timezone,
+    this.stage,
+  });
+
+  Eta.fromJson(Map<String, dynamic> json) {
+    min = json['min'];
+    max = json['max'];
+    unit = json['unit'];
+    text = json['text'];
+    overdue = DataParserHelper.parseBool(json['overdue']);
+    from = json['from'];
+    to = json['to'];
+    window = json['window'];
+    fromAt = json['from_at'];
+    toAt = json['to_at'];
+    timezone = json['timezone'];
+    stage = json['stage'];
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'min': min,
+    'max': max,
+    'unit': unit,
+    'text': text,
+    'overdue': overdue,
+    'from': from,
+    'to': to,
+    'window': window,
+    'from_at': fromAt,
+    'to_at': toAt,
+    'timezone': timezone,
+    'stage': stage,
+  };
 }
 
 class DeliveryMan {
