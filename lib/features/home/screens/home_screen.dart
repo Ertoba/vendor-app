@@ -8,6 +8,10 @@ import 'package:sixam_mart_store/features/order/controllers/order_controller.dar
 import 'package:sixam_mart_store/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_store/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
+import 'package:sixam_mart_store/helper/bogo_offer_action_helper.dart';
+import 'package:sixam_mart_store/helper/happy_hour_action_helper.dart';
+import 'package:sixam_mart_store/common/widgets/custom_asset_image_widget.dart';
+import 'package:sixam_mart_store/common/widgets/custom_ink_well_widget.dart';
 import 'package:sixam_mart_store/util/dimensions.dart';
 import 'package:sixam_mart_store/util/images.dart';
 import 'package:sixam_mart_store/util/styles.dart';
@@ -16,6 +20,8 @@ import 'package:sixam_mart_store/common/widgets/order_widget.dart';
 import 'package:sixam_mart_store/features/home/widgets/order_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+part '../widgets/bogo_offer_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -51,6 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
     await Get.find<ProfileController>().getProfile();
     await Get.find<OrderController>().getCurrentOrders();
     await Get.find<NotificationController>().getNotificationList();
+    HappyHourActionHelper.showAdminRequest();
+    BogoOfferActionHelper.showAdminRequest();
   }
 
   Future<void> _checkSystemNotification() async {
@@ -230,6 +238,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       profileController.modulePermission != null && profileController.modulePermission!.advertisement! ? const AdsSectionWidget() : const SizedBox(),
                       const SizedBox(height: Dimensions.paddingSizeSmall),
+
+                      // V4.2: BOGO applies only to item-selling modules.
+                      BogoOfferActionHelper.isSupportedModule ? const _BogoOfferCard() : const SizedBox(),
+                      SizedBox(height: BogoOfferActionHelper.isSupportedModule ? Dimensions.paddingSizeSmall : 0),
 
                     ]),
                   ),
