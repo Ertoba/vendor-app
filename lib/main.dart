@@ -58,6 +58,9 @@ Future<void> main() async {
         await NotificationHelper.initialize(
           flutterLocalNotificationsPlugin,
         ).timeout(const Duration(seconds: 8));
+        body ??= await NotificationHelper.getLaunchNotification(
+          flutterLocalNotificationsPlugin,
+        ).timeout(const Duration(seconds: 8), onTimeout: () => null);
       } catch (error) {
         debugPrint('Notification init skipped: $error');
       }
@@ -112,60 +115,58 @@ class MyApp extends StatelessWidget {
                 return Material(
                   child: AppSafeArea(
                     child: Stack(
-                        children: [
-                          widget!,
+                      children: [
+                        widget!,
 
-                          GetBuilder<ProfileController>(
-                            builder: (profileController) {
-                              bool canShow =
-                                  profileController.profileModel != null &&
-                                  profileController
-                                          .profileModel!
-                                          .subscription !=
-                                      null &&
-                                  profileController
-                                          .profileModel!
-                                          .subscription!
-                                          .isTrial ==
-                                      1 &&
-                                  profileController
-                                          .profileModel!
-                                          .subscription!
-                                          .status ==
-                                      1 &&
-                                  DateConverterHelper.differenceInDaysIgnoringTime(
-                                        DateTime.parse(
-                                          profileController
-                                              .profileModel!
-                                              .subscription!
-                                              .expiryDate!,
-                                        ),
-                                        null,
-                                      ) >
-                                      0;
-
-                              return canShow &&
-                                      !profileController.trialWidgetNotShow
-                                  ? Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 90,
-                                        ),
-                                        child: TrialWidget(
-                                          subscription: profileController
-                                              .profileModel!
-                                              .subscription!,
-                                        ),
+                        GetBuilder<ProfileController>(
+                          builder: (profileController) {
+                            bool canShow =
+                                profileController.profileModel != null &&
+                                profileController.profileModel!.subscription !=
+                                    null &&
+                                profileController
+                                        .profileModel!
+                                        .subscription!
+                                        .isTrial ==
+                                    1 &&
+                                profileController
+                                        .profileModel!
+                                        .subscription!
+                                        .status ==
+                                    1 &&
+                                DateConverterHelper.differenceInDaysIgnoringTime(
+                                      DateTime.parse(
+                                        profileController
+                                            .profileModel!
+                                            .subscription!
+                                            .expiryDate!,
                                       ),
-                                    )
-                                  : const SizedBox();
-                            },
-                          ),
-                        ],
-                      ),
+                                      null,
+                                    ) >
+                                    0;
+
+                            return canShow &&
+                                    !profileController.trialWidgetNotShow
+                                ? Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 90,
+                                      ),
+                                      child: TrialWidget(
+                                        subscription: profileController
+                                            .profileModel!
+                                            .subscription!,
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox();
+                          },
+                        ),
+                      ],
                     ),
-                  );
+                  ),
+                );
               },
             );
           },

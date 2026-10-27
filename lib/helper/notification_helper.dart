@@ -14,6 +14,8 @@ import 'package:sixam_mart_store/features/auth/controllers/auth_controller.dart'
 import 'package:sixam_mart_store/features/chat/controllers/chat_controller.dart';
 import 'package:sixam_mart_store/features/dashboard/screens/dashboard_screen.dart';
 import 'package:sixam_mart_store/features/dashboard/widgets/new_request_dialog_widget.dart';
+import 'package:sixam_mart_store/features/bogo_offer/controllers/bogo_offer_controller.dart';
+import 'package:sixam_mart_store/features/happy_hour/controllers/happy_hour_controller.dart';
 import 'package:sixam_mart_store/features/notification/controllers/notification_controller.dart';
 import 'package:sixam_mart_store/features/notification/domain/models/notification_body_model.dart';
 import 'package:sixam_mart_store/features/order/controllers/order_controller.dart';
@@ -22,135 +24,291 @@ import 'package:sixam_mart_store/features/rental_module/chat/controllers/taxi_ch
 import 'package:sixam_mart_store/features/rental_module/chat/screens/taxi_chat_screen.dart';
 import 'package:sixam_mart_store/features/rental_module/trips/controllers/trip_controller.dart';
 import 'package:sixam_mart_store/features/rental_module/trips/screens/trip_details_screen.dart';
+import 'package:sixam_mart_store/features/service_module/order/controllers/booking_controller.dart';
 import 'package:sixam_mart_store/features/splash/controllers/splash_controller.dart';
+import 'package:sixam_mart_store/helper/bogo_offer_action_helper.dart';
 import 'package:sixam_mart_store/helper/custom_print_helper.dart';
 import 'package:sixam_mart_store/helper/route_helper.dart';
 import 'package:sixam_mart_store/util/app_constants.dart';
 
 class NotificationHelper {
-
-  static Future<void> initialize(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
-    var androidInitialize = const AndroidInitializationSettings('mili_notification_icon');
+  static Future<void> initialize(
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
+  ) async {
+    var androidInitialize = const AndroidInitializationSettings(
+      'mili_notification_icon',
+    );
     var iOSInitialize = const DarwinInitializationSettings();
-    var initializationsSettings = InitializationSettings(android: androidInitialize, iOS: iOSInitialize);
-    flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation < AndroidFlutterLocalNotificationsPlugin>()!.requestNotificationsPermission();
-    flutterLocalNotificationsPlugin.initialize(initializationsSettings, onDidReceiveNotificationResponse: (NotificationResponse load) async{
-      try{
-        if(load.payload!.isNotEmpty){
-          NotificationBodyModel payload = NotificationBodyModel.fromJson(jsonDecode(load.payload!));
+    var initializationsSettings = InitializationSettings(
+      android: androidInitialize,
+      iOS: iOSInitialize,
+    );
+    flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()!
+        .requestNotificationsPermission();
+    flutterLocalNotificationsPlugin.initialize(
+      initializationsSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse load) async {
+        try {
+          if (load.payload!.isNotEmpty) {
+            NotificationBodyModel payload = NotificationBodyModel.fromJson(
+              jsonDecode(load.payload!),
+            );
 
-          final Map<NotificationType, Function> notificationActions = {
-            NotificationType.order: () {
-              if(Get.find<AuthController>().getModuleType() == 'rental'){
-                Get.to(()=> TripDetailsScreen(tripId: payload.orderId!, fromNotification: true));
-              }else{
-                Get.toNamed(RouteHelper.getOrderDetailsRoute(payload.orderId, fromNotification: true));
-              }
-            },
-            NotificationType.advertisement: () => Get.toNamed(RouteHelper.getAdvertisementDetailsScreen(advertisementId: payload.advertisementId, fromNotification: true)),
-            NotificationType.block: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
-            NotificationType.unblock: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
-            NotificationType.withdraw: () => Get.to(const DashboardScreen(pageIndex: 3)),
-            NotificationType.campaign: () => Get.toNamed(RouteHelper.getCampaignDetailsRoute(id: payload.campaignId, fromNotification: true)),
-            NotificationType.message: () {
-              if(Get.find<AuthController>().getModuleType() == 'rental'){
-                Get.to(()=> TaxiChatScreen(notificationBody: payload, conversationId: payload.conversationId, fromNotification: true));
-              }else{
-                Get.toNamed(RouteHelper.getChatRoute(notificationBody: payload, conversationId: payload.conversationId, fromNotification: true));
-              }
-            },
-            NotificationType.subscription: () async {
-              if (Get.find<SplashController>().configModel == null) {
-               await Get.find<SplashController>().getConfigData(closeRoute: true);
-              }
-              if (Get.find<ProfileController>().profileModel == null) {
-                 await Get.find<ProfileController>().getProfile();
-              }
-              return Get.toNamed(RouteHelper.getMySubscriptionRoute(fromNotification: true));
-            },
-            NotificationType.product_approve: () => Get.offAll(const DashboardScreen(pageIndex: 2)),
-            NotificationType.product_rejected: () => Get.toNamed(RouteHelper.getPendingItemRoute(fromNotification: true)),
-            NotificationType.general: () => Get.toNamed(RouteHelper.getNotificationRoute(fromNotification: true)),
-          };
+            final Map<NotificationType, Function> notificationActions = {
+              NotificationType.order: () {
+                if (Get.find<AuthController>().getModuleType() == 'rental') {
+                  Get.to(
+                    () => TripDetailsScreen(
+                      tripId: payload.orderId!,
+                      fromNotification: true,
+                    ),
+                  );
+                } else if (Get.find<AuthController>().getModuleType() ==
+                    AppConstants.service) {
+                  Get.toNamed(
+                    RouteHelper.getBookingDetailsRoute(
+                      payload.orderId!,
+                      fromNotification: true,
+                    ),
+                  );
+                } else {
+                  Get.toNamed(
+                    RouteHelper.getOrderDetailsRoute(
+                      payload.orderId,
+                      fromNotification: true,
+                    ),
+                  );
+                }
+              },
+              NotificationType.service_booking: () => Get.toNamed(
+                RouteHelper.getBookingDetailsRoute(
+                  payload.orderId!,
+                  fromNotification: true,
+                ),
+              ),
+              NotificationType.custom_service_request: () => Get.toNamed(
+                RouteHelper.getCustomServiceRequestDetailsRoute(
+                  payload.orderId!,
+                ),
+              ),
+              NotificationType.custom_service_bid_selected: () => Get.toNamed(
+                RouteHelper.getCustomServiceRequestDetailsRoute(
+                  payload.orderId!,
+                ),
+              ),
+              NotificationType.custom_service_bid_denied: () => Get.toNamed(
+                RouteHelper.getCustomServiceRequestDetailsRoute(
+                  payload.orderId!,
+                ),
+              ),
+              NotificationType.advertisement: () => Get.toNamed(
+                RouteHelper.getAdvertisementDetailsScreen(
+                  advertisementId: payload.advertisementId,
+                  fromNotification: true,
+                ),
+              ),
+              NotificationType.block: () =>
+                  Get.offAllNamed(RouteHelper.getSignInRoute()),
+              NotificationType.unblock: () =>
+                  Get.offAllNamed(RouteHelper.getSignInRoute()),
+              NotificationType.withdraw: () =>
+                  Get.to(const DashboardScreen(pageIndex: 3)),
+              NotificationType.campaign: () => Get.toNamed(
+                RouteHelper.getCampaignDetailsRoute(
+                  id: payload.campaignId,
+                  fromNotification: true,
+                ),
+              ),
+              NotificationType.happy_hour: () {
+                if (payload.happyHourId != null) {
+                  Get.toNamed(
+                    RouteHelper.getHappyHourDetailsRoute(
+                      id: payload.happyHourId!,
+                      fromNotification: true,
+                    ),
+                  );
+                }
+              },
+              NotificationType.bogo_offer: () => Get.toNamed(
+                payload.bogoOfferId != null
+                    ? RouteHelper.getBogoOfferDetailsRoute(
+                        id: payload.bogoOfferId!,
+                        fromNotification: true,
+                      )
+                    : RouteHelper.getBogoOfferRoute(fromNotification: true),
+              ),
+              NotificationType.message: () {
+                if (Get.find<AuthController>().getModuleType() == 'rental') {
+                  Get.to(
+                    () => TaxiChatScreen(
+                      notificationBody: payload,
+                      conversationId: payload.conversationId,
+                      fromNotification: true,
+                    ),
+                  );
+                } else {
+                  Get.toNamed(
+                    RouteHelper.getChatRoute(
+                      notificationBody: payload,
+                      conversationId: payload.conversationId,
+                      fromNotification: true,
+                    ),
+                  );
+                }
+              },
+              NotificationType.subscription: () async {
+                if (Get.find<SplashController>().configModel == null) {
+                  await Get.find<SplashController>().getConfigData(
+                    closeRoute: true,
+                  );
+                }
+                if (Get.find<ProfileController>().profileModel == null) {
+                  await Get.find<ProfileController>().getProfile();
+                }
+                return Get.toNamed(
+                  RouteHelper.getMySubscriptionRoute(fromNotification: true),
+                );
+              },
+              NotificationType.product_approve: () =>
+                  Get.offAll(const DashboardScreen(pageIndex: 2)),
+              NotificationType.product_rejected: () => Get.toNamed(
+                RouteHelper.getPendingItemRoute(fromNotification: true),
+              ),
+              NotificationType.general: () => Get.toNamed(
+                RouteHelper.getNotificationRoute(fromNotification: true),
+              ),
+            };
 
-          notificationActions[payload.notificationType]?.call();
-        }
-      }catch(_){}
-      return;
-    });
+            notificationActions[payload.notificationType]?.call();
+          }
+        } catch (_) {}
+        return;
+      },
+    );
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint("onMessage message type:${message.data['type']}");
       debugPrint("onMessage message :${message.data}");
 
-      if(message.data['type'] == 'maintenance'){
-
+      if (message.data['type'] == 'maintenance') {
         Get.find<SplashController>().getConfigData();
       }
 
-      if(message.data['type'] == 'message' && (Get.currentRoute.startsWith(RouteHelper.chatScreen) || Get.currentRoute.startsWith('/TaxiChatScreen'))) {
-        if(Get.find<AuthController>().getModuleType() == 'rental'){
-          if(Get.find<AuthController>().isLoggedIn()) {
+      if (message.data['type'] == 'message' &&
+          (Get.currentRoute.startsWith(RouteHelper.chatScreen) ||
+              Get.currentRoute.startsWith('/TaxiChatScreen'))) {
+        if (Get.find<AuthController>().getModuleType() == 'rental') {
+          if (Get.find<AuthController>().isLoggedIn()) {
             Get.find<TaxiChatController>().getConversationList(1);
-            if(Get.find<TaxiChatController>().messageModel!.conversation!.id.toString() == message.data['conversation_id'].toString()) {
+            if (Get.find<TaxiChatController>().messageModel!.conversation!.id
+                    .toString() ==
+                message.data['conversation_id'].toString()) {
               Get.find<TaxiChatController>().getMessages(
-                1, NotificationBodyModel(
-                notificationType: NotificationType.message,
-                customerId: message.data['sender_type'] == AppConstants.user ? 0 : null,
-                deliveryManId: message.data['sender_type'] == AppConstants.deliveryMan ? 0 : null,
-              ),
-                null, int.parse(message.data['conversation_id'].toString()),
+                1,
+                NotificationBodyModel(
+                  notificationType: NotificationType.message,
+                  customerId: message.data['sender_type'] == AppConstants.user
+                      ? 0
+                      : null,
+                  deliveryManId:
+                      message.data['sender_type'] == AppConstants.deliveryMan
+                      ? 0
+                      : null,
+                ),
+                null,
+                int.parse(message.data['conversation_id'].toString()),
               );
-            }else {
-              NotificationHelper.showNotification(message, flutterLocalNotificationsPlugin);
+            } else {
+              NotificationHelper.showNotification(
+                message,
+                flutterLocalNotificationsPlugin,
+              );
             }
           }
-        }else{
-          if(Get.find<AuthController>().isLoggedIn()) {
+        } else {
+          if (Get.find<AuthController>().isLoggedIn()) {
             Get.find<ChatController>().getConversationList(1);
-            if(Get.find<ChatController>().messageModel!.conversation!.id.toString() == message.data['conversation_id'].toString()) {
+            if (Get.find<ChatController>().messageModel!.conversation!.id
+                    .toString() ==
+                message.data['conversation_id'].toString()) {
               Get.find<ChatController>().getMessages(
-                1, NotificationBodyModel(
-                notificationType: NotificationType.message,
-                customerId: message.data['sender_type'] == AppConstants.user ? 0 : null,
-                deliveryManId: message.data['sender_type'] == AppConstants.deliveryMan ? 0 : null,
-              ),
-                null, int.parse(message.data['conversation_id'].toString()),
+                1,
+                NotificationBodyModel(
+                  notificationType: NotificationType.message,
+                  customerId: message.data['sender_type'] == AppConstants.user
+                      ? 0
+                      : null,
+                  deliveryManId:
+                      message.data['sender_type'] == AppConstants.deliveryMan
+                      ? 0
+                      : null,
+                ),
+                null,
+                int.parse(message.data['conversation_id'].toString()),
               );
-            }else {
-              NotificationHelper.showNotification(message, flutterLocalNotificationsPlugin);
+            } else {
+              NotificationHelper.showNotification(
+                message,
+                flutterLocalNotificationsPlugin,
+              );
             }
           }
         }
-      }else if(message.data['type'] == 'message' && (Get.currentRoute.startsWith(RouteHelper.conversationListScreen) || Get.currentRoute.startsWith('/TaxiConversationScreen'))) {
-        if(Get.find<AuthController>().getModuleType() == 'rental'){
-          if(Get.find<AuthController>().isLoggedIn()) {
+      } else if (message.data['type'] == 'message' &&
+          (Get.currentRoute.startsWith(RouteHelper.conversationListScreen) ||
+              Get.currentRoute.startsWith('/TaxiConversationScreen'))) {
+        if (Get.find<AuthController>().getModuleType() == 'rental') {
+          if (Get.find<AuthController>().isLoggedIn()) {
             Get.find<TaxiChatController>().getConversationList(1);
           }
-          NotificationHelper.showNotification(message, flutterLocalNotificationsPlugin);
-        }else{
-          if(Get.find<AuthController>().isLoggedIn()) {
+          NotificationHelper.showNotification(
+            message,
+            flutterLocalNotificationsPlugin,
+          );
+        } else {
+          if (Get.find<AuthController>().isLoggedIn()) {
             Get.find<ChatController>().getConversationList(1);
           }
-          NotificationHelper.showNotification(message, flutterLocalNotificationsPlugin);
+          NotificationHelper.showNotification(
+            message,
+            flutterLocalNotificationsPlugin,
+          );
         }
-      } else if(message.data['type'] == 'maintenance'){
-      }else {
-        NotificationHelper.showNotification(message, flutterLocalNotificationsPlugin);
+      } else if (message.data['type'] == 'maintenance') {
+      } else {
+        NotificationHelper.showNotification(
+          message,
+          flutterLocalNotificationsPlugin,
+        );
 
-        if (message.data['type'] == 'new_order' || message.data['title'] == 'New order placed') {
-          if(Get.find<AuthController>().getModuleType() == 'rental'){
+        if (message.data['type'] == 'new_order' ||
+            message.data['title'] == 'New order placed') {
+          if (Get.find<AuthController>().getModuleType() == 'rental') {
             TripController tripController = Get.find<TripController>();
             tripController.getTripList(status: 'pending', offset: '1');
             tripController.getTripList(status: 'confirmed', offset: '1');
             tripController.getTripList(status: 'ongoing', offset: '1');
-          }else{
+          } else if (Get.find<AuthController>().getModuleType() ==
+              AppConstants.service) {
+            Get.find<BookingController>().getRunningBookings();
+          } else {
             Get.find<OrderController>().getPaginatedOrders(1, true);
             Get.find<OrderController>().getCurrentOrders();
           }
-          Get.dialog(NewRequestDialogWidget(orderId: int.parse(message.data['order_id'])));
-        }else if(message.data['type'] == 'advertisement') {
+          Get.dialog(
+            NewRequestDialogWidget(
+              orderId: int.parse(message.data['order_id']),
+            ),
+          );
+        } else if (message.data['type'] == 'advertisement') {
           Get.find<AdvertisementController>().getAdvertisementList('1', 'all');
+        } else if (message.data['type'] == 'happy_hour') {
+          _refreshHappyHour(message.data['data_id']);
+        } else if (message.data['type'] == 'bogo_offer') {
+          _refreshBogoOffer(message.data['data_id']);
         }
         Get.find<NotificationController>().getNotificationList();
       }
@@ -160,106 +318,279 @@ class NotificationHelper {
       debugPrint("onOpenApp message type:${message.data['type']}");
       debugPrint("onOpenApp message :${message.data}");
 
-      try{
-        NotificationBodyModel notificationBody = convertNotification(message.data);
+      try {
+        NotificationBodyModel notificationBody = convertNotification(
+          message.data,
+        );
 
         final Map<NotificationType, Function> notificationActions = {
           NotificationType.order: () {
-            if(Get.find<AuthController>().getModuleType() == 'rental'){
-              Get.to(()=> TripDetailsScreen(tripId: int.parse(message.data['order_id']), fromNotification: true));
-            }else{
-              Get.toNamed(RouteHelper.getOrderDetailsRoute(int.parse(message.data['order_id']), fromNotification: true));
+            if (Get.find<AuthController>().getModuleType() == 'rental') {
+              Get.to(
+                () => TripDetailsScreen(
+                  tripId: notificationBody.orderId!,
+                  fromNotification: true,
+                ),
+              );
+            } else if (Get.find<AuthController>().getModuleType() ==
+                AppConstants.service) {
+              Get.toNamed(
+                RouteHelper.getBookingDetailsRoute(
+                  notificationBody.orderId!,
+                  fromNotification: true,
+                ),
+              );
+            } else {
+              Get.toNamed(
+                RouteHelper.getOrderDetailsRoute(
+                  notificationBody.orderId,
+                  fromNotification: true,
+                ),
+              );
             }
           },
-          NotificationType.advertisement: () => Get.toNamed(RouteHelper.getAdvertisementDetailsScreen(advertisementId:  notificationBody.advertisementId, fromNotification: true)),
-          NotificationType.block: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
-          NotificationType.unblock: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
-          NotificationType.withdraw: () => Get.to(const DashboardScreen(pageIndex: 3)),
-          NotificationType.campaign: () => Get.toNamed(RouteHelper.getCampaignDetailsRoute(id: notificationBody.campaignId, fromNotification: true)),
+          NotificationType.service_booking: () => Get.toNamed(
+            RouteHelper.getBookingDetailsRoute(
+              notificationBody.orderId!,
+              fromNotification: true,
+            ),
+          ),
+          NotificationType.custom_service_request: () => Get.toNamed(
+            RouteHelper.getCustomServiceRequestDetailsRoute(
+              notificationBody.orderId!,
+            ),
+          ),
+          NotificationType.custom_service_bid_selected: () => Get.toNamed(
+            RouteHelper.getCustomServiceRequestDetailsRoute(
+              notificationBody.orderId!,
+            ),
+          ),
+          NotificationType.custom_service_bid_denied: () => Get.toNamed(
+            RouteHelper.getCustomServiceRequestDetailsRoute(
+              notificationBody.orderId!,
+            ),
+          ),
+          NotificationType.advertisement: () => Get.toNamed(
+            RouteHelper.getAdvertisementDetailsScreen(
+              advertisementId: notificationBody.advertisementId,
+              fromNotification: true,
+            ),
+          ),
+          NotificationType.block: () =>
+              Get.offAllNamed(RouteHelper.getSignInRoute()),
+          NotificationType.unblock: () =>
+              Get.offAllNamed(RouteHelper.getSignInRoute()),
+          NotificationType.withdraw: () =>
+              Get.to(const DashboardScreen(pageIndex: 3)),
+          NotificationType.campaign: () => Get.toNamed(
+            RouteHelper.getCampaignDetailsRoute(
+              id: notificationBody.campaignId,
+              fromNotification: true,
+            ),
+          ),
+          NotificationType.happy_hour: () {
+            if (notificationBody.happyHourId != null) {
+              Get.toNamed(
+                RouteHelper.getHappyHourDetailsRoute(
+                  id: notificationBody.happyHourId!,
+                  fromNotification: true,
+                ),
+              );
+            }
+          },
+          NotificationType.bogo_offer: () => Get.toNamed(
+            notificationBody.bogoOfferId != null
+                ? RouteHelper.getBogoOfferDetailsRoute(
+                    id: notificationBody.bogoOfferId!,
+                    fromNotification: true,
+                  )
+                : RouteHelper.getBogoOfferRoute(fromNotification: true),
+          ),
           NotificationType.message: () {
-            if(Get.find<AuthController>().getModuleType() == 'rental'){
-              Get.to(()=> TaxiChatScreen(notificationBody: notificationBody, conversationId: notificationBody.conversationId, fromNotification: true));
-            }else{
-              Get.toNamed(RouteHelper.getChatRoute(notificationBody: notificationBody, conversationId: notificationBody.conversationId, fromNotification: true));
+            if (Get.find<AuthController>().getModuleType() == 'rental') {
+              Get.to(
+                () => TaxiChatScreen(
+                  notificationBody: notificationBody,
+                  conversationId: notificationBody.conversationId,
+                  fromNotification: true,
+                ),
+              );
+            } else {
+              Get.toNamed(
+                RouteHelper.getChatRoute(
+                  notificationBody: notificationBody,
+                  conversationId: notificationBody.conversationId,
+                  fromNotification: true,
+                ),
+              );
             }
           },
-          NotificationType.subscription: () => Get.toNamed(RouteHelper.getMySubscriptionRoute(fromNotification: true)),
-          NotificationType.product_approve: () => Get.offAll(const DashboardScreen(pageIndex: 2)),
-          NotificationType.product_rejected: () => Get.toNamed(RouteHelper.getPendingItemRoute(fromNotification: true)),
-          NotificationType.general: () => Get.toNamed(RouteHelper.getNotificationRoute(fromNotification: true)),
+          NotificationType.subscription: () => Get.toNamed(
+            RouteHelper.getMySubscriptionRoute(fromNotification: true),
+          ),
+          NotificationType.product_approve: () =>
+              Get.offAll(const DashboardScreen(pageIndex: 2)),
+          NotificationType.product_rejected: () => Get.toNamed(
+            RouteHelper.getPendingItemRoute(fromNotification: true),
+          ),
+          NotificationType.general: () => Get.toNamed(
+            RouteHelper.getNotificationRoute(fromNotification: true),
+          ),
         };
 
         notificationActions[notificationBody.notificationType]?.call();
-      }catch (_){}
+      } catch (_) {}
     });
   }
 
-  static Future<void> showNotification(RemoteMessage message, FlutterLocalNotificationsPlugin fln) async {
-    if(!GetPlatform.isIOS) {
+  static Future<void> showNotification(
+    RemoteMessage message,
+    FlutterLocalNotificationsPlugin fln,
+  ) async {
+    if (!GetPlatform.isIOS) {
       String? title;
       String? body;
       String? image;
-      NotificationBodyModel notificationBody = convertNotification(message.data);
+      NotificationBodyModel notificationBody = convertNotification(
+        message.data,
+      );
 
       title = message.data['title'];
       body = message.data['body'];
-      image = (message.data['image'] != null && message.data['image'].isNotEmpty) ? message.data['image'].startsWith('http') ? message.data['image']
-        : '${AppConstants.baseUrl}/storage/app/public/notification/${message.data['image']}' : null;
+      image =
+          (message.data['image'] != null && message.data['image'].isNotEmpty)
+          ? message.data['image'].startsWith('http')
+                ? message.data['image']
+                : '${AppConstants.baseUrl}/storage/app/public/notification/${message.data['image']}'
+          : null;
 
-      if(image != null && image.isNotEmpty) {
-        try{
-          await showBigPictureNotificationHiddenLargeIcon(title, body, notificationBody, image, fln);
-        }catch(e) {
+      if (image != null && image.isNotEmpty) {
+        try {
+          await showBigPictureNotificationHiddenLargeIcon(
+            title,
+            body,
+            notificationBody,
+            image,
+            fln,
+          );
+        } catch (e) {
           await showBigTextNotification(title, body!, notificationBody, fln);
         }
-      }else {
+      } else {
         await showBigTextNotification(title, body!, notificationBody, fln);
       }
     }
   }
 
-  static Future<void> showTextNotification(String title, String body, NotificationBodyModel notificationBody, FlutterLocalNotificationsPlugin fln) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'mili_order_notifications', AppConstants.appName, playSound: true,
-      importance: Importance.max, priority: Priority.max, sound: RawResourceAndroidNotificationSound('notification'),
+  static Future<void> showTextNotification(
+    String title,
+    String body,
+    NotificationBodyModel notificationBody,
+    FlutterLocalNotificationsPlugin fln,
+  ) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+          'mili_order_notifications',
+          AppConstants.appName,
+          playSound: true,
+          importance: Importance.max,
+          priority: Priority.max,
+          sound: RawResourceAndroidNotificationSound('notification'),
+        );
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
     );
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await fln.show(0, title, body, platformChannelSpecifics, payload: jsonEncode(notificationBody.toJson()));
+    await fln.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: jsonEncode(notificationBody.toJson()),
+    );
   }
 
-  static Future<void> showBigTextNotification(String? title, String body, NotificationBodyModel notificationBody, FlutterLocalNotificationsPlugin fln) async {
+  static Future<void> showBigTextNotification(
+    String? title,
+    String body,
+    NotificationBodyModel notificationBody,
+    FlutterLocalNotificationsPlugin fln,
+  ) async {
     BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
-      body, htmlFormatBigText: true,
-      contentTitle: title, htmlFormatContentTitle: true,
+      body,
+      htmlFormatBigText: true,
+      contentTitle: title,
+      htmlFormatContentTitle: true,
     );
-    AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'mili_order_notifications', AppConstants.appName, importance: Importance.max,
-      styleInformation: bigTextStyleInformation, priority: Priority.max, playSound: true,
-      sound: const RawResourceAndroidNotificationSound('notification'),
+    AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+          'mili_order_notifications',
+          AppConstants.appName,
+          importance: Importance.max,
+          styleInformation: bigTextStyleInformation,
+          priority: Priority.max,
+          playSound: true,
+          sound: const RawResourceAndroidNotificationSound('notification'),
+        );
+    NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
     );
-    NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await fln.show(0, title, body, platformChannelSpecifics, payload: jsonEncode(notificationBody.toJson()));
+    await fln.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: jsonEncode(notificationBody.toJson()),
+    );
   }
 
-  static Future<void> showBigPictureNotificationHiddenLargeIcon(String? title, String? body, NotificationBodyModel notificationBody, String image, FlutterLocalNotificationsPlugin fln) async {
+  static Future<void> showBigPictureNotificationHiddenLargeIcon(
+    String? title,
+    String? body,
+    NotificationBodyModel notificationBody,
+    String image,
+    FlutterLocalNotificationsPlugin fln,
+  ) async {
     final String largeIconPath = await _downloadAndSaveFile(image, 'largeIcon');
-    final String bigPicturePath = await _downloadAndSaveFile(image, 'bigPicture');
-    final BigPictureStyleInformation bigPictureStyleInformation = BigPictureStyleInformation(
-      FilePathAndroidBitmap(bigPicturePath), hideExpandedLargeIcon: true,
-      contentTitle: title, htmlFormatContentTitle: true,
-      summaryText: body, htmlFormatSummaryText: true,
+    final String bigPicturePath = await _downloadAndSaveFile(
+      image,
+      'bigPicture',
     );
-    final AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'mili_order_notifications', AppConstants.appName,
-      largeIcon: FilePathAndroidBitmap(largeIconPath), priority: Priority.max, playSound: true,
-      styleInformation: bigPictureStyleInformation, importance: Importance.max,
-      sound: const RawResourceAndroidNotificationSound('notification'),
+    final BigPictureStyleInformation bigPictureStyleInformation =
+        BigPictureStyleInformation(
+          FilePathAndroidBitmap(bigPicturePath),
+          hideExpandedLargeIcon: true,
+          contentTitle: title,
+          htmlFormatContentTitle: true,
+          summaryText: body,
+          htmlFormatSummaryText: true,
+        );
+    final AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+          'mili_order_notifications',
+          AppConstants.appName,
+          largeIcon: FilePathAndroidBitmap(largeIconPath),
+          priority: Priority.max,
+          playSound: true,
+          styleInformation: bigPictureStyleInformation,
+          importance: Importance.max,
+          sound: const RawResourceAndroidNotificationSound('notification'),
+        );
+    final NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
     );
-    final NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await fln.show(0, title, body, platformChannelSpecifics, payload: jsonEncode(notificationBody.toJson()));
+    await fln.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: jsonEncode(notificationBody.toJson()),
+    );
   }
 
-  static Future<String> _downloadAndSaveFile(String url, String fileName) async {
+  static Future<String> _downloadAndSaveFile(
+    String url,
+    String fileName,
+  ) async {
     final Directory directory = await getApplicationDocumentsDirectory();
     final String filePath = '${directory.path}/$fileName';
     final http.Response response = await http.get(Uri.parse(url));
@@ -268,60 +599,202 @@ class NotificationHelper {
     return filePath;
   }
 
+  static void _refreshBogoOffer(dynamic dataId) {
+    if (!Get.find<AuthController>().isLoggedIn()) {
+      return;
+    }
+
+    final BogoOfferController bogoOfferController =
+        Get.find<BogoOfferController>();
+    if (Get.currentRoute.startsWith(RouteHelper.bogoOffer)) {
+      bogoOfferController.getBogoOfferList(offset: '1');
+    }
+
+    final int? id = _asId(dataId);
+    if (id == null) {
+      return;
+    }
+
+    bogoOfferController.syncBogoOffer(id);
+    BogoOfferActionHelper.showAdminRequestForOffer(id);
+  }
+
+  static void _refreshHappyHour(dynamic dataId) {
+    if (!Get.find<AuthController>().isLoggedIn() ||
+        !Get.currentRoute.startsWith(RouteHelper.happyHour)) {
+      return;
+    }
+
+    final int? id = _asId(dataId);
+    if (id == null) {
+      return;
+    }
+
+    Get.find<HappyHourController>().syncHappyHour(id);
+  }
+
+  static Future<NotificationBodyModel?> getLaunchNotification(
+    FlutterLocalNotificationsPlugin fln,
+  ) async {
+    try {
+      final NotificationAppLaunchDetails? details = await fln
+          .getNotificationAppLaunchDetails();
+      if (details == null || !details.didNotificationLaunchApp) {
+        return null;
+      }
+
+      final String? payload = details.notificationResponse?.payload;
+      if (payload == null || payload.isEmpty) {
+        return null;
+      }
+
+      return NotificationBodyModel.fromJson(jsonDecode(payload));
+    } catch (e) {
+      debugPrint('Local notification launch recovery failed: $e');
+      return null;
+    }
+  }
+
+  static int? _asId(dynamic value) {
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    return int.tryParse(value?.toString() ?? '');
+  }
+
   static NotificationBodyModel convertNotification(Map<String, dynamic> data) {
-    final type = data['type'];
+    final String type = data['type']?.toString() ?? '';
 
     switch (type) {
       case 'advertisement':
-        return NotificationBodyModel(notificationType: NotificationType.advertisement, advertisementId: int.tryParse(data['advertisement_id']));
+        return NotificationBodyModel(
+          notificationType: NotificationType.advertisement,
+          advertisementId: _asId(data['advertisement_id']),
+        );
       case 'block':
         return NotificationBodyModel(notificationType: NotificationType.block);
       case 'unblock':
-        return NotificationBodyModel(notificationType: NotificationType.unblock);
+        return NotificationBodyModel(
+          notificationType: NotificationType.unblock,
+        );
       case 'withdraw':
-        return NotificationBodyModel(notificationType: NotificationType.withdraw);
+        return NotificationBodyModel(
+          notificationType: NotificationType.withdraw,
+        );
       case 'product_approve':
-        return NotificationBodyModel(notificationType: NotificationType.product_approve);
+        return NotificationBodyModel(
+          notificationType: NotificationType.product_approve,
+        );
       case 'product_rejected':
-      return NotificationBodyModel(notificationType: NotificationType.product_rejected);
+        return NotificationBodyModel(
+          notificationType: NotificationType.product_rejected,
+        );
       case 'campaign':
-        return NotificationBodyModel(notificationType: NotificationType.campaign, campaignId: int.tryParse(data['data_id']));
+        return NotificationBodyModel(
+          notificationType: NotificationType.campaign,
+          campaignId: _asId(data['data_id']),
+        );
+      case 'happy_hour':
+        return NotificationBodyModel(
+          notificationType: NotificationType.happy_hour,
+          happyHourId: _asId(data['data_id'] ?? data['happy_hour_id']),
+        );
+      case 'bogo_offer':
+        return NotificationBodyModel(
+          notificationType: NotificationType.bogo_offer,
+          bogoOfferId: _asId(data['data_id'] ?? data['bogo_offer_id']),
+        );
       case 'subscription':
-      return NotificationBodyModel(notificationType: NotificationType.subscription);
+        return NotificationBodyModel(
+          notificationType: NotificationType.subscription,
+        );
       case 'new_order':
       case 'New order placed':
       case 'order_status':
         return _handleOrderNotification(data);
       case 'message':
         return _handleMessageNotification(data);
+      case 'service_booking':
+        return _handleServiceBookingNotification(data);
+      case 'custom_service_request':
+        return _handleCustomServiceNotification(
+          data,
+          NotificationType.custom_service_request,
+        );
+      case 'custom_service_bid_selected':
+        return _handleCustomServiceNotification(
+          data,
+          NotificationType.custom_service_bid_selected,
+        );
+      case 'custom_service_bid_denied':
+        return _handleCustomServiceNotification(
+          data,
+          NotificationType.custom_service_bid_denied,
+        );
       default:
-        return NotificationBodyModel(notificationType: NotificationType.general);
+        if (type.startsWith('bogo')) {
+          return NotificationBodyModel(
+            notificationType: NotificationType.bogo_offer,
+            bogoOfferId: _asId(data['data_id'] ?? data['bogo_offer_id']),
+          );
+        }
+        if (type.startsWith('happy_hour')) {
+          return NotificationBodyModel(
+            notificationType: NotificationType.happy_hour,
+            happyHourId: _asId(data['data_id'] ?? data['happy_hour_id']),
+          );
+        }
+        return NotificationBodyModel(
+          notificationType: NotificationType.general,
+        );
     }
   }
 
-  static NotificationBodyModel _handleOrderNotification(Map<String, dynamic> data) {
+  static NotificationBodyModel _handleOrderNotification(
+    Map<String, dynamic> data,
+  ) {
     final orderId = data['order_id'];
     return NotificationBodyModel(
-      orderId: int.tryParse(orderId) ?? 0,
+      orderId: _asId(orderId) ?? 0,
       notificationType: NotificationType.order,
     );
   }
 
-  static NotificationBodyModel _handleMessageNotification(Map<String, dynamic> data) {
+  static NotificationBodyModel _handleServiceBookingNotification(
+    Map<String, dynamic> data,
+  ) {
+    return NotificationBodyModel(
+      orderId: _asId(data['order_id']) ?? 0,
+      notificationType: NotificationType.service_booking,
+    );
+  }
+
+  static NotificationBodyModel _handleCustomServiceNotification(
+    Map<String, dynamic> data,
+    NotificationType type,
+  ) {
+    return NotificationBodyModel(
+      orderId: _asId(data['order_id']) ?? 0,
+      notificationType: type,
+    );
+  }
+
+  static NotificationBodyModel _handleMessageNotification(
+    Map<String, dynamic> data,
+  ) {
     final orderId = data['order_id'];
     final conversationId = data['conversation_id'];
     final senderType = data['sender_type'];
 
     return NotificationBodyModel(
-      orderId: orderId != null && orderId.isNotEmpty ? int.tryParse(orderId) : null,
-      conversationId: conversationId != null && conversationId.isNotEmpty ? int.tryParse(conversationId) : null,
+      orderId: _asId(orderId),
+      conversationId: _asId(conversationId),
       notificationType: NotificationType.message,
-      type: senderType == AppConstants.deliveryMan ? AppConstants.deliveryMan : AppConstants.customer,
+      type: senderType == AppConstants.deliveryMan
+          ? AppConstants.deliveryMan
+          : AppConstants.customer,
     );
   }
-
 }
-
 
 final AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -331,10 +804,10 @@ Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) async {
   WidgetsFlutterBinding.ensureInitialized();
   customPrint("onBackground: ${message.data}");
 
-  NotificationBodyModel notificationBody = NotificationHelper.convertNotification(message.data);
+  NotificationBodyModel notificationBody =
+      NotificationHelper.convertNotification(message.data);
 
-  if(notificationBody.notificationType == NotificationType.order) {
-
+  if (notificationBody.notificationType == NotificationType.order) {
     FlutterForegroundTask.initCommunicationPort();
     await _initService();
     await _startService(notificationBody.orderId.toString());
@@ -348,7 +821,8 @@ Future<void> _initService() async {
     androidNotificationOptions: AndroidNotificationOptions(
       channelId: 'mili_foreground_service',
       channelName: 'Foreground Service Notification',
-      channelDescription: 'This notification appears when the foreground service is running.',
+      channelDescription:
+          'This notification appears when the foreground service is running.',
       onlyAlertOnce: false,
     ),
     iosNotificationOptions: const IOSNotificationOptions(

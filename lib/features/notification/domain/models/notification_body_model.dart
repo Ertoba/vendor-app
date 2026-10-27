@@ -1,4 +1,4 @@
-enum NotificationType{
+enum NotificationType {
   message,
   order,
   general,
@@ -12,6 +12,18 @@ enum NotificationType{
   product_rejected,
   withdraw,
   campaign,
+  //ignore: constant_identifier_names
+  service_booking,
+  //ignore: constant_identifier_names
+  custom_service_request,
+  //ignore: constant_identifier_names
+  custom_service_bid_selected,
+  //ignore: constant_identifier_names
+  custom_service_bid_denied,
+  //ignore: constant_identifier_names
+  bogo_offer,
+  //ignore: constant_identifier_names
+  happy_hour,
 }
 
 class NotificationBodyModel {
@@ -23,6 +35,8 @@ class NotificationBodyModel {
   String? type;
   int? advertisementId;
   int? campaignId;
+  int? happyHourId;
+  int? bogoOfferId;
 
   NotificationBodyModel({
     this.notificationType,
@@ -33,6 +47,8 @@ class NotificationBodyModel {
     this.type,
     this.advertisementId,
     this.campaignId,
+    this.happyHourId,
+    this.bogoOfferId,
   });
 
   NotificationBodyModel.fromJson(Map<String, dynamic> json) {
@@ -44,6 +60,8 @@ class NotificationBodyModel {
     type = json['type'];
     advertisementId = json['advertisement_id'];
     campaignId = json['data_id'];
+    happyHourId = json['happy_hour_id'];
+    bogoOfferId = json['bogo_offer_id'];
   }
 
   Map<String, dynamic> toJson() {
@@ -56,6 +74,8 @@ class NotificationBodyModel {
     data['type'] = type;
     data['advertisement_id'] = advertisementId;
     data['data_id'] = campaignId;
+    data['happy_hour_id'] = happyHourId;
+    data['bogo_offer_id'] = bogoOfferId;
     return data;
   }
 
@@ -68,13 +88,24 @@ class NotificationBodyModel {
       NotificationType.block.toString(): NotificationType.block,
       NotificationType.unblock.toString(): NotificationType.unblock,
       NotificationType.subscription.toString(): NotificationType.subscription,
-      NotificationType.product_approve.toString(): NotificationType.product_approve,
-      NotificationType.product_rejected.toString(): NotificationType.product_rejected,
+      NotificationType.product_approve.toString():
+          NotificationType.product_approve,
+      NotificationType.product_rejected.toString():
+          NotificationType.product_rejected,
       NotificationType.withdraw.toString(): NotificationType.withdraw,
       NotificationType.campaign.toString(): NotificationType.campaign,
+      NotificationType.service_booking.toString():
+          NotificationType.service_booking,
+      NotificationType.custom_service_request.toString():
+          NotificationType.custom_service_request,
+      NotificationType.custom_service_bid_selected.toString():
+          NotificationType.custom_service_bid_selected,
+      NotificationType.custom_service_bid_denied.toString():
+          NotificationType.custom_service_bid_denied,
+      NotificationType.bogo_offer.toString(): NotificationType.bogo_offer,
+      NotificationType.happy_hour.toString(): NotificationType.happy_hour,
     };
 
     return enumMap[enumString] ?? NotificationType.general;
   }
-
 }
