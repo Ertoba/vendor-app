@@ -4,6 +4,7 @@
 Requires Pillow and cairosvg. No Flutter builds or application logic changes.
 """
 from __future__ import annotations
+import argparse
 import io
 from pathlib import Path
 from PIL import Image, ImageDraw
@@ -43,21 +44,7 @@ def save_png(mark, path, size, occupancy=0.76, height=0.72, background="transpar
     render(mark, size, occupancy, height, background, round_icon).save(path, format="PNG", optimize=True)
     print(f"generated {path.relative_to(ROOT)} {size}")
 
-def main():
-    mark = master_logo()
-    image_dir = ROOT / "assets/image"
-    brand_dimensions = {
-        "logo.png": (640, 320),
-        "auth_logo.png": (640, 320),
-        "header_logo.png": (512, 256),
-        "brand_mark.png": (512, 512),
-        "logo_icon.png": (512, 512),
-    }
-    for name, dims in brand_dimensions.items():
-        file = image_dir / name
-        if file.exists():
-            save_png(mark, file, dims, occupancy=0.84, height=0.76)
-
+def build_android(mark):
     android_res = ROOT / "android/app/src/main/res"
     density = {"ldpi": 36, "mdpi": 48, "hdpi": 72, "xhdpi": 96, "xxhdpi": 144, "xxxhdpi": 192}
     for folder in android_res.glob("mipmap-*"):
@@ -76,6 +63,30 @@ def main():
                 save_png(mark, f, (px, px), occupancy=0.66, height=0.62, background="white", round_icon=True)
             else:
                 save_png(mark, f, (px, px), occupancy=0.70, height=0.70, background="white")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--android-only", action="store_true", help="Regenerate only Android launcher assets.")
+    args = parser.parse_args()
+    mark = master_logo()
+    build_android(mark)
+    if args.android_only:
+        print("MILI_ANDROID_BRAND_ASSETS_DONE")
+        return
+
+    image_dir = ROOT / "assets/image"
+    brand_dimensions = {
+        "logo.png": (640, 320),
+        "auth_logo.png": (640, 320),
+        "header_logo.png": (512, 256),
+        "brand_mark.png": (512, 512),
+        "logo_icon.png": (512, 512),
+    }
+    for name, dims in brand_dimensions.items():
+        file = image_dir / name
+        if file.exists():
+            save_png(mark, file, dims, occupancy=0.84, height=0.76)
 
     ios_icons = ROOT / "ios/Runner/Assets.xcassets/AppIcon.appiconset"
     if ios_icons.exists():

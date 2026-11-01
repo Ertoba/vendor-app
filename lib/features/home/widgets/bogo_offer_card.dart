@@ -10,8 +10,8 @@ class _BogoOfferCard extends StatelessWidget {
     /// rounded container below is the only surface. Painting an opaque colour here
     /// left its square corners showing outside that radius — invisible in light
     /// mode, four black notches in dark mode where cardColor is pure black.
-    return SizedBox(
-      height: 80,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 80),
       child: CustomInkWellWidget(
         onTap: (){
           Get.toNamed(RouteHelper.getBogoOfferRoute());

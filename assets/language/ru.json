@@ -2952,5 +2952,10 @@
   "failed_to_assign_items": "Не удалось назначить товары",
   "search_by_category_name": "Поиск по названию категории",
   "select_range": "Выберите диапазон",
-  "something_went_wrong": "Что-то пошло не так"
+  "something_went_wrong": "Что-то пошло не так",
+  "hurry_up_bogo_offer_is_live": "Товары в подарок",
+  "buy_more_and_enjoy_exclusive_free_items": "Повышайте продажи подарками",
+  "bogo_offer": "Акция с подарком",
+  "bogo_offer_list": "Акции с подарком",
+  "no_bogo_offer_found": "Акций с подарком пока нет"
 }

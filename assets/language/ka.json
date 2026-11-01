@@ -1858,5 +1858,10 @@
   "failed_to_assign_items": "ნივთების მინიჭება ვერ მოხერხდა",
   "search_by_category_name": "კატეგორიის სახელით ძიება",
   "select_range": "აირჩიეთ დიაპაზონი",
-  "something_went_wrong": "რაღაც შეფერხდა"
+  "something_went_wrong": "რაღაც შეფერხდა",
+  "hurry_up_bogo_offer_is_live": "საჩუქრის აქცია",
+  "buy_more_and_enjoy_exclusive_free_items": "გაზარდეთ გაყიდვები საჩუქრებით",
+  "bogo_offer": "აქცია საჩუქრით",
+  "bogo_offer_list": "აქციები საჩუქრით",
+  "no_bogo_offer_found": "საჩუქრის აქციები ჯერ არ არის"
 }

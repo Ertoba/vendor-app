@@ -1812,5 +1812,10 @@
   "failed_to_assign_items": "Failed to assign items",
   "search_by_category_name": "Search by category name",
   "select_range": "Select range",
-  "something_went_wrong": "Something went wrong"
+  "something_went_wrong": "Something went wrong",
+  "hurry_up_bogo_offer_is_live": "Buy & get free",
+  "buy_more_and_enjoy_exclusive_free_items": "Boost sales with free-item offers",
+  "bogo_offer": "Buy & get free offer",
+  "bogo_offer_list": "Buy & get free offers",
+  "no_bogo_offer_found": "No buy & get free offers yet"
 }
