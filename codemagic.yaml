@@ -1,0 +1,24 @@
+# Manual device builds only. This workflow never signs or publishes an app.
+workflows:
+  ios-sideloadly:
+    name: MILI Vendor - Unsigned Sideloadly IPA
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    environment:
+      flutter: 3.47.5
+      xcode: latest
+      cocoapods: 1.16.2
+      vars:
+        MILI_IOS_APP_SLUG: vendor
+        MILI_IOS_BUNDLE_ID: ge.mili.vendor
+        FLUTTER_SUPPRESS_ANALYTICS: "true"
+        DART_SUPPRESS_ANALYTICS: "true"
+    scripts:
+      - name: Verify configuration and build unsigned device IPA
+        script: bash scripts/build-ios-sideloadly.sh
+    artifacts:
+      - build/ios/sideloadly/*.ipa
+      - build/ios/sideloadly/provenance.json
+      - build/ios/sideloadly/Podfile.before.lock
+      - build/ios/sideloadly/Podfile.lock
+      - build/ios/sideloadly/firebase-preflight.log
